@@ -29,9 +29,8 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
-      { "pagePath": "pages/home/home", "text": "积分" },
+      { "pagePath": "pages/home/home", "text": "会员" },
       { "pagePath": "pages/gifts/gifts", "text": "兑礼" },
-      { "pagePath": "pages/records/records", "text": "记录" },
       { "pagePath": "pages/me/me", "text": "我的" }
     ]
   },

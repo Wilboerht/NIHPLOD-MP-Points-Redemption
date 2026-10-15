@@ -26,6 +26,22 @@
   margin-bottom: 24rpx;
 }
 
+.member-strip {
+  margin-bottom: 24rpx;
+}
+
+.level-chip {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 999rpx;
+  padding: 6rpx 22rpx;
+  font-size: 24rpx;
+}
+
+.muted-light {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .balance-label {
   font-size: 26rpx;
   opacity: 0.85;
@@ -53,6 +69,50 @@
 
 .card-title-inline {
   margin-bottom: 0;
+}
+
+.gift-scroll {
+  width: 100%;
+}
+
+.gift-scroll-inner {
+  display: inline-flex;
+  gap: 20rpx;
+}
+
+.hot-gift {
+  width: 200rpx;
+  flex-shrink: 0;
+}
+
+.hot-gift-img {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 16rpx;
+  background: #efeae4;
+}
+
+.hot-gift-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b8a992;
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
+}
+
+.hot-gift-name {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hot-gift-cost {
+  margin-top: 4rpx;
+  color: var(--color-primary);
+  font-size: 24rpx;
 }
 
 .ledger-row {

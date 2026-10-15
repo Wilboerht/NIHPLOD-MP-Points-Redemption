@@ -1,6 +1,7 @@
 import { api } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
-import { formatDateOnly, formatPoints, LEDGER_TYPE_LABELS } from "../../utils/format";
+import { setLastGifts } from "../../utils/cache";
+import { formatDateOnly, formatPoints, LEDGER_TYPE_LABELS, resolveImageUrl } from "../../utils/format";
 import type { PointLedgerItem } from "../../utils/types";
 
 interface LedgerRow extends PointLedgerItem {
@@ -15,11 +16,21 @@ interface ExpiringRow {
   expiresAt: string;
 }
 
+interface HotGift {
+  id: string;
+  name: string;
+  image: string | null;
+  costText: string;
+}
+
 Page({
   data: {
     loading: true,
     loggedIn: false,
     availableText: "0",
+    levelName: "",
+    nextLevelTip: "",
+    hotGifts: [] as HotGift[],
     recent: [] as LedgerRow[],
     expiring: [] as ExpiringRow[],
     error: "",
@@ -37,7 +48,13 @@ Page({
     }
     this.setData({ loading: true, error: "" });
     try {
-      const data = await api.points();
+      const [data, giftsData, membershipData] = await Promise.all([
+        api.points(),
+        // 精选好礼为增强模块：加载失败不影响积分主体展示
+        api.gifts().catch(() => null),
+        // 会员等级信息为增强模块：失败时不展示等级条
+        api.membership().catch(() => null),
+      ]);
       const recent: LedgerRow[] = data.recent.map((item) => ({
         ...item,
         typeLabel: LEDGER_TYPE_LABELS[item.type] ?? item.type,
@@ -59,10 +76,29 @@ Page({
           expiresAt: formatDateOnly(r.expiresAt),
         }));
 
+      // 精选好礼：取接口排序前 4 个；同时写入缓存，详情页可直接复用
+      let hotGifts: HotGift[] = [];
+      if (giftsData) {
+        setLastGifts(giftsData.gifts);
+        hotGifts = giftsData.gifts.slice(0, 4).map((g) => ({
+          id: g.id,
+          name: g.name,
+          image: g.image ? resolveImageUrl(g.image) : null,
+          costText: g.cost === null ? "未解锁" : `${formatPoints(g.cost)} 积分`,
+        }));
+      }
+
       this.setData({
         loading: false,
         loggedIn: true,
         availableText: formatPoints(data.available),
+        levelName: membershipData?.currentLevel.name ?? "",
+        nextLevelTip: membershipData
+          ? membershipData.nextLevel
+            ? `再消费 ¥${formatPoints(membershipData.nextLevel.spentNeeded)} 升级${membershipData.nextLevel.name}`
+            : "已达最高等级"
+          : "",
+        hotGifts,
         recent,
         expiring,
       });
@@ -86,6 +122,15 @@ Page({
 
   goLedger() {
     wx.navigateTo({ url: "/pages/points-ledger/points-ledger" });
+  },
+
+  goVip() {
+    wx.navigateTo({ url: "/pages/vip/vip" });
+  },
+
+  openGift(e: WechatMiniprogram.TouchEvent) {
+    const id = e.currentTarget.dataset.id as string;
+    wx.navigateTo({ url: `/pages/gift-detail/gift-detail?id=${id}` });
   },
 
   onShareAppMessage() {

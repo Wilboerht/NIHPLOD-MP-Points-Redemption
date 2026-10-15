@@ -107,7 +107,8 @@ Page({
         icon: "success",
       });
       setTimeout(() => {
-        wx.switchTab({ url: "/pages/records/records" });
+        // 记录页已不是 tab 页：redirectTo 替换当前确认页，返回时回到礼品详情
+        wx.redirectTo({ url: "/pages/records/records" });
       }, 800);
     } catch (e) {
       const err = e as ApiError;

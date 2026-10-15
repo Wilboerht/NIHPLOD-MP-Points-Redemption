@@ -62,7 +62,7 @@ Page({
   },
 
   goRecords() {
-    wx.switchTab({ url: "/pages/records/records" });
+    wx.navigateTo({ url: "/pages/records/records" });
   },
 
   onLogout() {
