@@ -1,0 +1,76 @@
+<view class="container profile-edit-page">
+  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+    <view class="login-title">登录后编辑资料</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:if="{{loggedIn}}">
+    <view class="card">
+      <view class="form-row avatar-row">
+        <text class="label">头像</text>
+        <button
+          class="avatar-btn"
+          open-type="chooseAvatar"
+          bindchooseavatar="onChooseAvatar"
+          disabled="{{uploading}}"
+        >
+          <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+          <view wx:else class="avatar avatar-fallback">＋</view>
+        </button>
+        <text class="muted small avatar-tip">{{uploading ? '上传中…' : '点击更换'}}</text>
+      </view>
+
+      <view class="form-row">
+        <text class="label">昵称</text>
+        <input
+          class="input"
+          value="{{nickname}}"
+          maxlength="20"
+          placeholder="请输入昵称"
+          bindinput="onNicknameInput"
+        />
+      </view>
+
+      <view class="form-row">
+        <text class="label">性别</text>
+        <radio-group class="gender-group" bindchange="onGenderChange">
+          <label wx:for="{{genderOptions}}" wx:key="*this" class="gender-item">
+            <radio value="{{index}}" checked="{{genderIndex === index}}" color="#8a6d4b" />
+            <text>{{item}}</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="form-row">
+        <text class="label">生日</text>
+        <text wx:if="{{birthdaySet}}">{{birthdayText}}（已锁定）</text>
+        <picker
+          wx:else
+          mode="date"
+          end="{{today}}"
+          value="{{birthdayText}}"
+          bindchange="onBirthdayChange"
+          class="picker"
+        >
+          <view class="{{birthdayText ? '' : 'muted'}}">{{birthdayText || '请选择生日'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="card muted small tip-card">
+      <view>· 生日用于生日礼遇积分发放，首次设置后不可修改（如需修改请联系客服）</view>
+      <view>· 头像支持 JPG / PNG / WebP，不超过 5MB</view>
+    </view>
+
+    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
+    <button
+      class="btn-primary save-btn"
+      loading="{{saving}}"
+      disabled="{{saving || uploading}}"
+      bindtap="save"
+    >
+      保存
+    </button>
+  </block>
+</view>

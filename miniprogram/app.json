@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/gifts/gifts",
+    "pages/records/records",
+    "pages/me/me",
+    "pages/gift-detail/gift-detail",
+    "pages/redeem/redeem",
+    "pages/addresses/addresses",
+    "pages/address-edit/address-edit",
+    "pages/record-detail/record-detail",
+    "pages/profile-edit/profile-edit",
+    "pages/login/login"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#2b2b2b",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "NIHPLOD 积分",
+    "backgroundColor": "#f7f5f2",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#8a8a8a",
+    "selectedColor": "#8a6d4b",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "积分" },
+      { "pagePath": "pages/gifts/gifts", "text": "兑礼" },
+      { "pagePath": "pages/records/records", "text": "记录" },
+      { "pagePath": "pages/me/me", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

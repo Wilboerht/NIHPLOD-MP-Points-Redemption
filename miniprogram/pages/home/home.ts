@@ -1,0 +1,86 @@
+import { api } from "../../utils/api";
+import { ensureSession } from "../../utils/auth";
+import { formatDateOnly, formatPoints, LEDGER_TYPE_LABELS } from "../../utils/format";
+import type { PointLedgerItem } from "../../utils/types";
+
+interface LedgerRow extends PointLedgerItem {
+  typeLabel: string;
+  dateText: string;
+  amountText: string;
+}
+
+interface ExpiringRow {
+  title: string;
+  points: number;
+  expiresAt: string;
+}
+
+Page({
+  data: {
+    loading: true,
+    loggedIn: false,
+    availableText: "0",
+    recent: [] as LedgerRow[],
+    expiring: [] as ExpiringRow[],
+    error: "",
+  },
+
+  onShow() {
+    void this.load();
+  },
+
+  async load() {
+    const loggedIn = await ensureSession();
+    if (!loggedIn) {
+      this.setData({ loading: false, loggedIn: false, error: "" });
+      return;
+    }
+    this.setData({ loading: true, error: "" });
+    try {
+      const data = await api.points();
+      const recent: LedgerRow[] = data.recent.map((item) => ({
+        ...item,
+        typeLabel: LEDGER_TYPE_LABELS[item.type] ?? item.type,
+        dateText: formatDateOnly(item.createdAt),
+        amountText: `${item.amount > 0 ? "+" : ""}${formatPoints(item.amount)}`,
+      }));
+
+      const now = Date.now();
+      const deadline = now + 30 * 24 * 60 * 60 * 1000;
+      const expiring: ExpiringRow[] = data.recent
+        .filter((r) => {
+          if (!r.expiresAt || !r.remaining || r.remaining <= 0 || r.amount <= 0) return false;
+          const t = new Date(r.expiresAt).getTime();
+          return !isNaN(t) && t > now && t <= deadline;
+        })
+        .map((r) => ({
+          title: LEDGER_TYPE_LABELS[r.type] ?? r.type,
+          points: r.remaining ?? 0,
+          expiresAt: formatDateOnly(r.expiresAt),
+        }));
+
+      this.setData({
+        loading: false,
+        loggedIn: true,
+        availableText: formatPoints(data.available),
+        recent,
+        expiring,
+      });
+    } catch (e) {
+      const err = e as Error & { status?: number };
+      if (err.status === 401) {
+        this.setData({ loading: false, loggedIn: false });
+        return;
+      }
+      this.setData({ loading: false, error: err.message || "积分加载失败" });
+    }
+  },
+
+  goLogin() {
+    wx.navigateTo({ url: "/pages/login/login" });
+  },
+
+  goGifts() {
+    wx.switchTab({ url: "/pages/gifts/gifts" });
+  },
+});

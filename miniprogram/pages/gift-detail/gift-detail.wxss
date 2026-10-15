@@ -1,0 +1,63 @@
+.gift-detail {
+  padding-bottom: 180rpx;
+}
+
+.gallery {
+  height: 640rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  background: #efeae4;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+}
+
+.gallery-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b8a992;
+  letter-spacing: 4rpx;
+}
+
+.gift-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.gift-desc {
+  margin-bottom: 20rpx;
+}
+
+.price-row {
+  margin-top: 8rpx;
+}
+
+.price {
+  color: var(--color-muted);
+  font-size: 26rpx;
+}
+
+.cost {
+  color: var(--color-primary);
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+}
+
+.submit-btn {
+  width: 100%;
+}

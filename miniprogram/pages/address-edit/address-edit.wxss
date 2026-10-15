@@ -1,0 +1,50 @@
+.form-card {
+  padding: 8rpx 28rpx;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.form-row-col {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24rpx 0;
+}
+
+.label {
+  width: 160rpx;
+  color: var(--color-text);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+}
+
+.picker {
+  flex: 1;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 140rpx;
+  margin-top: 16rpx;
+}
+
+.save-btn {
+  margin-top: 40rpx;
+  width: 100%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

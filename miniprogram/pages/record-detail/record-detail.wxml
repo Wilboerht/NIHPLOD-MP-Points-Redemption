@@ -1,0 +1,39 @@
+<view class="container" wx:if="{{item}}">
+  <view class="card">
+    <view class="row">
+      <text class="product-name">{{item.productName}}</text>
+      <text class="status status-{{item.status}}">{{item.statusText}}</text>
+    </view>
+    <view class="info-row"><text class="muted small">兑换时间</text><text class="small">{{item.dateText}}</text></view>
+    <view class="info-row"><text class="muted small">扣减积分</text><text class="points">{{item.pointsText}}</text></view>
+    <view wx:if="{{item.recipient}}" class="info-row">
+      <text class="muted small">收货信息</text>
+      <text class="small address-text">{{item.recipient}} {{item.phone}} {{item.address}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view class="card-title">物流信息</view>
+      <text wx:if="{{item.waybillNo}}" class="muted small" bindtap="copyWaybill">
+        运单号：{{item.waybillNo}}（复制）
+      </text>
+    </view>
+
+    <view wx:if="{{trackingLoading}}" class="muted small">物流查询中…</view>
+
+    <block wx:elif="{{tracking && tracking.rows.length > 0}}">
+      <view wx:for="{{tracking.rows}}" wx:key="index" class="route-row">
+        <view class="route-dot" />
+        <view class="route-body">
+          <view class="small">{{item.description}}</view>
+          <view class="muted small">{{item.time}}{{item.location ? ' · ' + item.location : ''}}</view>
+        </view>
+      </view>
+    </block>
+
+    <view wx:else class="muted small">{{trackingMessage || '暂无物流信息'}}</view>
+  </view>
+</view>
+
+<view wx:elif="{{error && !loading}}" class="empty">{{error}}</view>

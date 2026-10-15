@@ -1,0 +1,33 @@
+<view class="container addresses-page">
+  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+    <view class="login-title">登录后管理收货地址</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:if="{{loggedIn}}">
+    <view wx:if="{{addresses.length === 0 && !loading}}" class="empty">
+      暂无收货地址，点击下方按钮新增
+    </view>
+
+    <view wx:for="{{addresses}}" wx:key="id" class="card address-card">
+      <view class="address-body">
+        <view class="row header-row">
+          <text class="recipient">{{item.recipient}}</text>
+          <text class="muted small">{{item.phone}}</text>
+          <text wx:if="{{item.isDefault}}" class="default-tag">默认</text>
+        </view>
+        <view class="muted small address-text">{{item.region}} {{item.detail}}</view>
+      </view>
+      <view class="address-actions">
+        <view class="action" data-id="{{item.id}}" bindtap="edit">编辑</view>
+        <view class="action action-danger" data-id="{{item.id}}" bindtap="remove">删除</view>
+      </view>
+    </view>
+
+    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
+    <view class="bottom-bar">
+      <button class="btn-primary submit-btn" bindtap="add">新增收货地址</button>
+    </view>
+  </block>
+</view>

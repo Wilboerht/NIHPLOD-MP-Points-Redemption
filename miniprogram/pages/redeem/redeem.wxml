@@ -1,0 +1,53 @@
+<view class="container redeem-page" wx:if="{{gift}}">
+  <view class="card row gift-summary">
+    <image wx:if="{{gift.image}}" class="gift-thumb" src="{{gift.image}}" mode="aspectFill" />
+    <view class="gift-meta">
+      <view class="gift-name">{{gift.name}}</view>
+      <view class="cost">{{gift.costText}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view class="card-title">收货地址</view>
+      <view class="muted small" bindtap="addAddress">+ 新增地址</view>
+    </view>
+
+    <view wx:if="{{addresses.length === 0}}" class="empty">
+      暂无收货地址，请先新增
+    </view>
+
+    <view
+      wx:for="{{addresses}}"
+      wx:key="id"
+      class="address-row {{item.id === addressId ? 'address-row-active' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="pickAddress"
+    >
+      <view class="address-main">
+        <view class="row">
+          <text class="recipient">{{item.recipient}}</text>
+          <text class="muted small phone">{{item.phone}}</text>
+          <text wx:if="{{item.isDefault}}" class="default-tag">默认</text>
+        </view>
+        <view class="muted small address-text">{{item.region}} {{item.detail}}</view>
+      </view>
+      <view class="radio {{item.id === addressId ? 'radio-on' : ''}}" />
+    </view>
+  </view>
+
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
+  <view class="bottom-bar">
+    <button
+      class="btn-primary submit-btn"
+      loading="{{submitting}}"
+      disabled="{{submitting || addresses.length === 0}}"
+      bindtap="submit"
+    >
+      确认兑换
+    </button>
+  </view>
+</view>
+
+<view wx:elif="{{error && !loading}}" class="empty">{{error}}</view>

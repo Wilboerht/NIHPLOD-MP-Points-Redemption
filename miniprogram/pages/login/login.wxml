@@ -1,0 +1,66 @@
+<view class="container login-page">
+  <view wx:if="{{phase === 'loading'}}" class="empty">正在登录…</view>
+
+  <block wx:if="{{phase === 'ready'}}">
+    <view class="card intro-card">
+      <view class="intro-title">绑定手机号</view>
+      <view class="muted small intro-desc">
+        首次登录需绑定官网账户的手机号，用于积分同步与礼品寄送
+      </view>
+    </view>
+
+    <view class="card">
+      <button
+        class="btn-primary phone-btn"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="onGetPhoneNumber"
+        loading="{{busy}}"
+        disabled="{{busy}}"
+      >
+        微信一键绑定手机号
+      </button>
+    </view>
+
+    <view class="card">
+      <view class="card-title">或使用短信验证码</view>
+      <view class="sms-row">
+        <input
+          class="sms-input"
+          type="number"
+          maxlength="11"
+          placeholder="手机号"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+        />
+        <button
+          size="mini"
+          class="ghost-btn sms-btn"
+          disabled="{{counting > 0}}"
+          bindtap="sendCode"
+        >
+          {{counting > 0 ? counting + 's 后重试' : '获取验证码'}}
+        </button>
+      </view>
+      <input
+        class="sms-input code-input"
+        type="number"
+        maxlength="6"
+        placeholder="6 位验证码"
+        value="{{code}}"
+        bindinput="onCodeInput"
+      />
+      <button class="btn-primary sms-submit" loading="{{busy}}" disabled="{{busy}}" bindtap="submitSms">
+        绑定并登录
+      </button>
+    </view>
+
+    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
+    <view class="skip muted small" bindtap="skip">暂不绑定，先逛逛</view>
+  </block>
+
+  <block wx:if="{{phase === 'error'}}">
+    <view class="card error-card">{{error}}</view>
+    <view class="skip muted small" bindtap="skip">返回首页</view>
+  </block>
+</view>

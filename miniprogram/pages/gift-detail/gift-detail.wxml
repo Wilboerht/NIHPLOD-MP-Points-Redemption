@@ -1,0 +1,31 @@
+<view class="container gift-detail" wx:if="{{gift}}">
+  <swiper wx:if="{{images.length > 0}}" class="gallery" indicator-dots circular>
+    <swiper-item wx:for="{{images}}" wx:key="*this">
+      <image class="gallery-image" src="{{item}}" mode="aspectFill" />
+    </swiper-item>
+  </swiper>
+  <view wx:else class="gallery gallery-placeholder">NIHPLOD</view>
+
+  <view class="card">
+    <view class="gift-name">{{gift.name}}</view>
+    <view wx:if="{{gift.description}}" class="muted small gift-desc">{{gift.description}}</view>
+    <view class="row price-row">
+      <text class="price">参考价 {{gift.priceText}}</text>
+      <text class="cost">{{gift.costText}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{gift.detail.capacity}}" class="card">
+    <view class="card-title">规格</view>
+    <view class="muted">{{gift.detail.capacity}}</view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="btn-primary submit-btn" disabled="{{!canRedeem}}" bindtap="goRedeem">
+      {{buttonText}}
+    </button>
+  </view>
+</view>
+
+<view wx:elif="{{notFound && !loading}}" class="empty">礼品不存在或已下架</view>
+<view wx:elif="{{error}}" class="empty">{{error}}</view>

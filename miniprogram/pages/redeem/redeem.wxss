@@ -1,0 +1,106 @@
+.redeem-page {
+  padding-bottom: 180rpx;
+}
+
+.gift-summary {
+  display: flex;
+  align-items: center;
+}
+
+.gift-thumb {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 16rpx;
+  background: #efeae4;
+  flex-shrink: 0;
+}
+
+.gift-meta {
+  margin-left: 24rpx;
+}
+
+.gift-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.cost {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.address-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 20rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid transparent;
+  margin-bottom: 12rpx;
+  background: rgba(43, 43, 43, 0.02);
+}
+
+.address-row-active {
+  border-color: var(--color-primary);
+  background: rgba(138, 109, 75, 0.06);
+}
+
+.address-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.recipient {
+  font-weight: 600;
+  margin-right: 16rpx;
+}
+
+.phone {
+  margin-right: 16rpx;
+}
+
+.default-tag {
+  color: var(--color-primary);
+  border: 1rpx solid var(--color-primary);
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+}
+
+.address-text {
+  margin-top: 8rpx;
+}
+
+.radio {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(43, 43, 43, 0.2);
+  margin-left: 20rpx;
+  flex-shrink: 0;
+}
+
+.radio-on {
+  border-color: var(--color-primary);
+  background: radial-gradient(circle, var(--color-primary) 0 10rpx, transparent 11rpx);
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

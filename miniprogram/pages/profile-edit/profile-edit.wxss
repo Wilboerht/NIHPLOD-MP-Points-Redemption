@@ -1,0 +1,101 @@
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.avatar-row {
+  gap: 24rpx;
+}
+
+.label {
+  width: 120rpx;
+  flex-shrink: 0;
+}
+
+.avatar-btn {
+  width: 120rpx;
+  height: 120rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+.avatar-btn::after {
+  border: none;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #efeae4;
+}
+
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8a6d4b;
+  font-size: 44rpx;
+}
+
+.avatar-tip {
+  margin-left: auto;
+}
+
+.input {
+  flex: 1;
+}
+
+.gender-group {
+  display: flex;
+  gap: 32rpx;
+}
+
+.gender-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.picker {
+  flex: 1;
+}
+
+.tip-card {
+  line-height: 1.8;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}
+
+.save-btn {
+  margin-top: 20rpx;
+  width: 100%;
+}

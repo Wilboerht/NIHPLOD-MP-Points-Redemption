@@ -1,0 +1,78 @@
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.head-value {
+  font-size: 48rpx;
+  font-weight: 600;
+}
+
+.head-tip {
+  max-width: 55%;
+  text-align: right;
+}
+
+.gift-card {
+  display: flex;
+  align-items: center;
+}
+
+.gift-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
+  background: #efeae4;
+  flex-shrink: 0;
+}
+
+.gift-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b8a992;
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
+}
+
+.gift-info {
+  flex: 1;
+  margin-left: 24rpx;
+  min-width: 0;
+}
+
+.gift-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.gift-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.gift-cost {
+  color: var(--color-primary);
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

@@ -1,0 +1,89 @@
+.addresses-page {
+  padding-bottom: 180rpx;
+}
+
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.address-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.address-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.header-row {
+  justify-content: flex-start;
+}
+
+.recipient {
+  font-weight: 600;
+  margin-right: 16rpx;
+}
+
+.default-tag {
+  color: var(--color-primary);
+  border: 1rpx solid var(--color-primary);
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  margin-left: 16rpx;
+}
+
+.address-text {
+  margin-top: 8rpx;
+}
+
+.address-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16rpx;
+  margin-left: 20rpx;
+  flex-shrink: 0;
+}
+
+.action {
+  font-size: 24rpx;
+  color: var(--color-primary);
+}
+
+.action-danger {
+  color: var(--color-danger);
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

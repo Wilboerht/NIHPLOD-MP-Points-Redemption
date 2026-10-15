@@ -1,0 +1,38 @@
+<view class="container">
+  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+    <view class="login-title">登录后查看积分</view>
+    <view class="muted small login-desc">使用微信一键登录，积分与官网账号同步</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:if="{{loggedIn}}">
+    <view class="balance-card">
+      <view class="balance-label">可用积分</view>
+      <view class="balance-value">{{availableText}}</view>
+      <view class="balance-tip muted small">消费 1 元 = 1 积分 · 有效期 6 个月</view>
+      <button size="mini" class="ghost-btn balance-btn" bindtap="goGifts">去兑礼</button>
+    </view>
+
+    <view wx:if="{{expiring.length > 0}}" class="card warn-card">
+      <view class="card-title">即将过期</view>
+      <view wx:for="{{expiring}}" wx:key="index" class="row expiring-row">
+        <text class="small">{{item.title}}</text>
+        <text class="danger small">{{item.points}} 积分 · {{item.expiresAt}} 过期</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">积分明细</view>
+      <view wx:if="{{recent.length === 0}}" class="empty">暂无积分记录</view>
+      <view wx:for="{{recent}}" wx:key="id" class="row ledger-row">
+        <view class="ledger-left">
+          <view class="ledger-title">{{item.typeLabel}}</view>
+          <view class="muted small">{{item.dateText}}{{item.note ? ' · ' + item.note : ''}}</view>
+        </view>
+        <text class="{{item.amount > 0 ? 'plus' : 'minus'}}">{{item.amountText}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+  </block>
+</view>

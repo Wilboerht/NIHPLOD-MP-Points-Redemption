@@ -1,0 +1,71 @@
+.records-page {
+  padding-bottom: 48rpx;
+}
+
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.product-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  max-width: 60%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.status {
+  font-size: 24rpx;
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+}
+
+.status-PENDING {
+  color: #8a6d4b;
+  background: rgba(138, 109, 75, 0.1);
+}
+
+.status-FULFILLED {
+  color: #3f8f5f;
+  background: rgba(63, 143, 95, 0.1);
+}
+
+.status-CANCELLED {
+  color: var(--color-muted);
+  background: rgba(43, 43, 43, 0.06);
+}
+
+.secondary-row {
+  margin-top: 16rpx;
+}
+
+.points {
+  color: var(--color-primary);
+}
+
+.waybill {
+  margin-top: 12rpx;
+}
+
+.load-more {
+  text-align: center;
+  padding: 24rpx 0;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

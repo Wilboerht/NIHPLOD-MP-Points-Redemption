@@ -1,0 +1,41 @@
+<view class="container">
+  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+    <view class="login-title">登录后查看礼品</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:if="{{loggedIn}}">
+    <view class="card head-card">
+      <view class="row">
+        <view>
+          <view class="muted small">可用积分</view>
+          <view class="head-value">{{availableText}}</view>
+        </view>
+        <text class="muted small head-tip">{{redeemTip}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{gifts.length === 0 && !loading}}" class="empty">暂无可兑换礼品</view>
+
+    <view
+      wx:for="{{gifts}}"
+      wx:key="id"
+      class="card gift-card"
+      data-id="{{item.id}}"
+      bindtap="openGift"
+    >
+      <image wx:if="{{item.image}}" class="gift-image" src="{{item.image}}" mode="aspectFill" />
+      <view wx:else class="gift-image gift-image-placeholder">NIHPLOD</view>
+      <view class="gift-info">
+        <view class="gift-name">{{item.name}}</view>
+        <view wx:if="{{item.description}}" class="muted small gift-desc">{{item.description}}</view>
+        <view class="row gift-bottom">
+          <text class="gift-cost {{item.cost === null ? 'muted' : ''}}">{{item.costText}}</text>
+          <text class="muted small">{{item.priceText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+  </block>
+</view>

@@ -1,0 +1,54 @@
+.login-page {
+  padding-top: 40rpx;
+}
+
+.intro-card {
+  text-align: center;
+  padding: 44rpx 40rpx;
+}
+
+.intro-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.phone-btn {
+  width: 100%;
+}
+
+.sms-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.sms-input {
+  flex: 1;
+  border-bottom: 1rpx solid var(--color-border);
+  padding: 20rpx 0;
+}
+
+.sms-btn {
+  flex-shrink: 0;
+}
+
+.code-input {
+  margin-top: 24rpx;
+}
+
+.sms-submit {
+  margin-top: 32rpx;
+  width: 100%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}
+
+.skip {
+  text-align: center;
+  padding: 30rpx 0;
+  text-decoration: underline;
+}
