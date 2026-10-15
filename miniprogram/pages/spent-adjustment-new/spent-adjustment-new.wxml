@@ -1,0 +1,95 @@
+<view class="container new-page">
+  <view class="card">
+    <view class="form-row">
+      <text class="label">购买渠道</text>
+      <picker mode="selector" range="{{channelOptions}}" value="{{channelIndex}}" bindchange="onChannelChange" class="picker">
+        <view>{{channelOptions[channelIndex]}}</view>
+      </picker>
+    </view>
+
+    <view wx:if="{{isDealer}}" class="form-row">
+      <text class="label">经销商名称</text>
+      <input
+        class="input"
+        value="{{dealerName}}"
+        maxlength="50"
+        placeholder="必填，如：XX 美妆集合店"
+        bindinput="onDealerInput"
+      />
+    </view>
+
+    <view class="form-row">
+      <text class="label">订单号</text>
+      <input
+        class="input"
+        value="{{orderNo}}"
+        maxlength="64"
+        placeholder="订单号或小票号（必填）"
+        bindinput="onOrderInput"
+      />
+    </view>
+
+    <view class="form-row">
+      <text class="label">消费日期</text>
+      <picker mode="date" end="{{today}}" value="{{purchasedAt}}" bindchange="onDateChange" class="picker">
+        <view class="{{purchasedAt ? '' : 'muted'}}">{{purchasedAt || '选填，选择消费日期'}}</view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <text class="label">申报金额</text>
+      <input
+        class="input"
+        type="number"
+        value="{{amount}}"
+        maxlength="8"
+        placeholder="选填，整数（元）"
+        bindinput="onAmountInput"
+      />
+    </view>
+
+    <view class="form-row form-row-col">
+      <text class="label">备注</text>
+      <textarea
+        class="textarea"
+        value="{{note}}"
+        maxlength="500"
+        placeholder="选填，补充说明购买渠道与订单信息"
+        bindinput="onNoteInput"
+      />
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view class="card-title">凭证截图（{{images.length}}/{{maxImages}}）</view>
+      <text class="muted small" bindtap="chooseImages">{{uploading ? '上传中…' : '+ 添加图片'}}</text>
+    </view>
+    <view class="muted small tip-line">· 建议上传含订单号与金额的截图，最多 {{maxImages}} 张</view>
+
+    <view wx:if="{{images.length > 0}}" class="proof-grid">
+      <view wx:for="{{images}}" wx:key="raw" class="proof-item">
+        <image
+          wx:if="{{item.display}}"
+          class="proof-img"
+          src="{{item.display}}"
+          mode="aspectFill"
+          data-current="{{item.display}}"
+          bindtap="previewImage"
+        />
+        <view
+          wx:else
+          class="proof-img proof-img-private"
+          data-current="{{item.display}}"
+        >已上传</view>
+        <view class="proof-delete" data-index="{{index}}" catchtap="removeImage">×</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
+  <button class="btn-primary save-btn" loading="{{saving}}" disabled="{{saving || uploading}}" bindtap="submit">
+    提交申请
+  </button>
+</view>

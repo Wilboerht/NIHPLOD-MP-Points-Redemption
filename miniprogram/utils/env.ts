@@ -22,3 +22,10 @@ export const STORAGE_KEYS = {
   refreshToken: "nihplod_points_refresh_token",
   user: "nihplod_points_user",
 } as const;
+
+/**
+ * 订阅消息模板 ID（微信公众平台创建后填入；留空 = 对应订阅请求自动跳过）
+ * 官网 env 需配置同名模板：MP_POINTS_TEMPLATE_SHIPPED / MP_POINTS_TEMPLATE_SPENT_REVIEW
+ */
+export const SUBSCRIBE_TMPL_SHIPPED = "";
+export const SUBSCRIBE_TMPL_SPENT_REVIEW = "";

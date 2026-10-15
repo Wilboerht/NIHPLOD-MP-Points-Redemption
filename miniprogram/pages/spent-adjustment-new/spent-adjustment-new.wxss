@@ -1,0 +1,89 @@
+.form-row {
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.form-row-col {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24rpx 0;
+}
+
+.label {
+  width: 160rpx;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+}
+
+.picker {
+  flex: 1;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 140rpx;
+  margin-top: 16rpx;
+}
+
+.tip-line {
+  margin-top: 8rpx;
+}
+
+.proof-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.proof-item {
+  position: relative;
+}
+
+.proof-img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  background: #efeae4;
+}
+
+.proof-img-private {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b8a992;
+  font-size: 24rpx;
+}
+
+.proof-delete {
+  position: absolute;
+  top: -14rpx;
+  right: -14rpx;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(43, 43, 43, 0.75);
+  color: #ffffff;
+  font-size: 28rpx;
+}
+
+.save-btn {
+  margin-top: 20rpx;
+  width: 100%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

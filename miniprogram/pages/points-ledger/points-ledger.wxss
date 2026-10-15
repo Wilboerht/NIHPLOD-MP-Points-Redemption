@@ -1,0 +1,56 @@
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.summary {
+  padding: 4rpx 8rpx 20rpx;
+}
+
+.ledger-card {
+  padding: 8rpx 28rpx;
+}
+
+.ledger-row {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.ledger-row:last-child {
+  border-bottom: none;
+}
+
+.ledger-left {
+  max-width: 70%;
+}
+
+.ledger-title {
+  font-size: 28rpx;
+}
+
+.ref-row {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  word-break: break-all;
+}
+
+.load-more {
+  text-align: center;
+  padding: 24rpx 0;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

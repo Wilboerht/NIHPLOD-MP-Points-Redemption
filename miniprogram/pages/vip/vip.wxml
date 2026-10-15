@@ -1,0 +1,56 @@
+<view class="container vip-page">
+  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+    <view class="login-title">登录后查看会员权益</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:if="{{loggedIn && view}}">
+    <view class="member-card" style="background: linear-gradient(135deg, {{currentColor}} 0%, {{currentColor}}cc 100%);">
+      <view class="member-level">{{view.currentLevel.name}}</view>
+      <view class="member-id muted-light">会员编号 {{view.memberId}}</view>
+      <view class="row member-bottom">
+        <view>
+          <view class="muted-light small">累计消费</view>
+          <view class="member-spent">¥{{totalSpentText}}</view>
+        </view>
+        <button size="mini" class="ghost-btn-light" bindtap="goGifts">去兑礼</button>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">升级进度</view>
+      <block wx:if="{{view.nextLevel}}">
+        <view class="row progress-head">
+          <text class="small">距 {{view.nextLevel.name}}</text>
+          <text class="muted small">还差 ¥{{spentNeededText}}</text>
+        </view>
+        <progress percent="{{view.nextLevel.progress}}" stroke-width="6" activeColor="{{currentColor}}" border-radius="6" />
+        <view class="muted small progress-tip">满 ¥{{nextMinSpentText}} 即可升级（按累计消费实时判定）</view>
+      </block>
+      <view wx:else class="muted small">已达最高等级，感谢您的支持</view>
+    </view>
+
+    <view wx:for="{{levels}}" wx:key="level" class="card level-card {{item.isCurrent ? 'level-card-current' : ''}}">
+      <view class="row">
+        <view class="level-name" style="color: {{item.color}};">{{item.name}}</view>
+        <view class="level-badges">
+          <text wx:if="{{item.isCurrent}}" class="badge badge-current">当前等级</text>
+          <text wx:elif="{{item.unlocked}}" class="badge badge-unlocked">已解锁</text>
+          <text wx:else class="badge badge-locked">未解锁</text>
+        </view>
+      </view>
+      <view class="muted small level-threshold">{{item.thresholdText}}</view>
+      <view wx:for="{{item.benefits}}" wx:for-item="benefit" wx:key="title" class="benefit-row">
+        <text wx:if="{{benefit.icon}}" class="benefit-icon">{{benefit.icon}}</text>
+        <view class="benefit-body">
+          <view class="benefit-title">{{benefit.title}}</view>
+          <view class="muted small">{{benefit.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="muted small vip-tip">等级永久有效、按累计消费实时重算（退款可降级）；权益跟随当前等级。</view>
+
+    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+  </block>
+</view>

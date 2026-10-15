@@ -148,3 +148,108 @@ export interface ProfileUpdateInput {
   birthday?: string;
   gender?: "male" | "female" | null;
 }
+
+// ============================================
+// 积分明细（近一年）
+// ============================================
+
+export interface LedgerItem {
+  id: string;
+  type: PointLedgerType;
+  amount: number;
+  remaining: number | null;
+  note: string | null;
+  /** 业务流水号（商城单据号 / 幂等键） */
+  reference: string;
+  expiresAt: string | null;
+  createdAt: string;
+}
+
+/** GET /api/oauth/points/ledger */
+export interface LedgerPage {
+  items: LedgerItem[];
+  hasMore: boolean;
+  total: number;
+}
+
+// ============================================
+// 会员视图（GET /api/oauth/membership）
+// ============================================
+
+export interface LevelBenefitItem {
+  icon: string;
+  title: string;
+  desc: string;
+}
+
+export type MembershipLevelKey = "REGULAR" | "SILVER" | "GOLD" | "DIAMOND";
+
+export interface MembershipLevelInfo {
+  level: MembershipLevelKey;
+  name: string;
+  nameEn: string;
+  icon: string;
+  minSpent: number;
+  maxSpent: number | null;
+  benefits: LevelBenefitItem[];
+  colorClass: string;
+}
+
+export interface NextLevelInfo {
+  level: MembershipLevelKey;
+  name: string;
+  minSpent: number;
+  spentNeeded: number;
+  progress: number;
+}
+
+export interface MembershipView {
+  sub?: string;
+  membershipLevel: MembershipLevelKey;
+  memberId: string;
+  totalSpent: number;
+  currentLevel: MembershipLevelInfo;
+  nextLevel: NextLevelInfo | null;
+  allLevels: MembershipLevelInfo[];
+}
+
+// ============================================
+// 消费补录
+// ============================================
+
+export type SpentChannel =
+  | "TMALL"
+  | "DOUYIN"
+  | "XIAOHONGSHU"
+  | "WECHAT_SHOP"
+  | "OFFLINE"
+  | "DEALER"
+  | "OTHER";
+
+export type SpentStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface SpentApplication {
+  id: string;
+  channel: SpentChannel | "JD" | "MINIPROGRAM";
+  orderNo: string;
+  dealerName: string | null;
+  amountClaimed: number | null;
+  purchasedAt: string | null;
+  images: string[];
+  note: string | null;
+  status: SpentStatus;
+  reviewAmount: number | null;
+  reviewNote: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+}
+
+export interface SpentApplicationInput {
+  channel: SpentChannel;
+  orderNo: string;
+  dealerName?: string;
+  amountClaimed?: number;
+  purchasedAt?: string;
+  images?: string[];
+  note?: string;
+}

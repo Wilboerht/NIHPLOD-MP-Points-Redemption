@@ -24,12 +24,20 @@
         <text>编辑资料</text>
         <text class="muted">›</text>
       </view>
+      <view class="menu-item" bindtap="goVip">
+        <text>会员权益</text>
+        <text class="muted">›</text>
+      </view>
       <view class="menu-item" bindtap="goRecords">
         <text>兑换记录</text>
         <text class="muted">›</text>
       </view>
       <view class="menu-item" bindtap="goAddresses">
         <text>收货地址</text>
+        <text class="muted">›</text>
+      </view>
+      <view class="menu-item" bindtap="goSpentAdjust">
+        <text>消费补录</text>
         <text class="muted">›</text>
       </view>
       <button class="menu-item menu-item-btn" open-type="contact">

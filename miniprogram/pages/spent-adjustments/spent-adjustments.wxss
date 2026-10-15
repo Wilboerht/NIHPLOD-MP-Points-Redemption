@@ -1,0 +1,105 @@
+.adjust-page {
+  padding-bottom: 180rpx;
+}
+
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.tip-card {
+  background: rgba(138, 109, 75, 0.06);
+}
+
+.tip-line {
+  line-height: 1.8;
+}
+
+.channel {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.status {
+  font-size: 24rpx;
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+}
+
+.status-PENDING {
+  color: #8a6d4b;
+  background: rgba(138, 109, 75, 0.1);
+}
+
+.status-APPROVED {
+  color: #3f8f5f;
+  background: rgba(63, 143, 95, 0.1);
+}
+
+.status-REJECTED {
+  color: var(--color-danger);
+  background: rgba(194, 84, 80, 0.08);
+}
+
+.order-row {
+  margin-top: 12rpx;
+  word-break: break-all;
+}
+
+.meta-row {
+  margin-top: 8rpx;
+}
+
+.review-text {
+  margin-top: 12rpx;
+  color: var(--color-danger);
+}
+
+.proof-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.proof-thumb {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 12rpx;
+  background: #efeae4;
+}
+
+.proof-count {
+  margin-left: 4rpx;
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

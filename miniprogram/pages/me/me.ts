@@ -53,6 +53,14 @@ Page({
     wx.navigateTo({ url: "/pages/profile-edit/profile-edit" });
   },
 
+  goVip() {
+    wx.navigateTo({ url: "/pages/vip/vip" });
+  },
+
+  goSpentAdjust() {
+    wx.navigateTo({ url: "/pages/spent-adjustments/spent-adjustments" });
+  },
+
   goRecords() {
     wx.switchTab({ url: "/pages/records/records" });
   },

@@ -1,6 +1,7 @@
 import { api, ApiError } from "../../utils/api";
 import { findLastGift, setLastGifts } from "../../utils/cache";
 import { formatPoints, genRequestId, resolveImageUrl } from "../../utils/format";
+import { subscribeShipped } from "../../utils/subscribe";
 import type { AddressItem, GiftItem } from "../../utils/types";
 
 type GiftView = GiftItem & { costText: string; priceText: string };
@@ -93,6 +94,9 @@ Page({
     }
     this.setData({ submitting: true });
     try {
+      // 订阅发货通知（用户点击内触发，尽力而为；未配置模板/拒绝订阅均不影响流程）
+      await subscribeShipped();
+
       const result = await api.redeem({
         productId: gift.id,
         addressId,

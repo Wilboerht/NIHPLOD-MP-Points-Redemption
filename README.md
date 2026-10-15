@@ -1,6 +1,6 @@
 # nihplod-points-mp
 
-NIHPLOD 积分小程序（纯积分兑换）：微信登录 → 积分余额 → 兑礼 → 收货地址 / 兑换记录 / 顺丰物流 / 资料编辑。
+NIHPLOD 积分小程序（纯积分兑换）：微信登录 → 积分余额/近一年明细（含流水号）→ 会员权益 → 兑礼 → 收货地址 / 兑换记录 / 顺丰物流 / 消费补录 / 资料编辑 / 分享与订阅消息。
 
 小程序**直连官网 OAuth 端点**（无需自建后端），登录与业务契约见官网仓库 `docs/sso-integration.md`「微信小程序接入（独立小程序）」章节。
 
@@ -17,7 +17,7 @@ miniprogram/
 │   ├── cache.ts    # 页面间轻量数据传递（兑换记录详情）
 │   ├── format.ts   # 格式化与文案映射
 │   └── types.ts    # 与官网接口契约对齐的类型
-└── pages/          # home / gifts / gift-detail / redeem / addresses / address-edit / records / record-detail / profile-edit / login / me
+└── pages/          # home / gifts / gift-detail / redeem / addresses / address-edit / records / record-detail / profile-edit / points-ledger / vip / spent-adjustments / spent-adjustment-new / login / me
 ```
 
 ## 初始化配置

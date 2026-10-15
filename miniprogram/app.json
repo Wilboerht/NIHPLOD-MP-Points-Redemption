@@ -10,6 +10,10 @@
     "pages/address-edit/address-edit",
     "pages/record-detail/record-detail",
     "pages/profile-edit/profile-edit",
+    "pages/points-ledger/points-ledger",
+    "pages/vip/vip",
+    "pages/spent-adjustments/spent-adjustments",
+    "pages/spent-adjustment-new/spent-adjustment-new",
     "pages/login/login"
   ],
   "window": {

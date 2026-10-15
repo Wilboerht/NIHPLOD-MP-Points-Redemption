@@ -83,4 +83,16 @@ Page({
   goGifts() {
     wx.switchTab({ url: "/pages/gifts/gifts" });
   },
+
+  goLedger() {
+    wx.navigateTo({ url: "/pages/points-ledger/points-ledger" });
+  },
+
+  onShareAppMessage() {
+    return { title: "NIHPLOD 积分礼遇，好礼免费兑", path: "/pages/home/home" };
+  },
+
+  onShareTimeline() {
+    return { title: "NIHPLOD 积分礼遇，好礼免费兑" };
+  },
 });

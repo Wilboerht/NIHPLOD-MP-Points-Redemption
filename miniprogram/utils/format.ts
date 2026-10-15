@@ -56,6 +56,56 @@ export const REDEMPTION_STATUS_LABELS: Record<string, string> = {
   CANCELLED: "已取消",
 };
 
+/** 消费补录：渠道选项（表单提交用，白名单与服务端一致） */
+export const SPENT_CHANNEL_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: "TMALL", label: "天猫国际" },
+  { value: "DOUYIN", label: "抖音商城" },
+  { value: "XIAOHONGSHU", label: "小红书" },
+  { value: "WECHAT_SHOP", label: "微信小铺" },
+  { value: "OFFLINE", label: "线下专柜" },
+  { value: "DEALER", label: "经销渠道" },
+  { value: "OTHER", label: "其它" },
+];
+
+/** 消费补录：渠道展示文案（含历史渠道，存量数据展示用） */
+export const SPENT_CHANNEL_LABELS: Record<string, string> = {
+  TMALL: "天猫国际",
+  DOUYIN: "抖音商城",
+  XIAOHONGSHU: "小红书",
+  WECHAT_SHOP: "微信小铺",
+  OFFLINE: "线下专柜",
+  DEALER: "经销渠道",
+  OTHER: "其它",
+  JD: "京东",
+  MINIPROGRAM: "微信小程序",
+};
+
+/** 消费补录：状态文案 */
+export const SPENT_STATUS_LABELS: Record<string, string> = {
+  PENDING: "待审核",
+  APPROVED: "已通过",
+  REJECTED: "已驳回",
+};
+
+/** 会员等级主题色（WXSS 不便直接使用 Tailwind 类名，按等级映射） */
+export const LEVEL_THEME_COLORS: Record<string, string> = {
+  REGULAR: "#78716c",
+  SILVER: "#8a8a8a",
+  GOLD: "#c98a1f",
+  DIAMOND: "#5f63c7",
+};
+
+/**
+ * 消费补录凭证展示地址：公开 URL / 本地路径可直接展示；
+ * 私有 objectName（需鉴权签名，小程序 <image> 无法携带鉴权头）返回空串，
+ * 页面仅展示"已上传"占位。
+ */
+export function spentProofDisplayUrl(raw: string): string {
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("/")) return resolveImageUrl(raw);
+  return "";
+}
+
 /** 兑换错误码文案补充（服务端已带 message，此处兜底） */
 export const REDEEM_ERROR_MESSAGES: Record<string, string> = {
   NOT_ELIGIBLE: "银卡及以上会员才能参与积分兑礼",

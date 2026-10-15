@@ -12,10 +12,14 @@ import type {
   AddressInput,
   AddressItem,
   GiftsData,
+  LedgerPage,
+  MembershipView,
   PointsOverview,
   ProfileUpdateInput,
   RedeemResult,
   RedemptionsData,
+  SpentApplication,
+  SpentApplicationInput,
   TrackingData,
   UserInfoClaims,
 } from "./types";
@@ -220,4 +224,27 @@ export const api = {
   /** 头像上传（≤5MB，JPG/PNG/WebP；返回绝对 URL，随后经 updateProfile 写入） */
   uploadAvatar: (filePath: string) =>
     uploadRequest<{ url: string }>("/api/oauth/userinfo/avatar", filePath),
+
+  /** 近一年积分明细（offset 分页每页 20 条，含流水号） */
+  pointsLedger: (offset: number) =>
+    authRequest<LedgerPage>({ url: `/api/oauth/points/ledger?offset=${offset}` }),
+
+  /** 会员等级/权益/升级进度 */
+  membership: () => authRequest<MembershipView>({ url: "/api/oauth/membership" }),
+
+  /** 消费补录申请列表 */
+  spentAdjustments: () =>
+    authRequest<{ applications: SpentApplication[] }>({ url: "/api/oauth/spent-adjustments" }),
+
+  /** 提交消费补录申请 */
+  createSpentAdjustment: (data: SpentApplicationInput) =>
+    authRequest<{ application: { id: string; status: string; statusLabel: string } }>({
+      url: "/api/oauth/spent-adjustments",
+      method: "POST",
+      data: { ...data },
+    }),
+
+  /** 补录凭证上传（≤10MB 图片；返回原始值，私有存储时为 objectName） */
+  uploadSpentProof: (filePath: string) =>
+    uploadRequest<{ url: string; private: boolean }>("/api/oauth/spent-adjustments/upload", filePath),
 };

@@ -74,4 +74,17 @@ Page({
     }
     wx.navigateTo({ url: `/pages/redeem/redeem?id=${this.giftId}` });
   },
+
+  onShareAppMessage() {
+    const name = this.data.gift?.name ?? "积分好礼";
+    return {
+      title: `${name} · NIHPLOD 积分礼遇`,
+      path: `/pages/gift-detail/gift-detail?id=${this.giftId}`,
+    };
+  },
+
+  onShareTimeline() {
+    const name = this.data.gift?.name ?? "积分好礼";
+    return { title: `${name} · NIHPLOD 积分礼遇` };
+  },
 });

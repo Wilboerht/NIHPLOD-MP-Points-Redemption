@@ -62,6 +62,14 @@ Page({
     wx.navigateTo({ url: "/pages/login/login" });
   },
 
+  onShareAppMessage() {
+    return { title: "NIHPLOD 积分礼遇，好礼免费兑", path: "/pages/gifts/gifts" };
+  },
+
+  onShareTimeline() {
+    return { title: "NIHPLOD 积分礼遇，好礼免费兑" };
+  },
+
   openGift(e: WechatMiniprogram.TouchEvent) {
     const id = e.currentTarget.dataset.id as string;
     wx.navigateTo({ url: `/pages/gift-detail/gift-detail?id=${id}` });

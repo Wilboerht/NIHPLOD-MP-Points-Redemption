@@ -47,6 +47,14 @@
   color: #ffffff;
 }
 
+.ledger-head {
+  margin-bottom: 12rpx;
+}
+
+.card-title-inline {
+  margin-bottom: 0;
+}
+
 .ledger-row {
   padding: 20rpx 0;
   border-bottom: 1rpx solid var(--color-border);

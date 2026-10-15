@@ -1,0 +1,129 @@
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.member-card {
+  border-radius: 24rpx;
+  padding: 44rpx 36rpx;
+  color: #ffffff;
+  margin-bottom: 24rpx;
+}
+
+.member-level {
+  font-size: 44rpx;
+  font-weight: 600;
+}
+
+.member-id {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+}
+
+.muted-light {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.member-bottom {
+  margin-top: 32rpx;
+}
+
+.member-spent {
+  font-size: 40rpx;
+  font-weight: 600;
+}
+
+.ghost-btn-light {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  border: none;
+}
+
+.ghost-btn-light::after {
+  border: none;
+}
+
+.progress-head {
+  margin-bottom: 16rpx;
+}
+
+.progress-tip {
+  margin-top: 12rpx;
+}
+
+.level-card-current {
+  border: 2rpx solid var(--color-primary);
+}
+
+.level-name {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.level-badges {
+  display: flex;
+  gap: 12rpx;
+}
+
+.badge {
+  font-size: 20rpx;
+  border-radius: 8rpx;
+  padding: 4rpx 12rpx;
+}
+
+.badge-current {
+  color: #ffffff;
+  background: var(--color-primary);
+}
+
+.badge-unlocked {
+  color: #3f8f5f;
+  background: rgba(63, 143, 95, 0.1);
+}
+
+.badge-locked {
+  color: var(--color-muted);
+  background: rgba(43, 43, 43, 0.06);
+}
+
+.level-threshold {
+  margin-top: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.benefit-row {
+  display: flex;
+  margin-top: 16rpx;
+}
+
+.benefit-icon {
+  margin-right: 12rpx;
+}
+
+.benefit-title {
+  font-size: 27rpx;
+  font-weight: 600;
+  margin-bottom: 4rpx;
+}
+
+.vip-tip {
+  padding: 0 8rpx 30rpx;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

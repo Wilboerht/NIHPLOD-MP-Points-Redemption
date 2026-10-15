@@ -22,7 +22,10 @@
     </view>
 
     <view class="card">
-      <view class="card-title">积分明细</view>
+      <view class="row ledger-head">
+        <view class="card-title card-title-inline">积分明细</view>
+        <text class="muted small" bindtap="goLedger">全部明细 ›</text>
+      </view>
       <view wx:if="{{recent.length === 0}}" class="empty">暂无积分记录</view>
       <view wx:for="{{recent}}" wx:key="id" class="row ledger-row">
         <view class="ledger-left">
