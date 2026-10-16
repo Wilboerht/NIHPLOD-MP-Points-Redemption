@@ -1,4 +1,5 @@
-import { api } from "../../utils/api";
+import { api, ApiError } from "../../utils/api";
+import { ensureSession } from "../../utils/auth";
 import { findLastGift, setLastGifts } from "../../utils/cache";
 import { formatPoints, resolveImageUrl } from "../../utils/format";
 import type { GiftItem } from "../../utils/types";
@@ -8,6 +9,7 @@ type GiftView = GiftItem & { costText: string; priceText: string };
 Page({
   data: {
     loading: true,
+    needLogin: false,
     notFound: false,
     gift: null as GiftView | null,
     images: [] as string[],
@@ -23,11 +25,25 @@ Page({
     void this.load();
   },
 
+  onShow() {
+    // 从登录页返回后（needLogin 置位）重试加载
+    if (this.data.needLogin) {
+      void this.load();
+    }
+  },
+
   async load() {
     if (!this.giftId) {
       this.setData({ loading: false, notFound: true });
       return;
     }
+    // 分享/订阅消息可冷启动直达本页：等待启动期登录完成，未登录时展示登录引导
+    const loggedIn = await ensureSession();
+    if (!loggedIn) {
+      this.setData({ loading: false, needLogin: true });
+      return;
+    }
+    this.setData({ needLogin: false });
     try {
       let gift = findLastGift(this.giftId);
       if (!gift) {
@@ -63,8 +79,17 @@ Page({
           gift.cost === null ? "升级银卡后解锁" : gift.affordable ? "立即兑换" : "积分不足",
       });
     } catch (e) {
-      this.setData({ loading: false, error: (e as Error).message || "加载失败" });
+      const err = e as ApiError;
+      if (err.status === 401) {
+        this.setData({ loading: false, needLogin: true });
+        return;
+      }
+      this.setData({ loading: false, error: err.message || "加载失败" });
     }
+  },
+
+  goLogin() {
+    wx.navigateTo({ url: "/pages/login/login" });
   },
 
   goRedeem() {

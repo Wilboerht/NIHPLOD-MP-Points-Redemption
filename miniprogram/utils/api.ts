@@ -6,7 +6,7 @@
  * - 统一错误：抛 ApiError（status/code/message），页面只需捕获展示 message
  */
 import { rawRequest, type HttpMethod, type RawResponse } from "./request";
-import { getAccessToken, refreshAccessToken, clearSession } from "./auth";
+import { getAccessToken, refreshAccessTokenOnce, clearSession } from "./auth";
 import { BASE_URL } from "./env";
 import type {
   AddressInput,
@@ -39,18 +39,6 @@ interface AuthRequestOptions {
   url: string;
   method?: HttpMethod;
   data?: Record<string, unknown>;
-}
-
-/** 单飞刷新：并发 401 只触发一次 refresh */
-let refreshing: Promise<boolean> | null = null;
-
-function refreshOnce(): Promise<boolean> {
-  if (!refreshing) {
-    refreshing = refreshAccessToken().finally(() => {
-      refreshing = null;
-    });
-  }
-  return refreshing;
 }
 
 function extractError(statusCode: number, body: unknown): ApiError {
@@ -107,7 +95,7 @@ export async function authRequest<T>(options: AuthRequestOptions): Promise<T> {
   let res = await call();
 
   if (res.statusCode === 401) {
-    const refreshed = await refreshOnce();
+    const refreshed = await refreshAccessTokenOnce();
     if (refreshed) {
       res = await call();
     }
@@ -148,7 +136,7 @@ function uploadRequest<T>(url: string, filePath: string): Promise<T> {
   return (async () => {
     let res = await doUpload();
     if (res.statusCode === 401) {
-      const refreshed = await refreshOnce();
+      const refreshed = await refreshAccessTokenOnce();
       if (refreshed) {
         res = await doUpload();
       }

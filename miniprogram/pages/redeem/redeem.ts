@@ -1,6 +1,11 @@
 import { api, ApiError } from "../../utils/api";
 import { findLastGift, setLastGifts } from "../../utils/cache";
-import { formatPoints, genRequestId, resolveImageUrl } from "../../utils/format";
+import {
+  formatPoints,
+  genRequestId,
+  REDEEM_ERROR_MESSAGES,
+  resolveImageUrl,
+} from "../../utils/format";
 import { subscribeShipped } from "../../utils/subscribe";
 import type { AddressItem, GiftItem } from "../../utils/types";
 
@@ -54,7 +59,12 @@ Page({
       });
       await this.loadAddresses();
     } catch (e) {
-      this.setData({ loading: false, error: (e as Error).message || "加载失败" });
+      const err = e as ApiError;
+      if (err.status === 401) {
+        wx.navigateTo({ url: "/pages/login/login" });
+        return;
+      }
+      this.setData({ loading: false, error: err.message || "加载失败" });
     }
   },
 
@@ -102,10 +112,7 @@ Page({
         addressId,
         requestId: genRequestId(),
       });
-      wx.showToast({
-        title: result.duplicated ? "兑换成功" : "兑换成功",
-        icon: "success",
-      });
+      wx.showToast({ title: "兑换成功", icon: "success" });
       setTimeout(() => {
         // 记录页已不是 tab 页：redirectTo 替换当前确认页，返回时回到礼品详情
         wx.redirectTo({ url: "/pages/records/records" });
@@ -114,10 +121,10 @@ Page({
       const err = e as ApiError;
       if (err.status === 401) {
         wx.navigateTo({ url: "/pages/login/login" });
-      } else if (err.status === 400 && err.code === "INSUFFICIENT") {
-        wx.showToast({ title: "可用积分不足", icon: "none" });
       } else {
-        wx.showToast({ title: err.message || "兑换失败", icon: "none" });
+        // 服务端已带 message；错误码文案兜底（网络抖动/网关错误等场景）
+        const friendly = REDEEM_ERROR_MESSAGES[err.code] ?? err.message;
+        wx.showToast({ title: friendly || "兑换失败", icon: "none" });
       }
     } finally {
       this.setData({ submitting: false });

@@ -27,5 +27,10 @@
   </view>
 </view>
 
+<view wx:elif="{{needLogin && !loading}}" class="card login-card">
+  <view class="login-title">登录后查看礼品详情</view>
+  <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+</view>
+
 <view wx:elif="{{notFound && !loading}}" class="empty">礼品不存在或已下架</view>
 <view wx:elif="{{error}}" class="empty">{{error}}</view>

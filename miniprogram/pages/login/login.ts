@@ -54,8 +54,17 @@ Page({
   done() {
     wx.showToast({ title: "登录成功", icon: "success" });
     setTimeout(() => {
-      wx.switchTab({ url: "/pages/home/home" });
+      this.leave();
     }, 600);
+  },
+
+  /** 有来源页（「去登录」引导进入）时原路返回，由来源页 onShow 刷新；否则回首页 tab */
+  leave() {
+    if (getCurrentPages().length > 1) {
+      wx.navigateBack({ delta: 1 });
+      return;
+    }
+    wx.switchTab({ url: "/pages/home/home" });
   },
 
   async onGetPhoneNumber(e: WechatMiniprogram.CustomEvent<{ code?: string }>) {
@@ -133,6 +142,6 @@ Page({
   },
 
   skip() {
-    wx.switchTab({ url: "/pages/home/home" });
+    this.leave();
   },
 });

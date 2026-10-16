@@ -41,6 +41,13 @@ Page({
     await this.load();
   },
 
+  onShow() {
+    // 从登录页返回后（仍未登录态）重试加载
+    if (!this.data.loading && !this.data.loggedIn) {
+      void this.load();
+    }
+  },
+
   async load() {
     const loggedIn = await ensureSession();
     if (!loggedIn) {

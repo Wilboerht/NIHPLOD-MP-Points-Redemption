@@ -171,6 +171,21 @@ export async function refreshAccessToken(): Promise<boolean> {
   }
 }
 
+/**
+ * 单飞刷新：bootstrap 与 API 401 重放共用同一在途刷新，
+ * 避免并发 refresh_token 触发服务端轮换互踢（后到者失败清会话）。
+ */
+let refreshingPromise: Promise<boolean> | null = null;
+
+export function refreshAccessTokenOnce(): Promise<boolean> {
+  if (!refreshingPromise) {
+    refreshingPromise = refreshAccessToken().finally(() => {
+      refreshingPromise = null;
+    });
+  }
+  return refreshingPromise;
+}
+
 // ============================================
 // 绑定（未绑定用户：短信验证码）
 // ============================================
@@ -283,7 +298,7 @@ let bootstrapPromise: Promise<void> | null = null;
 
 async function doBootstrap(): Promise<void> {
   if (hasSession()) {
-    const ok = await refreshAccessToken();
+    const ok = await refreshAccessTokenOnce();
     if (ok) return;
   }
   const outcome = await login();
