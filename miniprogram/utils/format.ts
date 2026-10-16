@@ -99,6 +99,17 @@ export const LEVEL_THEME_COLORS: Record<string, string> = {
 };
 
 /**
+ * 会员卡背景图（与官网 VipPanel 的 CARD_BG_IMAGES 一致，官网静态资源按等级映射；
+ * 卡面为浅色纹理，使用方需配白色薄纱层 + 深色文字保证可读性）
+ */
+export const LEVEL_CARD_BG_IMAGES: Record<string, string> = {
+  REGULAR: "/images/membership-card-regular.png",
+  SILVER: "/images/membership-card-silver.jpg",
+  GOLD: "/images/membership-card-gold.png",
+  DIAMOND: "/images/membership-card-diamond.png",
+};
+
+/**
  * 消费补录凭证展示地址：公开 URL / 本地路径可直接展示；
  * 私有 objectName（需鉴权签名，小程序 <image> 无法携带鉴权头）返回空串，
  * 页面仅展示"已上传"占位。

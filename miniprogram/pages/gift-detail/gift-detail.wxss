@@ -29,8 +29,32 @@
   margin-bottom: 12rpx;
 }
 
+.gift-name-en {
+  margin-bottom: 8rpx;
+  letter-spacing: 1rpx;
+}
+
 .gift-desc {
   margin-bottom: 20rpx;
+}
+
+.benefit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.benefit-tag {
+  background: rgba(138, 109, 75, 0.08);
+  color: var(--color-primary);
+  border-radius: 8rpx;
+  padding: 6rpx 18rpx;
+  font-size: 24rpx;
+}
+
+.detail-text {
+  line-height: 1.7;
+  white-space: pre-wrap;
 }
 
 .price-row {

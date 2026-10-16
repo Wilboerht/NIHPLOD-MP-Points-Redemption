@@ -1,7 +1,13 @@
 import { api } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
 import { setLastGifts } from "../../utils/cache";
-import { formatDateOnly, formatPoints, LEDGER_TYPE_LABELS, resolveImageUrl } from "../../utils/format";
+import {
+  formatDateOnly,
+  formatPoints,
+  LEDGER_TYPE_LABELS,
+  LEVEL_CARD_BG_IMAGES,
+  resolveImageUrl,
+} from "../../utils/format";
 import type { PointLedgerItem } from "../../utils/types";
 
 interface LedgerRow extends PointLedgerItem {
@@ -31,6 +37,7 @@ Page({
     availableText: "0",
     levelName: "",
     nextLevelTip: "",
+    cardBg: "",
     hotGifts: [] as HotGift[],
     recent: [] as LedgerRow[],
     expiring: [] as ExpiringRow[],
@@ -82,6 +89,10 @@ Page({
         loggedIn: true,
         availableText: formatPoints(data.available),
         levelName: membershipData?.currentLevel.name ?? "",
+        // 会员卡背景图（按等级映射官网静态资源）；等级信息加载失败时为空白卡面
+        cardBg: membershipData
+          ? resolveImageUrl(LEVEL_CARD_BG_IMAGES[membershipData.membershipLevel] ?? "")
+          : "",
         nextLevelTip: membershipData
           ? membershipData.nextLevel
             ? `再消费 ¥${formatPoints(membershipData.nextLevel.spentNeeded)} 升级${membershipData.nextLevel.name}`

@@ -15,10 +15,27 @@
 }
 
 .member-card {
+  position: relative;
+  overflow: hidden;
+  background: #f3ece4;
+  color: var(--color-text);
   border-radius: 24rpx;
-  padding: 44rpx 36rpx;
-  color: #ffffff;
   margin-bottom: 24rpx;
+}
+
+.member-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 白色薄纱层：浅色卡面图上保证深色文字可读性（与官网版式一致） */
+.member-inner {
+  position: relative;
+  padding: 44rpx 36rpx;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .member-level {
@@ -31,10 +48,6 @@
   font-size: 24rpx;
 }
 
-.muted-light {
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .member-bottom {
   margin-top: 32rpx;
 }
@@ -42,18 +55,6 @@
 .member-spent {
   font-size: 40rpx;
   font-weight: 600;
-}
-
-.ghost-btn-light {
-  background: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-  border-radius: 40rpx;
-  font-size: 26rpx;
-  border: none;
-}
-
-.ghost-btn-light::after {
-  border: none;
 }
 
 .card-title-inline {

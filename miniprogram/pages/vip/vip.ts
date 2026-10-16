@@ -1,6 +1,6 @@
 import { api, ApiError } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
-import { formatPoints, LEVEL_THEME_COLORS } from "../../utils/format";
+import { formatPoints, LEVEL_CARD_BG_IMAGES, LEVEL_THEME_COLORS, resolveImageUrl } from "../../utils/format";
 import type { MembershipLevelInfo, MembershipView, SkinTestUsage } from "../../utils/types";
 
 /** 测肤小程序 appid（同一开放平台账号，用于跨小程序跳转） */
@@ -32,6 +32,8 @@ Page({
     nextMinSpentText: "",
     levels: [] as LevelCard[],
     skinUsage: null as SkinView | null,
+    /** 会员卡背景图（按等级映射官网静态资源） */
+    cardBg: "",
   },
 
   onShow() {
@@ -68,6 +70,7 @@ Page({
         loggedIn: true,
         view,
         currentColor: LEVEL_THEME_COLORS[view.membershipLevel] ?? "#78716c",
+        cardBg: resolveImageUrl(LEVEL_CARD_BG_IMAGES[view.membershipLevel] ?? ""),
         totalSpentText: formatPoints(view.totalSpent),
         spentNeededText: view.nextLevel ? formatPoints(view.nextLevel.spentNeeded) : "",
         nextMinSpentText: view.nextLevel ? formatPoints(view.nextLevel.minSpent) : "",

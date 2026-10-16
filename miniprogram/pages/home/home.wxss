@@ -19,11 +19,27 @@
 }
 
 .balance-card {
-  background: linear-gradient(135deg, #8a6d4b 0%, #6f5639 100%);
-  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  background: #f3ece4;
+  color: var(--color-text);
   border-radius: 24rpx;
-  padding: 44rpx 36rpx;
   margin-bottom: 24rpx;
+}
+
+.balance-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 白色薄纱层：浅色卡面图上保证深色文字可读性（与官网版式一致） */
+.balance-inner {
+  position: relative;
+  padding: 44rpx 36rpx;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .member-strip {
@@ -31,20 +47,16 @@
 }
 
 .level-chip {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--color-text);
   border-radius: 999rpx;
   padding: 6rpx 22rpx;
   font-size: 24rpx;
 }
 
-.muted-light {
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .balance-label {
   font-size: 26rpx;
-  opacity: 0.85;
+  color: var(--color-muted);
 }
 
 .balance-value {
@@ -54,13 +66,11 @@
 }
 
 .balance-tip {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--color-muted);
 }
 
 .balance-btn {
   margin-top: 28rpx;
-  background: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
 }
 
 .ledger-head {

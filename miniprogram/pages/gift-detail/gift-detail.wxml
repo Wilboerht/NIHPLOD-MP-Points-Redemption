@@ -8,6 +8,7 @@
 
   <view class="card">
     <view class="gift-name">{{gift.name}}</view>
+    <view wx:if="{{gift.detail.nameEn}}" class="muted small gift-name-en">{{gift.detail.nameEn}}</view>
     <view wx:if="{{gift.description}}" class="muted small gift-desc">{{gift.description}}</view>
     <view class="row price-row">
       <text class="price">参考价 {{gift.priceText}}</text>
@@ -15,9 +16,26 @@
     </view>
   </view>
 
+  <view wx:if="{{benefits.length > 0}}" class="card">
+    <view class="card-title">核心功效</view>
+    <view class="benefit-tags">
+      <text wx:for="{{benefits}}" wx:key="*this" class="benefit-tag">{{item}}</text>
+    </view>
+  </view>
+
   <view wx:if="{{gift.detail.capacity}}" class="card">
     <view class="card-title">规格</view>
     <view class="muted">{{gift.detail.capacity}}</view>
+  </view>
+
+  <view wx:if="{{gift.detail.ingredients}}" class="card">
+    <view class="card-title">成分说明</view>
+    <view class="muted small detail-text">{{gift.detail.ingredients}}</view>
+  </view>
+
+  <view wx:if="{{gift.detail.usage}}" class="card">
+    <view class="card-title">使用方法</view>
+    <view class="muted small detail-text">{{gift.detail.usage}}</view>
   </view>
 
   <view class="bottom-bar">

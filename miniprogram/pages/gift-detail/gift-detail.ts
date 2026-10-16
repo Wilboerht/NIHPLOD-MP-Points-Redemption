@@ -13,6 +13,7 @@ Page({
     notFound: false,
     gift: null as GiftView | null,
     images: [] as string[],
+    benefits: [] as string[],
     canRedeem: false,
     buttonText: "立即兑换",
     error: "",
@@ -74,6 +75,8 @@ Page({
           priceText: `¥${formatPoints(gift.priceYuan)}`,
         },
         images,
+        // 核心功效标签（detail 全量下发，按需渲染）
+        benefits: gift.detail?.benefits ?? [],
         canRedeem,
         buttonText:
           gift.cost === null ? "升级银卡后解锁" : gift.affordable ? "立即兑换" : "积分不足",

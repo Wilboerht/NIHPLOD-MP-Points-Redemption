@@ -39,6 +39,27 @@ export interface ProductImage {
   alt?: string;
 }
 
+/** 礼品详情（与官网 ProductData 对齐；服务端 detail 字段的完整形状） */
+export interface GiftDetail {
+  id: string;
+  name: string;
+  /** 英文名（可能为空） */
+  nameEn?: string | null;
+  slug?: string;
+  description?: string | null;
+  /** 参考价（元） */
+  price?: number;
+  capacity?: string | null;
+  images?: ProductImage[];
+  category?: { name: string };
+  ingredients?: string | null;
+  usage?: string | null;
+  /** 核心功效标签 */
+  benefits?: string[];
+  /** 官网购买链接（小程序内不展示） */
+  purchaseLinks?: Array<{ id: string; platform: string; url: string }>;
+}
+
 export interface GiftItem {
   id: string;
   name: string;
@@ -48,13 +69,7 @@ export interface GiftItem {
   /** 按当前等级折算所需积分；普通档为 null（不可兑礼） */
   cost: number | null;
   affordable: boolean;
-  detail: {
-    id: string;
-    name: string;
-    images?: ProductImage[];
-    capacity?: string;
-    description?: string | null;
-  };
+  detail: GiftDetail;
 }
 
 /** GET /api/oauth/points/gifts */

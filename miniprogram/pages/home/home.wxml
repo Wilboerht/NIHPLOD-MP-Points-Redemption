@@ -7,15 +7,18 @@
 
   <block wx:if="{{loggedIn}}">
     <view class="balance-card">
-      <view class="row member-strip">
-        <view class="level-chip">{{levelName || '会员'}}</view>
-        <text class="muted-light small" bindtap="goVip">会员权益 ›</text>
+      <image wx:if="{{cardBg}}" class="balance-bg" src="{{cardBg}}" mode="aspectFill" />
+      <view class="balance-inner">
+        <view class="row member-strip">
+          <view class="level-chip">{{levelName || '会员'}}</view>
+          <text class="muted small" bindtap="goVip">会员权益 ›</text>
+        </view>
+        <view class="balance-label">可用积分</view>
+        <view class="balance-value">{{availableText}}</view>
+        <view class="balance-tip small">消费 1 元 = 1 积分 · 有效期 6 个月</view>
+        <view wx:if="{{nextLevelTip}}" class="balance-tip small">{{nextLevelTip}}</view>
+        <button size="mini" class="ghost-btn balance-btn" bindtap="goGifts">去兑礼</button>
       </view>
-      <view class="balance-label">可用积分</view>
-      <view class="balance-value">{{availableText}}</view>
-      <view class="balance-tip muted small">消费 1 元 = 1 积分 · 有效期 6 个月</view>
-      <view wx:if="{{nextLevelTip}}" class="balance-tip small">{{nextLevelTip}}</view>
-      <button size="mini" class="ghost-btn balance-btn" bindtap="goGifts">去兑礼</button>
     </view>
 
     <view wx:if="{{hotGifts.length > 0}}" class="card">
