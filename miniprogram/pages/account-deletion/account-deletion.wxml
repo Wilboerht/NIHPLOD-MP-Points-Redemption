@@ -6,8 +6,10 @@
       <view class="card pending-card">
         <view class="card-title">注销申请处理中</view>
         <view class="small tip-line">将于 {{request.scheduledText}} 生效（剩余 {{request.remainingDays}} 天）</view>
-        <view class="muted small tip-line">冷静期内账号可正常使用、可随时撤回；生效后账号不可恢复</view>
+        <view wx:if="{{request.status === 'PENDING'}}" class="muted small tip-line">冷静期内账号可正常使用、可随时撤回；生效后账号不可恢复</view>
+        <view wx:else class="muted small tip-line">注销正在执行中，完成后账号将不可恢复</view>
         <button
+          wx:if="{{request.status === 'PENDING'}}"
           class="btn-primary action-btn"
           loading="{{submitting}}"
           disabled="{{submitting}}"

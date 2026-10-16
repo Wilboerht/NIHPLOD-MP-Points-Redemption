@@ -214,6 +214,26 @@ export interface MembershipView {
 }
 
 // ============================================
+// AI 测肤用量（GET /api/oauth/skin-test-usage）
+// ============================================
+
+/** AI 测肤用量（会员权益；来源测肤子站，不可用时为 null） */
+export interface SkinTestUsage {
+  /** 子站会员等级标识；从未测肤的用户可能为 null */
+  level: string | null;
+  totalUsed: number;
+  todayUsed: number;
+  quota: {
+    /** 累计上限（null = 不限）；unlimited 为 true 时无累计上限 */
+    lifetimeLimit: number | null;
+    dailyLimit: number | null;
+    unlimited: boolean;
+  };
+  /** 剩余次数；null = 不限次 */
+  remaining: number | null;
+}
+
+// ============================================
 // 消费补录
 // ============================================
 

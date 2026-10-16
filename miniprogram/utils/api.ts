@@ -19,6 +19,7 @@ import type {
   ProfileUpdateInput,
   RedeemResult,
   RedemptionsData,
+  SkinTestUsage,
   SpentApplication,
   SpentApplicationInput,
   TrackingData,
@@ -220,6 +221,10 @@ export const api = {
 
   /** 会员等级/权益/升级进度 */
   membership: () => authRequest<MembershipView>({ url: "/api/oauth/membership" }),
+
+  /** AI 测肤用量（会员权益之一；子站不可用时 usage 为 null） */
+  skinTestUsage: () =>
+    authRequest<{ usage: SkinTestUsage | null }>({ url: "/api/oauth/skin-test-usage" }),
 
   /** 消费补录申请列表 */
   spentAdjustments: () =>

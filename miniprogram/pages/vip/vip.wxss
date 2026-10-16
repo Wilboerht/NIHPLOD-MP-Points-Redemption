@@ -56,6 +56,24 @@
   border: none;
 }
 
+.card-title-inline {
+  margin-bottom: 0;
+}
+
+.skin-remaining {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.skin-line {
+  margin-top: 10rpx;
+}
+
+.skin-btn {
+  width: 100%;
+  margin-top: 20rpx;
+}
+
 .progress-head {
   margin-bottom: 16rpx;
 }

@@ -17,6 +17,16 @@
       </view>
     </view>
 
+    <view wx:if="{{skinUsage}}" class="card">
+      <view class="row">
+        <view class="card-title card-title-inline">AI 测肤权益</view>
+        <text class="skin-remaining">{{skinUsage.remainingText}}</text>
+      </view>
+      <view class="muted small skin-line">{{skinUsage.usedText}}</view>
+      <view wx:if="{{skinUsage.quotaText}}" class="muted small skin-line">{{skinUsage.quotaText}}</view>
+      <button class="ghost-btn skin-btn" bindtap="goSkinTest">去测肤小程序使用</button>
+    </view>
+
     <view class="card">
       <view class="card-title">升级进度</view>
       <block wx:if="{{view.nextLevel}}">
