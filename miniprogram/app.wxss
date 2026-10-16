@@ -85,3 +85,18 @@ page {
 .ghost-btn::after {
   border: none;
 }
+
+/* 自绘导航栏（tab 页 navigationStyle: custom）：logo 替代标题文字。
+   状态栏占位由页面内联 padding-top 提供，内容区与系统导航栏同高 44px */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  box-sizing: content-box;
+}
+
+.nav-logo {
+  width: 200rpx;
+  height: 56rpx;
+}

@@ -1,6 +1,7 @@
 import { api } from "../../utils/api";
 import { ensureSession, getStoredUser, logout, updateStoredUser } from "../../utils/auth";
 import { formatPoints, resolveImageUrl } from "../../utils/format";
+import { getStatusBarHeight } from "../../utils/ui";
 
 function maskPhone(phone: string): string {
   return phone.length === 11 ? `${phone.slice(0, 3)}****${phone.slice(7)}` : phone;
@@ -9,10 +10,17 @@ function maskPhone(phone: string): string {
 Page({
   data: {
     loggedIn: false,
+    /** 自定义导航栏状态栏高度（px） */
+    statusBarHeight: 20,
     nickname: "微信用户",
     phoneMasked: "",
     avatar: "",
     availableText: "",
+  },
+
+  onLoad() {
+    // 页面为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
+    this.setData({ statusBarHeight: getStatusBarHeight() });
   },
 
   onShow() {

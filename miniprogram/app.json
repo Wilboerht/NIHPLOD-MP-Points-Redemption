@@ -18,8 +18,8 @@
     "pages/login/login"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#2b2b2b",
-    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#f7f5f2",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "NIHPLOD 积分",
     "backgroundColor": "#f7f5f2",
     "backgroundTextStyle": "dark"

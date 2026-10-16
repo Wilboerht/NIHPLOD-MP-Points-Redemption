@@ -9,6 +9,7 @@ import {
   resolveImageUrl,
 } from "../../utils/format";
 import type { PointLedgerItem } from "../../utils/types";
+import { getStatusBarHeight } from "../../utils/ui";
 
 interface LedgerRow extends PointLedgerItem {
   typeLabel: string;
@@ -34,6 +35,8 @@ Page({
   data: {
     loading: true,
     loggedIn: false,
+    /** 自定义导航栏状态栏高度（px），onLoad 时由全局缓存填充 */
+    statusBarHeight: 20,
     availableText: "0",
     levelName: "",
     nextLevelTip: "",
@@ -42,6 +45,11 @@ Page({
     recent: [] as LedgerRow[],
     expiring: [] as ExpiringRow[],
     error: "",
+  },
+
+  onLoad() {
+    // 首页为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
+    this.setData({ statusBarHeight: getStatusBarHeight() });
   },
 
   onShow() {

@@ -1,3 +1,5 @@
+/* 自绘导航栏样式见 app.wxss（.nav-bar / .nav-logo，三个 tab 页共用） */
+
 .login-card {
   margin-top: 120rpx;
   text-align: center;

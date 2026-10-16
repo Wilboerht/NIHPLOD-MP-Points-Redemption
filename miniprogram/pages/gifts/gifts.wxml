@@ -1,3 +1,8 @@
+<!-- 自绘导航栏（gifts.json navigationStyle: custom）：logo 替代标题文字 -->
+<view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+  <image class="nav-logo" src="/images/nihplod-logo.svg" mode="aspectFit" />
+</view>
+
 <view class="container">
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看礼品</view>

@@ -2,6 +2,7 @@ import { api } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
 import { formatPoints, resolveImageUrl } from "../../utils/format";
 import { setLastGifts } from "../../utils/cache";
+import { getStatusBarHeight } from "../../utils/ui";
 import type { GiftItem } from "../../utils/types";
 
 interface GiftRow extends GiftItem {
@@ -13,10 +14,17 @@ Page({
   data: {
     loading: true,
     loggedIn: false,
+    /** 自定义导航栏状态栏高度（px） */
+    statusBarHeight: 20,
     availableText: "0",
     redeemTip: "",
     gifts: [] as GiftRow[],
     error: "",
+  },
+
+  onLoad() {
+    // 页面为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
+    this.setData({ statusBarHeight: getStatusBarHeight() });
   },
 
   onShow() {
