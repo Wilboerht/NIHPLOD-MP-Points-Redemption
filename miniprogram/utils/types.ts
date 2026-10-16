@@ -253,3 +253,16 @@ export interface SpentApplicationInput {
   images?: string[];
   note?: string;
 }
+
+// ============================================
+// 账号注销（GET/POST/DELETE /api/oauth/account/deletion）
+// ============================================
+
+/** 进行中的注销申请（冷静期内可撤回） */
+export interface DeletionRequestInfo {
+  status: "PENDING" | "RUNNING";
+  requestedAt: string;
+  scheduledAt: string;
+  /** 距离生效剩余天数（向上取整） */
+  remainingDays: number;
+}

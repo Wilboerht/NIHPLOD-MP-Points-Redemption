@@ -44,6 +44,10 @@
         <text>联系客服</text>
         <text class="muted">›</text>
       </button>
+      <view class="menu-item" bindtap="goAccountDeletion">
+        <text>账号注销</text>
+        <text class="muted">›</text>
+      </view>
     </view>
 
     <view class="card">

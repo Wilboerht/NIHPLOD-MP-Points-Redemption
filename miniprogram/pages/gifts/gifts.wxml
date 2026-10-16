@@ -1,5 +1,5 @@
 <view class="container">
-  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+  <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看礼品</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
   </view>
@@ -35,7 +35,7 @@
         </view>
       </view>
     </view>
-
-    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
   </block>
+
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 </view>

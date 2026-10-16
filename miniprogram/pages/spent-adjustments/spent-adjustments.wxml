@@ -1,5 +1,5 @@
 <view class="container adjust-page">
-  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+  <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后申请消费补录</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
   </view>
@@ -36,11 +36,9 @@
         >
           <image class="proof-thumb" src="{{img}}" mode="aspectFill" />
         </view>
-        <text class="muted small proof-count">{{item.imageCount}} 张凭证{{item.displayImages.length < item.imageCount ? '（部分需后台查看）' : ''}}</text>
+        <text class="muted small proof-count">{{item.imageCount}} 张凭证{{item.displayImages.length === 0 ? '（需后台查看）' : item.displayImages.length < item.imageCount ? '（部分需后台查看）' : ''}}</text>
       </view>
     </view>
-
-    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 
     <view class="bottom-bar">
       <button class="btn-primary submit-btn" bindtap="createNew">
@@ -48,4 +46,6 @@
       </button>
     </view>
   </block>
+
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 </view>

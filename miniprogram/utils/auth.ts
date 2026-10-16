@@ -27,10 +27,25 @@ type ApiEnvelope<T> = {
 export type LoginOutcome =
   | { kind: "ok" }
   | { kind: "need-binding"; bindToken: string }
-  | { kind: "failed"; message: string };
+  | { kind: "failed"; message: string; code?: string };
 
 /** 绑定结果：不会出现 need-binding（bindToken 已由登录流程持有） */
-export type BindOutcome = { kind: "ok" } | { kind: "failed"; message: string };
+export type BindOutcome =
+  | { kind: "ok" }
+  /** 绑定已完成（bindToken 已被服务端消费）但换发登录会话失败，可重试登录（无需再绑定） */
+  | { kind: "bound-login-failed"; message: string }
+  | { kind: "failed"; message: string; code?: string };
+
+/** 绑定令牌失效类错误码：需重新静默登录换取新 bindToken 后再继续 */
+export const STALE_BIND_TOKEN_CODES = [
+  "BIND_TOKEN_EXPIRED",
+  "INVALID_BIND_TOKEN",
+  "BIND_TOKEN_USED",
+] as const;
+
+export function isStaleBindTokenError(code: string | undefined): boolean {
+  return Boolean(code && (STALE_BIND_TOKEN_CODES as readonly string[]).includes(code));
+}
 
 // ============================================
 // 本地会话存取
@@ -68,12 +83,19 @@ function saveSession(data: {
   wx.setStorageSync(STORAGE_KEYS.accessToken, data.accessToken);
   wx.setStorageSync(STORAGE_KEYS.refreshToken, data.refreshToken);
   if (data.user) wx.setStorageSync(STORAGE_KEYS.user, data.user);
+  // 登录/刷新成功 = 用户已恢复会话：解除「主动退出」抑制
+  wx.removeStorageSync(STORAGE_KEYS.loggedOut);
 }
 
 export function clearSession(): void {
   wx.removeStorageSync(STORAGE_KEYS.accessToken);
   wx.removeStorageSync(STORAGE_KEYS.refreshToken);
   wx.removeStorageSync(STORAGE_KEYS.user);
+}
+
+/** 用户是否已主动退出（退出后不再静默登录，直到显式重新登录） */
+export function isLoggedOut(): boolean {
+  return Boolean(wx.getStorageSync(STORAGE_KEYS.loggedOut));
 }
 
 // ============================================
@@ -129,7 +151,7 @@ export async function login(phoneCode?: string): Promise<LoginOutcome> {
         return { kind: "ok" };
       }
     }
-    return { kind: "failed", message: body.error?.message ?? "登录失败，请重试" };
+    return { kind: "failed", message: body.error?.message ?? "登录失败，请重试", code: body.error?.code };
   } catch {
     return { kind: "failed", message: "网络异常，请稍后重试" };
   }
@@ -213,7 +235,11 @@ export async function bind(
     if (res.statusCode === 200 && body.success) {
       return { kind: "ok" };
     }
-    return { kind: "failed", message: body.error?.message ?? "绑定失败，请重试" };
+    return {
+      kind: "failed",
+      message: body.error?.message ?? "绑定失败，请重试",
+      code: body.error?.code,
+    };
   } catch {
     return { kind: "failed", message: "网络异常，请稍后重试" };
   }
@@ -222,6 +248,9 @@ export async function bind(
 /**
  * 绑定并登录（短信通道）：
  * bind 完成身份写入（ExternalIdentity）后，重新静默登录换取 RS256 OAuth 双 Token。
+ *
+ * 注意：bindToken 为服务端一次性令牌，bind 成功后即被消费——此后登录失败
+ * 只能重试「登录」，不能重试「绑定」（详见 bound-login-failed 结果类型）。
  */
 export async function bindAndLogin(
   bindToken: string,
@@ -230,13 +259,13 @@ export async function bindAndLogin(
   const bound = await bind(bindToken, payload);
   if (bound.kind !== "ok") return bound;
 
-  const outcome = await login();
-  if (outcome.kind === "ok") return { kind: "ok" };
-  if (outcome.kind === "need-binding") {
-    // 绑定成功后理论上不再需要绑定；出现则提示重试（不覆盖 bindToken）
-    return { kind: "failed", message: "绑定成功但登录未完成，请重试" };
+  // 绑定已完成：登录失败（网络抖动等）重试一次，仍失败则交由调用方重试登录
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const outcome = await login();
+    if (outcome.kind === "ok") return { kind: "ok" };
+    if (outcome.kind === "need-binding") break;
   }
-  return { kind: "failed", message: outcome.message };
+  return { kind: "bound-login-failed", message: "绑定已完成，登录未完成，请重试登录" };
 }
 
 /** 发送绑定短信验证码（携带 bindToken 保证未注册号码也真实发码） */
@@ -262,10 +291,12 @@ export async function sendBindSmsCode(
 // 退出登录
 // ============================================
 
-/** 撤销 refresh token（RFC 7009，public client）+ 清本地会话 */
+/** 撤销 refresh token（RFC 7009，public client）+ 清本地会话 + 置退出标记（抑制静默登录） */
 export async function logout(): Promise<void> {
   const token = getRefreshToken();
   clearSession();
+  pendingBindToken = "";
+  wx.setStorageSync(STORAGE_KEYS.loggedOut, 1);
   if (!token) return;
   try {
     await rawRequest({
@@ -297,6 +328,8 @@ export function setPendingBindToken(token: string): void {
 let bootstrapPromise: Promise<void> | null = null;
 
 async function doBootstrap(): Promise<void> {
+  // 用户主动退出后不静默登录：由「去登录」按钮显式触发
+  if (isLoggedOut()) return;
   if (hasSession()) {
     const ok = await refreshAccessTokenOnce();
     if (ok) return;

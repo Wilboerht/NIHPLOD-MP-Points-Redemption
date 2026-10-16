@@ -23,7 +23,7 @@
     <view wx:if="{{trackingLoading}}" class="muted small">物流查询中…</view>
 
     <block wx:elif="{{tracking && tracking.rows.length > 0}}">
-      <view wx:for="{{tracking.rows}}" wx:key="index" class="route-row">
+      <view wx:for="{{tracking.rows}}" wx:key="key" class="route-row">
         <view class="route-dot" />
         <view class="route-body">
           <view class="small">{{item.description}}</view>

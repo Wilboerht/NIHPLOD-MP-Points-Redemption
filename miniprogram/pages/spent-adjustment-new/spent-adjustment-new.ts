@@ -31,17 +31,36 @@ Page({
     maxImages: MAX_IMAGES,
   },
 
-  async onLoad() {
-    const loggedIn = await ensureSession();
-    if (!loggedIn) {
-      wx.navigateTo({ url: "/pages/login/login" });
-      return;
-    }
+  /** 登录引导是否已触发（用户跳过登录返回时不再反复跳转） */
+  loginPrompted: false,
+  checkingSession: false,
+
+  onLoad() {
     const now = new Date();
     const pad = (n: number) => (n < 10 ? `0${n}` : String(n));
     this.setData({
       today: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
     });
+    void this.checkSession();
+  },
+
+  onShow() {
+    // 从登录页返回后重试会话检查（首次进入由 onLoad 触发）
+    void this.checkSession();
+  },
+
+  async checkSession() {
+    if (this.checkingSession) return;
+    this.checkingSession = true;
+    try {
+      const loggedIn = await ensureSession();
+      if (!loggedIn && !this.loginPrompted) {
+        this.loginPrompted = true;
+        wx.navigateTo({ url: "/pages/login/login" });
+      }
+    } finally {
+      this.checkingSession = false;
+    }
   },
 
   onChannelChange(e: WechatMiniprogram.PickerChange) {

@@ -107,17 +107,19 @@ Page({
       // 订阅发货通知（用户点击内触发，尽力而为；未配置模板/拒绝订阅均不影响流程）
       await subscribeShipped();
 
-      const result = await api.redeem({
+      await api.redeem({
         productId: gift.id,
         addressId,
         requestId: genRequestId(),
       });
+      // 成功提示期间保持 submitting=true，避免 800ms 跳转窗口内重复提交
       wx.showToast({ title: "兑换成功", icon: "success" });
       setTimeout(() => {
         // 记录页已不是 tab 页：redirectTo 替换当前确认页，返回时回到礼品详情
         wx.redirectTo({ url: "/pages/records/records" });
       }, 800);
     } catch (e) {
+      this.setData({ submitting: false });
       const err = e as ApiError;
       if (err.status === 401) {
         wx.navigateTo({ url: "/pages/login/login" });
@@ -126,8 +128,6 @@ Page({
         const friendly = REDEEM_ERROR_MESSAGES[err.code] ?? err.message;
         wx.showToast({ title: friendly || "兑换失败", icon: "none" });
       }
-    } finally {
-      this.setData({ submitting: false });
     }
   },
 });

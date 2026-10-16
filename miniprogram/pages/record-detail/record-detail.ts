@@ -5,11 +5,16 @@ import type { RedemptionItem, TrackingData, TrackingRoute } from "../../utils/ty
 
 type ItemView = RedemptionItem & { statusText: string; dateText: string; pointsText: string };
 
+/** 轨迹行：字段可能重复（同一时刻多条），预生成稳定 key 供 wx:for 使用 */
+interface TrackingRow extends TrackingRoute {
+  key: string;
+}
+
 Page({
   data: {
     loading: true,
     item: null as ItemView | null,
-    tracking: null as (TrackingData & { rows: TrackingRoute[] }) | null,
+    tracking: null as (TrackingData & { rows: TrackingRow[] }) | null,
     trackingLoading: false,
     trackingMessage: "",
     error: "",
@@ -56,7 +61,10 @@ Page({
     this.setData({ trackingLoading: true, trackingMessage: "" });
     try {
       const data = await api.tracking(this.redemptionId);
-      const rows = (data.routes ?? []).slice().reverse();
+      const rows: TrackingRow[] = (data.routes ?? [])
+        .slice()
+        .reverse()
+        .map((route, index) => ({ ...route, key: `${index}` }));
       this.setData({
         trackingLoading: false,
         tracking: { ...data, rows },

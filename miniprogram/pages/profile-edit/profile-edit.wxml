@@ -24,6 +24,7 @@
         <text class="label">昵称</text>
         <input
           class="input"
+          type="nickname"
           value="{{nickname}}"
           maxlength="20"
           placeholder="请输入昵称"

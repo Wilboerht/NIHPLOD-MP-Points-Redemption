@@ -11,6 +11,7 @@ import { BASE_URL } from "./env";
 import type {
   AddressInput,
   AddressItem,
+  DeletionRequestInfo,
   GiftsData,
   LedgerPage,
   MembershipView,
@@ -235,4 +236,20 @@ export const api = {
   /** 补录凭证上传（≤10MB 图片；返回原始值，私有存储时为 objectName） */
   uploadSpentProof: (filePath: string) =>
     uploadRequest<{ url: string; private: boolean }>("/api/oauth/spent-adjustments/upload", filePath),
+
+  /** 账号注销：查询进行中的申请（无则 request: null） */
+  deletionStatus: () =>
+    authRequest<{ request: DeletionRequestInfo | null }>({ url: "/api/oauth/account/deletion" }),
+
+  /** 账号注销：提交申请（冷静期默认 7 天，可随时撤回；幂等） */
+  requestDeletion: (data: { reason?: string }) =>
+    authRequest<{ request: DeletionRequestInfo; warnings: string[] }>({
+      url: "/api/oauth/account/deletion",
+      method: "POST",
+      data: { ...data },
+    }),
+
+  /** 账号注销：撤回申请 */
+  cancelDeletion: () =>
+    authRequest<{ message: string }>({ url: "/api/oauth/account/deletion", method: "DELETE" }),
 };

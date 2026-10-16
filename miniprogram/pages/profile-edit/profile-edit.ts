@@ -21,7 +21,6 @@ Page({
     uploading: false,
     error: "",
     avatarUrl: "",
-    originalAvatar: "",
     nickname: "",
     originalNickname: "",
     genderOptions: GENDER_OPTIONS.map((o) => o.label),
@@ -32,6 +31,11 @@ Page({
     birthdaySet: false,
     birthdayText: "",
   },
+
+  /** 待上传的本地头像路径：保存时才上传，用户放弃编辑不产生孤儿文件 */
+  pendingAvatarPath: "",
+  /** 已上传的新头像绝对地址：保存失败重试时复用，避免重复上传 */
+  uploadedAvatarUrl: "",
 
   async onLoad() {
     const now = new Date();
@@ -63,7 +67,6 @@ Page({
         loading: false,
         loggedIn: true,
         avatarUrl: avatar,
-        originalAvatar: avatar,
         nickname: info.nickname ?? "",
         originalNickname: info.nickname ?? "",
         genderIndex: index,
@@ -81,16 +84,13 @@ Page({
     wx.navigateTo({ url: "/pages/login/login" });
   },
 
-  async onChooseAvatar(e: WechatMiniprogram.CustomEvent<{ avatarUrl: string }>) {
+  onChooseAvatar(e: WechatMiniprogram.CustomEvent<{ avatarUrl: string }>) {
     const tempPath = e.detail.avatarUrl;
     if (!tempPath) return;
-    this.setData({ uploading: true, error: "" });
-    try {
-      const result = await api.uploadAvatar(tempPath);
-      this.setData({ uploading: false, avatarUrl: resolveImageUrl(result.url) || tempPath });
-    } catch (err) {
-      this.setData({ uploading: false, error: (err as ApiError).message || "头像上传失败" });
-    }
+    // 仅暂存本地路径用于预览；实际上传推迟到「保存」，避免放弃编辑产生孤儿文件
+    this.pendingAvatarPath = tempPath;
+    this.uploadedAvatarUrl = "";
+    this.setData({ avatarUrl: tempPath, error: "" });
   },
 
   onNicknameInput(e: WechatMiniprogram.Input) {
@@ -109,8 +109,6 @@ Page({
     const {
       nickname,
       originalNickname,
-      avatarUrl,
-      originalAvatar,
       genderIndex,
       originalGenderIndex,
       birthdaySet,
@@ -126,10 +124,24 @@ Page({
       return;
     }
 
+    // 先上传新头像（如有），失败则中止保存
+    if (this.pendingAvatarPath) {
+      this.setData({ uploading: true, error: "" });
+      try {
+        const result = await api.uploadAvatar(this.pendingAvatarPath);
+        this.uploadedAvatarUrl = resolveImageUrl(result.url);
+        this.pendingAvatarPath = "";
+      } catch (err) {
+        this.setData({ uploading: false, error: (err as ApiError).message || "头像上传失败" });
+        return;
+      }
+      this.setData({ uploading: false });
+    }
+
     // 仅提交有变更的字段（生日只允许"首次设置"提交一次，锁定后页面不再提供入口）
     const patch: ProfileUpdateInput = {};
     if (trimmed !== originalNickname) patch.nickname = trimmed;
-    if (avatarUrl && avatarUrl !== originalAvatar) patch.avatar = avatarUrl;
+    if (this.uploadedAvatarUrl) patch.avatar = this.uploadedAvatarUrl;
     if (genderIndex !== originalGenderIndex) {
       patch.gender = GENDER_OPTIONS[genderIndex].value;
     }

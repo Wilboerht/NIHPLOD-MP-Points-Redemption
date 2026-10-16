@@ -1,5 +1,5 @@
 <view class="container">
-  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
+  <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看会员信息</view>
     <view class="muted small login-desc">使用微信一键登录，积分与官网账号同步</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
@@ -43,7 +43,7 @@
 
     <view wx:if="{{expiring.length > 0}}" class="card warn-card">
       <view class="card-title">即将过期</view>
-      <view wx:for="{{expiring}}" wx:key="index" class="row expiring-row">
+      <view wx:for="{{expiring}}" wx:key="id" class="row expiring-row">
         <text class="small">{{item.title}}</text>
         <text class="danger small">{{item.points}} 积分 · {{item.expiresAt}} 过期</text>
       </view>
@@ -63,7 +63,7 @@
         <text class="{{item.amount > 0 ? 'plus' : 'minus'}}">{{item.amountText}}</text>
       </view>
     </view>
-
-    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
   </block>
+
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 </view>

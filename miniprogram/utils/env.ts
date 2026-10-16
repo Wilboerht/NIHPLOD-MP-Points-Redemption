@@ -21,11 +21,13 @@ export const STORAGE_KEYS = {
   accessToken: "nihplod_points_access_token",
   refreshToken: "nihplod_points_refresh_token",
   user: "nihplod_points_user",
+  /** 主动退出标记：抑制启动期静默登录（下次显式登录成功即清除） */
+  loggedOut: "nihplod_points_logged_out",
 } as const;
 
 /**
  * 订阅消息模板 ID（微信公众平台创建后填入；留空 = 对应订阅请求自动跳过）
  * 官网 env 需配置同名模板：MP_POINTS_TEMPLATE_SHIPPED / MP_POINTS_TEMPLATE_SPENT_REVIEW
  */
-export const SUBSCRIBE_TMPL_SHIPPED = "";
-export const SUBSCRIBE_TMPL_SPENT_REVIEW = "";
+export const SUBSCRIBE_TMPL_SHIPPED = "gn7tg4ZpQABFC3aQO6dDho_x4ZddIm_31B1wX5ChSvA";
+export const SUBSCRIBE_TMPL_SPENT_REVIEW = "6hPzooJROfwlVrfS8GjMBP6DcBIB6i3Jy4OwALvwWQ0";

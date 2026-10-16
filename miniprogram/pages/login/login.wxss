@@ -42,6 +42,11 @@
   width: 100%;
 }
 
+.error-retry {
+  width: 70%;
+  margin-bottom: 24rpx;
+}
+
 .error-card {
   color: var(--color-danger);
   text-align: center;

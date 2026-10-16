@@ -11,11 +11,14 @@ export function resolveImageUrl(url: string | null | undefined): string {
   return `${BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-/** 千分位格式化（不依赖 Intl，兼容低端机型） */
+/** 千分位格式化（不依赖 Intl，兼容低端机型；最多保留两位小数） */
 export function formatPoints(value: number): string {
+  if (!Number.isFinite(value)) return "0";
   const sign = value < 0 ? "-" : "";
-  const digits = Math.abs(Math.trunc(value)).toString();
-  return sign + digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const abs = Math.round(Math.abs(value) * 100) / 100;
+  const [intText, decText] = String(abs).split(".");
+  const grouped = intText.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return `${sign}${grouped}${decText ? `.${decText}` : ""}`;
 }
 
 function pad(n: number): string {

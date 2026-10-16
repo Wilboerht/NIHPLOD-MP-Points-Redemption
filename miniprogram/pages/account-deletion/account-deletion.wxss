@@ -1,0 +1,63 @@
+.tip-line {
+  line-height: 1.8;
+  margin-top: 8rpx;
+}
+
+.warn-card {
+  background: rgba(194, 84, 80, 0.04);
+}
+
+.pending-card {
+  border: 2rpx solid rgba(138, 109, 75, 0.4);
+}
+
+.reason-input {
+  width: 100%;
+  min-height: 140rpx;
+  margin-top: 8rpx;
+}
+
+.confirm-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8rpx;
+}
+
+.confirm-label checkbox {
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 100%;
+  margin-top: 28rpx;
+}
+
+.link {
+  color: var(--color-primary);
+}
+
+.contact-btn {
+  width: 100%;
+  margin-top: 20rpx;
+}
+
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}

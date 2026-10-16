@@ -93,10 +93,8 @@ Page({
   },
 
   goRedeem() {
-    if (!this.data.canRedeem) {
-      wx.showToast({ title: this.data.buttonText, icon: "none" });
-      return;
-    }
+    // 按钮已禁用，此为防御分支
+    if (!this.data.canRedeem) return;
     wx.navigateTo({ url: `/pages/redeem/redeem?id=${this.giftId}` });
   },
 

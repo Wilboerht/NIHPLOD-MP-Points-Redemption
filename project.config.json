@@ -1,7 +1,7 @@
 {
   "compileType": "miniprogram",
   "libVersion": "3.4.10",
-  "appid": "touristappid",
+  "appid": "wx9fb8f3d1c719c4ed",
   "projectname": "nihplod-points-mp",
   "miniprogramRoot": "miniprogram/",
   "setting": {
@@ -10,7 +10,30 @@
     "postcss": true,
     "minified": true,
     "urlCheck": false,
-    "useCompilerPlugins": ["typescript"]
+    "useCompilerPlugins": [
+      "typescript"
+    ],
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }

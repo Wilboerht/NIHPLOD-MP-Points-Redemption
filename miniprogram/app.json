@@ -14,6 +14,7 @@
     "pages/vip/vip",
     "pages/spent-adjustments/spent-adjustments",
     "pages/spent-adjustment-new/spent-adjustment-new",
+    "pages/account-deletion/account-deletion",
     "pages/login/login"
   ],
   "window": {

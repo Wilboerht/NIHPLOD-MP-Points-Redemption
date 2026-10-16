@@ -11,6 +11,7 @@ interface LedgerRow extends PointLedgerItem {
 }
 
 interface ExpiringRow {
+  id: string;
   title: string;
   points: number;
   expiresAt: string;
@@ -62,19 +63,7 @@ Page({
         amountText: `${item.amount > 0 ? "+" : ""}${formatPoints(item.amount)}`,
       }));
 
-      const now = Date.now();
-      const deadline = now + 30 * 24 * 60 * 60 * 1000;
-      const expiring: ExpiringRow[] = data.recent
-        .filter((r) => {
-          if (!r.expiresAt || !r.remaining || r.remaining <= 0 || r.amount <= 0) return false;
-          const t = new Date(r.expiresAt).getTime();
-          return !isNaN(t) && t > now && t <= deadline;
-        })
-        .map((r) => ({
-          title: LEDGER_TYPE_LABELS[r.type] ?? r.type,
-          points: r.remaining ?? 0,
-          expiresAt: formatDateOnly(r.expiresAt),
-        }));
+      const expiring = await this.loadExpiring(data.recent);
 
       // 精选好礼：取接口排序前 4 个；同时写入缓存，详情页可直接复用
       let hotGifts: HotGift[] = [];
@@ -110,6 +99,48 @@ Page({
       }
       this.setData({ loading: false, error: err.message || "积分加载失败" });
     }
+  },
+
+  /**
+   * 收集 30 天内即将过期积分（含剩余量）。
+   * recent 不足 20 条时即近一年全量；否则翻积分明细页补齐（封顶 10 页 200 条）。
+   */
+  async loadExpiring(recent: PointLedgerItem[]): Promise<ExpiringRow[]> {
+    if (recent.length < 20) return this.filterExpiring(recent);
+    try {
+      const items: PointLedgerItem[] = [];
+      // 积分有效期 6 个月（日历月 181~184 天）：早于 190 天的流水必然已过期，可提前截止
+      const cutoff = Date.now() - 190 * 24 * 60 * 60 * 1000;
+      let offset = 0;
+      for (let page = 0; page < 10; page++) {
+        const data = await api.pointsLedger(offset);
+        items.push(...data.items);
+        const oldest = data.items[data.items.length - 1];
+        if (!data.hasMore || !oldest || new Date(oldest.createdAt).getTime() < cutoff) break;
+        offset += data.items.length;
+      }
+      return this.filterExpiring(items);
+    } catch {
+      // 明细接口异常时退回 recent（可能遗漏较早记录，不影响主体展示）
+      return this.filterExpiring(recent);
+    }
+  },
+
+  filterExpiring(items: PointLedgerItem[]): ExpiringRow[] {
+    const now = Date.now();
+    const deadline = now + 30 * 24 * 60 * 60 * 1000;
+    return items
+      .filter((r) => {
+        if (!r.expiresAt || !r.remaining || r.remaining <= 0 || r.amount <= 0) return false;
+        const t = new Date(r.expiresAt).getTime();
+        return !isNaN(t) && t > now && t <= deadline;
+      })
+      .map((r) => ({
+        id: r.id,
+        title: LEDGER_TYPE_LABELS[r.type] ?? r.type,
+        points: r.remaining ?? 0,
+        expiresAt: formatDateOnly(r.expiresAt),
+      }));
   },
 
   goLogin() {
