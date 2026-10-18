@@ -1,38 +1,72 @@
-<view class="container" wx:if="{{item}}">
+<view wx:if="{{loading}}" class="loading-block">加载中…</view>
+
+<view class="container record-detail" wx:if="{{item}}">
   <view class="card">
-    <view class="row">
-      <text class="product-name">{{item.productName}}</text>
-      <text class="status status-{{item.status}}">{{item.statusText}}</text>
+    <view class="detail-head">
+      <image wx:if="{{item.imageUrl}}" class="detail-thumb" src="{{item.imageUrl}}" mode="aspectFill" />
+      <view wx:else class="detail-thumb detail-thumb-placeholder">NIHPLOD</view>
+      <view class="detail-head-main">
+        <view class="detail-name-row">
+          <view class="product-name">{{item.productName}}</view>
+          <text class="status status-{{item.status}}">{{item.statusText}}</text>
+        </view>
+        <view wx:if="{{item.statusHint}}" class="status-hint">{{item.statusHint}}</view>
+      </view>
     </view>
-    <view class="info-row"><text class="muted small">兑换时间</text><text class="small">{{item.dateText}}</text></view>
-    <view class="info-row"><text class="muted small">扣减积分</text><text class="points">{{item.pointsText}}</text></view>
-    <view wx:if="{{item.recipient}}" class="info-row">
-      <text class="muted small">收货信息</text>
-      <text class="small address-text">{{item.recipient}} {{item.phone}} {{item.address}}</text>
+
+    <view class="info-list">
+      <view class="info-row">
+        <text class="muted small">兑换时间</text>
+        <text class="info-value">{{item.dateText}}</text>
+      </view>
+      <view class="info-row">
+        <text class="muted small">扣减积分</text>
+        <text class="points">{{item.pointsText}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{item.recipient}}" class="address-block">
+      <view class="muted small">收货信息</view>
+      <view class="address-name">{{item.recipient}} {{item.phone}}</view>
+      <view class="address-detail">{{item.address}}</view>
     </view>
   </view>
 
   <view class="card">
-    <view class="row">
-      <view class="card-title">物流信息</view>
-      <text wx:if="{{item.waybillNo}}" class="muted small" bindtap="copyWaybill">
-        运单号：{{item.waybillNo}}（复制）
-      </text>
+    <view class="row logistics-head">
+      <view class="card-title card-title-inline">物流信息</view>
+      <view wx:if="{{item.waybillNo}}" class="copy-hit" bindtap="copyWaybill" hover-class="copy-hit-hover">
+        复制运单号
+      </view>
     </view>
 
-    <view wx:if="{{trackingLoading}}" class="muted small">物流查询中…</view>
+    <view wx:if="{{item.waybillNo}}" class="waybill-row">
+      <text class="muted small">运单号</text>
+      <text class="waybill-no">{{item.waybillNo}}</text>
+    </view>
+
+    <view wx:if="{{trackingLoading}}" class="tracking-note">物流查询中…</view>
 
     <block wx:elif="{{tracking && tracking.rows.length > 0}}">
-      <view wx:for="{{tracking.rows}}" wx:key="key" class="route-row">
-        <view class="route-dot" />
-        <view class="route-body">
-          <view class="small">{{item.description}}</view>
-          <view class="muted small">{{item.time}}{{item.location ? ' · ' + item.location : ''}}</view>
+      <view class="timeline">
+        <view
+          wx:for="{{tracking.rows}}"
+          wx:key="key"
+          class="timeline-item {{index === 0 ? 'timeline-item-latest' : ''}}"
+        >
+          <view class="timeline-rail">
+            <view class="timeline-dot" />
+            <view wx:if="{{index < tracking.rows.length - 1}}" class="timeline-line" />
+          </view>
+          <view class="timeline-body">
+            <view class="timeline-desc">{{item.description}}</view>
+            <view class="timeline-meta">{{item.time}}{{item.location ? ' · ' + item.location : ''}}</view>
+          </view>
         </view>
       </view>
     </block>
 
-    <view wx:else class="muted small">{{trackingMessage || '暂无物流信息'}}</view>
+    <view wx:else class="tracking-note">{{trackingMessage || '暂无物流信息'}}</view>
   </view>
 </view>
 

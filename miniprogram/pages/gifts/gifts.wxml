@@ -1,26 +1,60 @@
-<!-- 自绘导航栏（gifts.json navigationStyle: custom）：logo 替代标题文字 -->
+<!-- 自绘导航栏（gifts.json navigationStyle: custom）：logo 替代标题文字，固定悬浮如原生导航栏 -->
 <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
   <image class="nav-logo" src="/images/nihplod-logo.svg" mode="aspectFit" />
 </view>
+<view style="height: {{statusBarHeight + 44}}px;"></view>
 
 <view class="container">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看礼品</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn}}">
-    <view class="card head-card">
-      <view class="row">
-        <view>
-          <view class="muted small">可用积分</view>
-          <view class="head-value">{{availableText}}</view>
+    <view class="points-card" style="{{cardStyle}}">
+      <view class="points-top">
+        <view class="points-meta">
+          <view class="level-tag">{{levelName || '会员'}}</view>
+          <text class="points-label">可用积分</text>
+          <view class="help-hit" catchtap="openRules">
+            <view class="help-dot">?</view>
+          </view>
         </view>
-        <text class="muted small head-tip">{{redeemTip}}</text>
+        <view class="points-link" bindtap="goLedger" hover-class="points-link-hover">
+          <text>明细</text>
+          <image class="points-link-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
+      </view>
+      <view class="points-value">{{availableText}}</view>
+    </view>
+
+    <view class="point-actions">
+      <view class="point-action" bindtap="goRecords" hover-class="point-action-hover">
+        <image class="point-action-icon" src="/images/icons/package.svg" mode="aspectFit" />
+        <text class="point-action-label">兑换记录</text>
+      </view>
+      <view class="point-action" bindtap="goSpentAdjust" hover-class="point-action-hover">
+        <image class="point-action-icon" src="/images/icons/receipt-text.svg" mode="aspectFit" />
+        <text class="point-action-label">获取积分</text>
       </view>
     </view>
 
-    <view wx:if="{{gifts.length === 0 && !loading}}" class="empty">暂无可兑换礼品</view>
+    <view wx:if="{{!canRedeem}}" class="card upgrade-card">
+      <view class="upgrade-title">升级银卡，解锁积分兑礼</view>
+      <view class="muted small upgrade-desc">累计消费满 ¥1,000 即可升级银卡会员</view>
+      <button class="ghost-btn upgrade-btn" bindtap="goVip">查看会员权益</button>
+    </view>
+
+    <view wx:if="{{gifts.length > 0}}" class="gift-section-head">
+      <view class="gift-section-title">积分可兑</view>
+    </view>
+
+    <view wx:if="{{gifts.length === 0 && !loading}}" class="empty-state">
+      <view class="empty">暂无可兑换礼品</view>
+      <button class="ghost-btn empty-btn" bindtap="goVip">查看会员权益</button>
+    </view>
 
     <view
       wx:for="{{gifts}}"
@@ -28,19 +62,26 @@
       class="card gift-card"
       data-id="{{item.id}}"
       bindtap="openGift"
+      hover-class="gift-card-hover"
     >
-      <image wx:if="{{item.image}}" class="gift-image" src="{{item.image}}" mode="aspectFill" />
-      <view wx:else class="gift-image gift-image-placeholder">NIHPLOD</view>
+      <view class="gift-media">
+        <image wx:if="{{item.image}}" class="gift-image" src="{{item.image}}" mode="aspectFill" />
+        <view wx:else class="gift-image gift-image-placeholder">NIHPLOD</view>
+        <text wx:if="{{item.statusText}}" class="gift-tag {{item.statusClass}}">{{item.statusText}}</text>
+      </view>
       <view class="gift-info">
         <view class="gift-name">{{item.name}}</view>
         <view wx:if="{{item.description}}" class="muted small gift-desc">{{item.description}}</view>
-        <view class="row gift-bottom">
-          <text class="gift-cost {{item.cost === null ? 'muted' : ''}}">{{item.costText}}</text>
-          <text class="muted small">{{item.priceText}}</text>
+        <view class="gift-bottom">
+          <text class="gift-cost {{item.costClass}}">{{item.costText}}</text>
+          <text class="gift-price">{{item.priceText}}</text>
         </view>
       </view>
     </view>
   </block>
 
   <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
+  <!-- 积分规则半屏抽屉（组件，与「我的」页共用） -->
+  <rules-sheet id="rules-sheet" />
 </view>

@@ -1,68 +1,125 @@
-<!-- 自绘导航栏（me.json navigationStyle: custom）：logo 替代标题文字 -->
+<!-- 自绘导航栏（me.json navigationStyle: custom）：logo 替代标题文字，固定悬浮如原生导航栏 -->
 <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
   <image class="nav-logo" src="/images/nihplod-logo.svg" mode="aspectFit" />
 </view>
+<view style="height: {{statusBarHeight + 44}}px;"></view>
 
 <view class="container me-page">
-  <view wx:if="{{!loggedIn}}" class="card login-card">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
+  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
     <view class="login-title">未登录</view>
     <view class="muted small login-desc">登录后查看积分与兑换记录</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn}}">
-    <view class="card profile-card">
-      <image wx:if="{{avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
-      <view wx:else class="avatar avatar-fallback">{{nickname[0]}}</view>
-      <view class="profile-meta">
-        <view class="nickname">{{nickname}}</view>
-        <view class="muted small">{{phoneMasked || '已绑定手机号'}}</view>
+    <view class="profile-card" style="{{cardStyle}}">
+      <view class="profile-left" bindtap="goProfileEdit" hover-class="row-hover">
+        <image wx:if="{{avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
+        <view wx:else class="avatar avatar-fallback">{{nickname[0]}}</view>
+        <view class="profile-meta">
+          <view class="nickname">{{nickname}}</view>
+          <view class="muted small">{{phoneMasked || '已绑定手机号'}}</view>
+        </view>
       </view>
-      <view wx:if="{{availableText}}" class="profile-points">
-        <view class="muted small">可用积分</view>
+      <view class="profile-points" bindtap="goLedger" hover-class="row-hover">
+        <view class="points-head">
+          <view class="help-hit" catchtap="openRules">
+            <view class="help-dot">?</view>
+          </view>
+          <text class="muted small">可用积分</text>
+        </view>
         <view class="points-value">{{availableText}}</view>
       </view>
     </view>
 
+    <!-- 快捷入口：高频功能四列等分（不套白卡，直接铺在页面底色上） -->
+    <view class="quick-row">
+      <view class="quick-item" bindtap="goVip" hover-class="quick-item-hover">
+        <image class="quick-icon" src="/images/icons/crown.svg" mode="aspectFit" />
+        <text class="quick-label">会员权益</text>
+      </view>
+      <view class="quick-item" bindtap="goRecords" hover-class="quick-item-hover">
+        <image class="quick-icon" src="/images/icons/package.svg" mode="aspectFit" />
+        <text class="quick-label">兑换记录</text>
+      </view>
+      <view class="quick-item" bindtap="goSpentAdjust" hover-class="quick-item-hover">
+        <image class="quick-icon" src="/images/icons/receipt-text.svg" mode="aspectFit" />
+        <text class="quick-label">消费补录</text>
+      </view>
+      <view class="quick-item" bindtap="goLedger" hover-class="quick-item-hover">
+        <image class="quick-icon" src="/images/icons/list.svg" mode="aspectFit" />
+        <text class="quick-label">积分明细</text>
+      </view>
+    </view>
+
     <view class="card menu-card">
-      <view class="menu-item" bindtap="goProfileEdit">
-        <text>编辑资料</text>
-        <text class="muted">›</text>
+      <view class="menu-item" bindtap="goProfileEdit" hover-class="row-hover">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/user.svg" mode="aspectFit" />
+          <text>个人资料</text>
+        </view>
+        <image class="menu-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
       </view>
-      <view class="menu-item" bindtap="goVip">
-        <text>会员权益</text>
-        <text class="muted">›</text>
-      </view>
-      <view class="menu-item" bindtap="goRecords">
-        <text>兑换记录</text>
-        <text class="muted">›</text>
-      </view>
-      <view class="menu-item" bindtap="goAddresses">
-        <text>收货地址</text>
-        <text class="muted">›</text>
-      </view>
-      <view class="menu-item" bindtap="goSpentAdjust">
-        <text>消费补录</text>
-        <text class="muted">›</text>
-      </view>
-      <button class="menu-item menu-item-btn" open-type="contact">
-        <text>联系客服</text>
-        <text class="muted">›</text>
-      </button>
-      <view class="menu-item" bindtap="goAccountDeletion">
-        <text>账号注销</text>
-        <text class="muted">›</text>
+      <view class="menu-item" bindtap="goAddresses" hover-class="row-hover">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/map-pin.svg" mode="aspectFit" />
+          <text>收货地址</text>
+        </view>
+        <image class="menu-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
       </view>
     </view>
 
-    <view class="card">
-      <view class="card-title">积分规则</view>
-      <view class="muted small rule-row">· 官网/官方渠道消费 1 元 = 1 积分，所有等级均累积</view>
-      <view class="muted small rule-row">· 积分有效期 6 个月，过期自动失效</view>
-      <view class="muted small rule-row">· 银卡及以上会员可参与积分兑礼（兑礼率 1 / 1.3 / 1.5）</view>
-      <view class="muted small rule-row">· 累计消费满 ¥1,000 / ¥5,000 / ¥10,000 升级银卡 / 金卡 / 钻石卡</view>
+    <view class="card menu-card">
+      <view class="menu-item" bindtap="goFollowUs" hover-class="row-hover">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/messages.svg" mode="aspectFit" />
+          <text>关注我们</text>
+        </view>
+        <image class="menu-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+      </view>
+      <view class="menu-item" bindtap="goSecurityCenter" hover-class="row-hover">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/shield.svg" mode="aspectFit" />
+          <text>安全中心</text>
+        </view>
+        <image class="menu-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+      </view>
+      <view class="menu-item" bindtap="goPrivacy" hover-class="row-hover">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/lock.svg" mode="aspectFit" />
+          <text>隐私政策</text>
+        </view>
+        <image class="menu-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+      </view>
+      <view class="menu-item" bindtap="goTerms" hover-class="row-hover">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/file-text.svg" mode="aspectFit" />
+          <text>服务条款</text>
+        </view>
+        <image class="menu-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+      </view>
     </view>
 
-    <button class="logout-btn" bindtap="onLogout">退出登录</button>
+    <view class="card menu-card">
+      <view class="menu-item menu-item-relative" hover-class="row-hover">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/headset.svg" mode="aspectFit" />
+          <text>在线客服</text>
+        </view>
+        <image class="menu-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+        <button class="contact-hit" open-type="contact" hover-class="none" aria-label="在线客服"></button>
+      </view>
+    </view>
   </block>
+
+  <!-- 页脚：版权与小程序 ICP 备案信息（备案通过后替换 me.ts 中 ICP_BEIAN） -->
+  <view class="footer-filing">
+    <view class="footer-filing-text">© {{year}} NIHPLOD. All Rights Reserved.</view>
+    <view wx:if="{{filingText}}" class="footer-filing-text">{{filingText}}</view>
+  </view>
+
+  <!-- 积分规则半屏抽屉（组件，与「积分」页共用） -->
+  <rules-sheet id="rules-sheet" />
 </view>

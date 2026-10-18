@@ -1,4 +1,6 @@
-<view class="container ledger-page">
+<view class="container">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看积分明细</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
@@ -8,22 +10,29 @@
     <view wx:if="{{total > 0}}" class="muted small summary">近一年共 {{total}} 条记录（点击流水号可复制）</view>
     <view wx:if="{{rows.length === 0 && !loading}}" class="empty">近一年暂无积分记录</view>
 
-    <view class="card ledger-card">
+    <view wx:if="{{rows.length > 0}}" class="card menu-card">
       <view wx:for="{{rows}}" wx:key="id" class="ledger-row">
         <view class="row">
           <view class="ledger-left">
             <view class="ledger-title">{{item.typeLabel}}</view>
-            <view class="muted small">{{item.dateText}}{{item.note ? ' · ' + item.note : ''}}</view>
+            <view class="muted small ledger-sub">{{item.dateText}}{{item.note ? ' · ' + item.note : ''}}</view>
           </view>
-          <text class="{{item.amount > 0 ? 'plus' : 'minus'}}">{{item.amountText}}</text>
+          <text class="ledger-amount {{item.amount > 0 ? 'plus' : 'minus'}}">{{item.amountText}}</text>
         </view>
-        <view class="muted ref-row" data-ref="{{item.reference}}" bindtap="copyReference">
+        <view
+          class="muted small ref-row"
+          data-ref="{{item.reference}}"
+          bindtap="copyReference"
+          hover-class="row-hover"
+        >
           流水号：{{item.reference}}
         </view>
       </view>
     </view>
 
-    <view wx:if="{{hasMore}}" class="load-more muted small">上拉加载更多</view>
+    <view wx:if="{{rows.length > 0}}" class="load-more muted small">
+      {{loadingMore ? '加载中…' : (hasMore ? '上拉加载更多' : '没有更多了')}}
+    </view>
   </block>
 
   <view wx:if="{{error}}" class="card error-card">{{error}}</view>

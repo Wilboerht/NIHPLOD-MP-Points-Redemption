@@ -1,63 +1,80 @@
 <view class="container vip-page">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看会员权益</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn && view}}">
-    <view class="member-card">
-      <image wx:if="{{cardBg}}" class="member-bg" src="{{cardBg}}" mode="aspectFill" />
-      <view class="member-inner">
-        <view class="member-level">{{view.currentLevel.name}}</view>
-        <view class="muted small member-id">会员编号 {{view.memberId}}</view>
-        <view class="row member-bottom">
-          <view>
-            <view class="muted small">累计消费</view>
-            <view class="member-spent">¥{{totalSpentText}}</view>
+    <view class="vip-card" style="{{cardStyle}}">
+      <view class="vip-top">
+        <view class="vip-meta">
+          <view class="level-tag">{{view.currentLevel.name}}</view>
+          <text class="vip-label">累计消费</text>
+        </view>
+        <view class="vip-link" bindtap="goGifts" hover-class="vip-link-hover">
+          <text>去兑礼</text>
+          <image class="vip-link-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
+      </view>
+      <view class="vip-value">¥{{totalSpentText}}</view>
+      <view class="vip-id">会员编号 {{view.memberId}}</view>
+
+      <view class="vip-progress">
+        <block wx:if="{{view.nextLevel}}">
+          <view class="row vip-progress-head">
+            <text class="small">距 {{view.nextLevel.name}}</text>
+            <text class="muted small">还差 ¥{{spentNeededText}}</text>
           </view>
-          <button size="mini" class="ghost-btn" bindtap="goGifts">去兑礼</button>
-        </view>
+          <progress percent="{{view.nextLevel.progress}}" stroke-width="6" activeColor="{{currentColor}}" border-radius="6" />
+        </block>
+        <view wx:else class="muted small">已达最高等级，感谢您的支持</view>
       </view>
     </view>
 
-    <view wx:if="{{skinUsage}}" class="card">
-      <view class="row">
-        <view class="card-title card-title-inline">AI 测肤权益</view>
-        <text class="skin-remaining">{{skinUsage.remainingText}}</text>
-      </view>
-      <view class="muted small skin-line">{{skinUsage.usedText}}</view>
-      <view wx:if="{{skinUsage.quotaText}}" class="muted small skin-line">{{skinUsage.quotaText}}</view>
-      <button class="ghost-btn skin-btn" bindtap="goSkinTest">去测肤小程序使用</button>
-    </view>
-
-    <view class="card">
-      <view class="card-title">升级进度</view>
-      <block wx:if="{{view.nextLevel}}">
-        <view class="row progress-head">
-          <text class="small">距 {{view.nextLevel.name}}</text>
-          <text class="muted small">还差 ¥{{spentNeededText}}</text>
-        </view>
-        <progress percent="{{view.nextLevel.progress}}" stroke-width="6" activeColor="{{currentColor}}" border-radius="6" />
-        <view class="muted small progress-tip">满 ¥{{nextMinSpentText}} 即可升级（按累计消费实时判定）</view>
-      </block>
-      <view wx:else class="muted small">已达最高等级，感谢您的支持</view>
-    </view>
-
-    <view wx:for="{{levels}}" wx:key="level" class="card level-card {{item.isCurrent ? 'level-card-current' : ''}}">
-      <view class="row">
-        <view class="level-name" style="color: {{item.color}};">{{item.name}}</view>
-        <view class="level-badges">
-          <text wx:if="{{item.isCurrent}}" class="badge badge-current">当前等级</text>
-          <text wx:elif="{{item.unlocked}}" class="badge badge-unlocked">已解锁</text>
-          <text wx:else class="badge badge-locked">未解锁</text>
-        </view>
-      </view>
-      <view class="muted small level-threshold">{{item.thresholdText}}</view>
-      <view wx:for="{{item.benefits}}" wx:for-item="benefit" wx:key="title" class="benefit-row">
-        <text wx:if="{{benefit.icon}}" class="benefit-icon">{{benefit.icon}}</text>
-        <view class="benefit-body">
+    <view class="card benefits-card">
+      <view class="card-title">当前权益</view>
+      <view class="benefit-list">
+        <view wx:for="{{view.currentLevel.benefits}}" wx:for-item="benefit" wx:key="title" class="benefit-row">
           <view class="benefit-title">{{benefit.title}}</view>
-          <view class="muted small">{{benefit.desc}}</view>
+          <view wx:if="{{benefit.desc}}" class="muted small benefit-desc">{{benefit.desc}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{skinUsage}}" class="benefit-row benefit-row-link" bindtap="goSkinTest" hover-class="benefit-row-hover">
+        <view class="benefit-main">
+          <view class="benefit-title">AI 测肤权益</view>
+          <view class="muted small benefit-desc">{{skinUsage.usedText}}{{skinUsage.quotaText ? ' · ' + skinUsage.quotaText : ''}}</view>
+        </view>
+        <view class="benefit-side">
+          <text class="benefit-remaining">{{skinUsage.remainingText}}</text>
+          <image class="benefit-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
+      </view>
+
+      <view wx:if="{{view.currentLevel.benefits.length === 0 && !skinUsage}}" class="muted small">当前等级暂无额外权益</view>
+    </view>
+
+    <view class="card level-list">
+      <view class="card-title">会员等级</view>
+      <view wx:for="{{levels}}" wx:key="level" class="level-item {{item.isCurrent ? 'level-item-current' : ''}}">
+        <view class="level-row" data-level="{{item.level}}" bindtap="toggleLevel" hover-class="level-row-hover">
+          <view class="level-main">
+            <view class="level-name" style="color: {{item.color}};">{{item.name}}</view>
+            <view class="muted small level-threshold">{{item.thresholdText}}</view>
+          </view>
+          <view class="level-side">
+            <text wx:if="{{!item.isCurrent}}" class="level-state {{item.unlocked ? 'level-state-unlocked' : 'level-state-locked'}}">{{item.unlocked ? '已解锁' : '未解锁'}}</text>
+            <image class="level-chevron {{item.expanded ? 'level-chevron-open' : ''}}" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+          </view>
+        </view>
+        <view wx:if="{{item.expanded}}" class="level-benefits">
+          <view wx:for="{{item.benefits}}" wx:for-item="benefit" wx:key="title" class="benefit-row">
+            <view class="benefit-title">{{benefit.title}}</view>
+            <view wx:if="{{benefit.desc}}" class="muted small benefit-desc">{{benefit.desc}}</view>
+          </view>
+          <view wx:if="{{item.benefits.length === 0}}" class="muted small">暂无权益说明</view>
         </view>
       </view>
     </view>

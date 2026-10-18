@@ -1,14 +1,17 @@
 <view class="container new-page">
-  <view class="card">
+  <view class="card form-card">
     <view class="form-row">
-      <text class="label">购买渠道</text>
+      <text class="label"><text class="required">*</text>购买渠道</text>
       <picker mode="selector" range="{{channelOptions}}" value="{{channelIndex}}" bindchange="onChannelChange" class="picker">
-        <view>{{channelOptions[channelIndex]}}</view>
+        <view class="picker-inner">
+          <text class="picker-value">{{channelOptions[channelIndex]}}</text>
+          <image class="row-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
       </picker>
     </view>
 
-    <view wx:if="{{isDealer}}" class="form-row">
-      <text class="label">经销商名称</text>
+    <view wx:if="{{isDealer}}" class="form-row {{errorField === 'dealerName' ? 'form-row-error' : ''}}">
+      <text class="label"><text class="required">*</text>经销商名称</text>
       <input
         class="input"
         value="{{dealerName}}"
@@ -17,9 +20,10 @@
         bindinput="onDealerInput"
       />
     </view>
+    <view wx:if="{{errorField === 'dealerName'}}" class="field-error">{{error}}</view>
 
-    <view class="form-row">
-      <text class="label">订单号</text>
+    <view class="form-row {{errorField === 'orderNo' ? 'form-row-error' : ''}}">
+      <text class="label"><text class="required">*</text>订单号</text>
       <input
         class="input"
         value="{{orderNo}}"
@@ -28,25 +32,34 @@
         bindinput="onOrderInput"
       />
     </view>
+    <view wx:if="{{errorField === 'orderNo'}}" class="field-error">{{error}}</view>
 
     <view class="form-row">
       <text class="label">消费日期</text>
       <picker mode="date" end="{{today}}" value="{{purchasedAt}}" bindchange="onDateChange" class="picker">
-        <view class="{{purchasedAt ? '' : 'muted'}}">{{purchasedAt || '选填，选择消费日期'}}</view>
+        <view class="picker-inner">
+          <text class="picker-value {{purchasedAt ? '' : 'muted'}}">{{purchasedAt || '选填，选择消费日期'}}</text>
+          <view wx:if="{{purchasedAt}}" class="field-clear" catchtap="clearDate">×</view>
+          <image class="row-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
       </picker>
     </view>
 
-    <view class="form-row">
+    <view class="form-row {{errorField === 'amount' ? 'form-row-error' : ''}}">
       <text class="label">申报金额</text>
-      <input
-        class="input"
-        type="number"
-        value="{{amount}}"
-        maxlength="8"
-        placeholder="选填，整数（元）"
-        bindinput="onAmountInput"
-      />
+      <view class="amount-field">
+        <input
+          class="input"
+          type="number"
+          value="{{amount}}"
+          maxlength="8"
+          placeholder="选填，整数"
+          bindinput="onAmountInput"
+        />
+        <text class="muted small amount-unit">元</text>
+      </view>
     </view>
+    <view wx:if="{{errorField === 'amount'}}" class="field-error">{{error}}</view>
 
     <view class="form-row form-row-col">
       <text class="label">备注</text>
@@ -57,17 +70,15 @@
         placeholder="选填，补充说明购买渠道与订单信息"
         bindinput="onNoteInput"
       />
+      <view class="textarea-meta muted small">{{note.length}}/500</view>
     </view>
   </view>
 
   <view class="card">
-    <view class="row">
-      <view class="card-title">凭证截图（{{images.length}}/{{maxImages}}）</view>
-      <text class="muted small" bindtap="chooseImages">{{uploading ? '上传中…' : '+ 添加图片'}}</text>
-    </view>
+    <view class="card-title">凭证截图（{{images.length}}/{{maxImages}}）</view>
     <view class="muted small tip-line">· 建议上传含订单号与金额的截图，最多 {{maxImages}} 张</view>
 
-    <view wx:if="{{images.length > 0}}" class="proof-grid">
+    <view class="proof-grid">
       <view wx:for="{{images}}" wx:key="raw" class="proof-item">
         <image
           wx:if="{{item.display}}"
@@ -82,14 +93,28 @@
           class="proof-img proof-img-private"
           data-current="{{item.display}}"
         >已上传</view>
-        <view class="proof-delete" data-index="{{index}}" catchtap="removeImage">×</view>
+        <view class="proof-delete" data-index="{{index}}" catchtap="removeImage">
+          <text class="proof-delete-icon">×</text>
+        </view>
+      </view>
+      <view
+        wx:if="{{images.length < maxImages}}"
+        class="proof-add {{uploading ? 'proof-add-uploading' : ''}}"
+        hover-class="{{uploading ? 'none' : 'proof-add-hover'}}"
+        bindtap="chooseImages"
+      >
+        <text class="proof-add-icon">+</text>
+        <text class="proof-add-text">{{uploading ? '上传中…' : '添加凭证'}}</text>
       </view>
     </view>
+    <view wx:if="{{images.length >= maxImages}}" class="muted small proof-limit">已达上传上限，如需更换请先删除</view>
   </view>
 
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+  <view wx:if="{{error && !errorField}}" class="card error-card">{{error}}</view>
 
-  <button class="btn-primary save-btn" loading="{{saving}}" disabled="{{saving || uploading}}" bindtap="submit">
-    提交申请
-  </button>
+  <view class="bottom-bar">
+    <button class="btn-primary submit-btn" loading="{{saving}}" disabled="{{saving || uploading}}" bindtap="submit">
+      提交申请
+    </button>
+  </view>
 </view>

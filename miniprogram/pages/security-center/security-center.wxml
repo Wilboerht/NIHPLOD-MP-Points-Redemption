@@ -1,0 +1,121 @@
+<view class="container security-page">
+  <view wx:if="{{!needLogin}}" class="seg-bar">
+    <view
+      wx:for="{{segments}}"
+      wx:key="key"
+      class="seg-item {{active === item.key ? 'seg-item-active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onSwitchSegment"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-block">加载中…</view>
+
+  <view wx:if="{{!needLogin}}">
+    <!-- 设备管理 -->
+    <block wx:if="{{!loading && active === 'devices'}}">
+      <view wx:if="{{devices.length === 0}}" class="empty">暂无设备记录</view>
+      <view wx:if="{{devices.length > 0}}" class="card sec-list">
+        <view wx:for="{{devices}}" wx:key="id" class="row sec-row">
+          <view class="sec-main">
+            <view class="sec-title">
+              <text class="sec-name">{{item.deviceName}}</text>
+              <text wx:if="{{item.isCurrent}}" class="tag tag-ok">当前设备</text>
+            </view>
+            <view class="muted small sec-sub">{{item.ipAddress}} · 最后活跃：{{item.lastActiveText}}</view>
+          </view>
+          <text
+            wx:if="{{!item.isCurrent}}"
+            class="sec-action"
+            data-id="{{item.id}}"
+            bindtap="onRevokeDevice"
+            hover-class="sec-action-hover"
+          >
+            下线
+          </text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 授权管理 -->
+    <block wx:if="{{!loading && active === 'authorizations'}}">
+      <view wx:if="{{authorizations.length === 0}}" class="empty">暂无已授权应用</view>
+      <view wx:if="{{authorizations.length > 0}}" class="card sec-list">
+        <view wx:for="{{authorizations}}" wx:key="clientId" class="row sec-row">
+          <view class="sec-main">
+            <view class="sec-title">
+              <text class="sec-name">{{item.clientName}}</text>
+              <text wx:if="{{item.isCurrentClient}}" class="tag tag-ok">当前应用</text>
+            </view>
+            <view class="muted small sec-sub">权限：{{item.scopesText}}</view>
+            <view class="muted small sec-sub">授权时间：{{item.createdText}}</view>
+          </view>
+          <text
+            wx:if="{{!item.isCurrentClient}}"
+            class="sec-action"
+            data-client="{{item.clientId}}"
+            bindtap="onRevokeAuthorization"
+            hover-class="sec-action-hover"
+          >
+            撤销
+          </text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 账号绑定 -->
+    <block wx:if="{{!loading && active === 'bindings'}}">
+      <view wx:if="{{identities.length === 0}}" class="empty">暂无绑定记录</view>
+      <view wx:if="{{identities.length > 0}}" class="card sec-list">
+        <view wx:for="{{identities}}" wx:key="id" class="row sec-row">
+          <view class="sec-main">
+            <view class="sec-title">
+              <text class="sec-name">{{item.providerLabel}}</text>
+              <text wx:if="{{item.isCurrentLogin}}" class="tag tag-ok">当前登录方式</text>
+            </view>
+            <view class="muted small sec-sub">{{item.nickname ? item.nickname + ' · ' : ''}}绑定时间：{{item.createdText}}</view>
+          </view>
+          <text
+            wx:if="{{item.canUnbind}}"
+            class="sec-action sec-action-danger"
+            data-id="{{item.id}}"
+            bindtap="onUnbindIdentity"
+            hover-class="sec-action-hover"
+          >
+            解绑
+          </text>
+        </view>
+      </view>
+      <view class="muted small sec-tip">· 当前登录方式不可在小程序内解绑；如需更换请联系客服</view>
+    </block>
+
+    <!-- 登录历史 -->
+    <block wx:if="{{!loading && active === 'history'}}">
+      <view wx:if="{{history.length === 0}}" class="empty">暂无登录记录</view>
+      <view wx:if="{{history.length > 0}}" class="card sec-list">
+        <view wx:for="{{history}}" wx:key="id" class="row sec-row">
+          <view class="sec-main">
+            <view class="sec-title">
+              <text class="sec-name">{{item.typeLabel}}</text>
+              <text class="{{item.success ? 'tag tag-ok' : 'tag tag-fail'}}">{{item.success ? '成功' : '失败'}}</text>
+            </view>
+            <view class="muted small sec-sub">{{item.dateText}} · {{item.ipAddress}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <view class="bottom-bar">
+      <button class="deletion-btn" bindtap="goAccountDeletion">账号注销</button>
+    </view>
+  </view>
+
+  <view wx:if="{{needLogin && !loading}}" class="card login-card">
+    <view class="login-title">登录后查看安全中心</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+</view>

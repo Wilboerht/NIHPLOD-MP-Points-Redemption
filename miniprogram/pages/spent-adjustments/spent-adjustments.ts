@@ -3,7 +3,6 @@ import { ensureSession } from "../../utils/auth";
 import {
   formatDateOnly,
   formatPoints,
-  spentProofDisplayUrl,
   SPENT_CHANNEL_LABELS,
   SPENT_STATUS_LABELS,
 } from "../../utils/format";
@@ -13,10 +12,9 @@ interface AppRow extends SpentApplication {
   channelLabel: string;
   statusLabel: string;
   dateText: string;
+  purchasedAtText: string | null;
   amountText: string | null;
   reviewText: string | null;
-  displayImages: string[];
-  imageCount: number;
 }
 
 Page({
@@ -25,6 +23,9 @@ Page({
     loggedIn: false,
     rows: [] as AppRow[],
     pendingCount: 0,
+    canSubmit: true,
+    submitText: "申请补录",
+    tipExpanded: false,
     error: "",
   },
 
@@ -46,6 +47,7 @@ Page({
         channelLabel: SPENT_CHANNEL_LABELS[a.channel] ?? a.channel,
         statusLabel: SPENT_STATUS_LABELS[a.status] ?? a.status,
         dateText: formatDateOnly(a.createdAt),
+        purchasedAtText: formatDateOnly(a.purchasedAt) || null,
         amountText:
           a.amountClaimed !== null ? `¥${formatPoints(a.amountClaimed)}` : null,
         reviewText:
@@ -54,14 +56,20 @@ Page({
             : a.status === "REJECTED" && a.reviewNote
               ? `驳回原因：${a.reviewNote}`
               : null,
-        displayImages: a.images.map(spentProofDisplayUrl).filter(Boolean),
-        imageCount: a.images.length,
       }));
+      const pendingCount = rows.filter((r) => r.status === "PENDING").length;
+      const canSubmit = pendingCount < 2;
       this.setData({
         loading: false,
         loggedIn: true,
         rows,
-        pendingCount: rows.filter((r) => r.status === "PENDING").length,
+        pendingCount,
+        canSubmit,
+        submitText: canSubmit
+          ? pendingCount > 0
+            ? `申请补录 · ${pendingCount} 条待审`
+            : "申请补录"
+          : "待审核 2 条，暂不可申请",
       });
     } catch (e) {
       const err = e as ApiError;
@@ -73,17 +81,16 @@ Page({
     }
   },
 
-  createNew() {
-    wx.navigateTo({ url: "/pages/spent-adjustment-new/spent-adjustment-new" });
+  toggleTips() {
+    this.setData({ tipExpanded: !this.data.tipExpanded });
   },
 
-  previewImage(e: WechatMiniprogram.TouchEvent) {
-    const { urls, current } = e.currentTarget.dataset as {
-      urls: string[];
-      current: string;
-    };
-    if (!urls || urls.length === 0) return;
-    wx.previewImage({ urls, current });
+  createNew() {
+    if (this.data.pendingCount >= 2) {
+      wx.showToast({ title: "最多同时 2 条待审核", icon: "none" });
+      return;
+    }
+    wx.navigateTo({ url: "/pages/spent-adjustment-new/spent-adjustment-new" });
   },
 
   goLogin() {

@@ -17,6 +17,16 @@
   width: 100%;
 }
 
+.login-legal {
+  margin: 8rpx 0 24rpx;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.legal-link {
+  color: var(--color-primary);
+}
+
 .sms-row {
   display: flex;
   align-items: center;
@@ -45,11 +55,6 @@
 .error-retry {
   width: 70%;
   margin-bottom: 24rpx;
-}
-
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
 }
 
 .skip {

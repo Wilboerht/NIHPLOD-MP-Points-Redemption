@@ -18,7 +18,7 @@ miniprogram/
 │   ├── subscribe.ts # 订阅消息请求封装（fail-soft）
 │   ├── format.ts   # 格式化与文案映射
 │   └── types.ts    # 与官网接口契约对齐的类型
-└── pages/          # home / gifts / gift-detail / redeem / addresses / address-edit / records / record-detail / profile-edit / points-ledger / vip / spent-adjustments / spent-adjustment-new / account-deletion / login / me
+└── pages/          # home / gifts / gift-detail / redeem / addresses / address-edit / records / record-detail / profile-edit / points-ledger / vip / spent-adjustments / spent-adjustment-new / account-deletion / security-center / legal / login / me
 ```
 
 ## 初始化配置

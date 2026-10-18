@@ -1,5 +1,6 @@
 /** 格式化与文案映射 */
 import { BASE_URL } from "./env";
+import type { GiftItem } from "./types";
 
 /**
  * 图片 URL 归一化：商品图在本地存储模式下为相对路径（/uploads/...），
@@ -19,6 +20,48 @@ export function formatPoints(value: number): string {
   const [intText, decText] = String(abs).split(".");
   const grouped = intText.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return `${sign}${grouped}${decText ? `.${decText}` : ""}`;
+}
+
+export interface GiftRow extends GiftItem {
+  costText: string;
+  priceText: string;
+  /** 可兑状态标签（仅可兑时展示；未解锁/积分不足时为空） */
+  statusText: string;
+  statusClass: string;
+  /** 所需积分文字的颜色类（不可兑时为 muted） */
+  costClass: string;
+}
+
+/**
+ * 礼品展示字段映射（首页精选 / 好礼列表共用）：
+ * 可兑状态仅「可兑」展示标签，未解锁与积分不足统一弱化所需积分。
+ */
+export function mapGiftRow(g: GiftItem): GiftRow {
+  let statusText = "";
+  let statusClass = "";
+  let costClass = "";
+  if (g.cost === null) {
+    costClass = "muted";
+  } else if (g.affordable) {
+    statusText = "可兑";
+    statusClass = "gift-tag-ok";
+  } else {
+    costClass = "muted";
+  }
+  return {
+    ...g,
+    image: g.image ? resolveImageUrl(g.image) : null,
+    costText: g.cost === null ? "银卡解锁" : `${formatPoints(g.cost)} 积分`,
+    priceText: `参考价 ¥${formatPoints(g.priceYuan)}`,
+    statusText,
+    statusClass,
+    costClass,
+  };
+}
+
+/** 手机号脱敏：138****8000（非 11 位原样返回） */
+export function maskPhone(phone: string): string {
+  return phone.length === 11 ? `${phone.slice(0, 3)}****${phone.slice(7)}` : phone;
 }
 
 function pad(n: number): string {
@@ -96,6 +139,14 @@ export const LEVEL_THEME_COLORS: Record<string, string> = {
   SILVER: "#8a8a8a",
   GOLD: "#c98a1f",
   DIAMOND: "#5f63c7",
+};
+
+/** 会员等级短名称（标签展示用） */
+export const LEVEL_NAME_LABELS: Record<string, string> = {
+  REGULAR: "普通会员",
+  SILVER: "银卡",
+  GOLD: "金卡",
+  DIAMOND: "钻石卡",
 };
 
 /**

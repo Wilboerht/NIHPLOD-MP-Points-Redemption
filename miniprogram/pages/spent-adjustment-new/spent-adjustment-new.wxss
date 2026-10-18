@@ -1,37 +1,43 @@
-.form-row {
+/* 表单行/输入框/文本域/保存按钮/校验提示公共样式见 app.wxss */
+
+.new-page {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+}
+
+/* 底部操作栏：与消费补录列表页一致的由实到虚渐变 */
+.bottom-bar {
+  padding-top: 48rpx;
+  background: linear-gradient(
+    to top,
+    var(--color-bg) 0%,
+    var(--color-bg) 45%,
+    rgba(247, 245, 242, 0) 100%
+  );
+  box-shadow: none;
+}
+
+.amount-field {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  min-height: 100rpx;
-  border-bottom: 1rpx solid var(--color-border);
 }
 
-.form-row:last-child {
-  border-bottom: none;
-}
-
-.form-row-col {
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 24rpx 0;
-}
-
-.label {
-  width: 160rpx;
+.amount-unit {
   flex-shrink: 0;
+  margin-left: 8rpx;
 }
 
-.input {
-  flex: 1;
-}
-
-.picker {
-  flex: 1;
-}
-
-.textarea {
-  width: 100%;
-  min-height: 140rpx;
-  margin-top: 16rpx;
+.field-clear {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  margin-left: 8rpx;
+  color: var(--color-muted);
+  font-size: 30rpx;
 }
 
 .tip-line {
@@ -52,6 +58,7 @@
 .proof-img {
   width: 160rpx;
   height: 160rpx;
+  box-sizing: border-box;
   border-radius: 12rpx;
   background: #efeae4;
 }
@@ -60,14 +67,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #b8a992;
-  font-size: 24rpx;
+  color: var(--color-muted);
+  background: #f1ece6;
+  border: 2rpx dashed var(--color-border);
 }
 
 .proof-delete {
   position: absolute;
-  top: -14rpx;
-  right: -14rpx;
+  top: -20rpx;
+  right: -20rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.proof-delete-icon {
   width: 40rpx;
   height: 40rpx;
   line-height: 36rpx;
@@ -78,12 +94,39 @@
   font-size: 28rpx;
 }
 
-.save-btn {
-  margin-top: 20rpx;
-  width: 100%;
+.proof-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  width: 160rpx;
+  height: 160rpx;
+  box-sizing: border-box;
+  border: 2rpx dashed rgba(138, 109, 75, 0.4);
+  border-radius: 12rpx;
+  background: rgba(138, 109, 75, 0.04);
+  color: var(--color-primary);
 }
 
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
+.proof-add-hover {
+  background: rgba(138, 109, 75, 0.1);
+}
+
+.proof-add-uploading {
+  opacity: 0.6;
+}
+
+.proof-add-icon {
+  font-size: 44rpx;
+  line-height: 1;
+}
+
+.proof-add-text {
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.proof-limit {
+  margin-top: 12rpx;
 }

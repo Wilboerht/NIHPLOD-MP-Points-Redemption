@@ -1,4 +1,5 @@
 import { api, ApiError } from "../../utils/api";
+import { ensureSession } from "../../utils/auth";
 import { findLastGift, setLastGifts } from "../../utils/cache";
 import {
   formatPoints,
@@ -14,6 +15,7 @@ type GiftView = GiftItem & { costText: string; priceText: string };
 Page({
   data: {
     loading: true,
+    needLogin: false,
     gift: null as GiftView | null,
     addresses: [] as AddressItem[],
     addressId: "",
@@ -22,20 +24,33 @@ Page({
   },
 
   giftId: "",
+  /** 幂等请求号：进入页面生成一次，超时/网络失败重试复用；成功后清空 */
+  requestId: "",
 
   onLoad(query: Record<string, string | undefined>) {
     this.giftId = query.id ?? "";
+    this.requestId = genRequestId();
     void this.loadGift();
   },
 
   onShow() {
-    // 从地址编辑页返回时刷新地址簿（首次加载由 loadGift 负责）
+    // 从登录页返回：重新走登录/礼品/地址加载；从地址编辑页返回：只刷新地址簿
+    if (this.data.needLogin && !this.data.loading) {
+      void this.loadGift();
+      return;
+    }
     if (!this.data.loading && this.giftId) {
       void this.loadAddresses();
     }
   },
 
   async loadGift() {
+    const loggedIn = await ensureSession();
+    if (!loggedIn) {
+      this.setData({ loading: false, needLogin: true });
+      return;
+    }
+    this.setData({ loading: true, needLogin: false, error: "" });
     try {
       let gift = findLastGift(this.giftId);
       if (!gift) {
@@ -61,7 +76,7 @@ Page({
     } catch (e) {
       const err = e as ApiError;
       if (err.status === 401) {
-        wx.navigateTo({ url: "/pages/login/login" });
+        this.setData({ loading: false, needLogin: true });
         return;
       }
       this.setData({ loading: false, error: err.message || "加载失败" });
@@ -80,11 +95,15 @@ Page({
     } catch (e) {
       const err = e as ApiError;
       if (err.status === 401) {
-        wx.navigateTo({ url: "/pages/login/login" });
+        this.setData({ needLogin: true, loading: false });
         return;
       }
       this.setData({ error: err.message || "地址加载失败" });
     }
+  },
+
+  goLogin() {
+    wx.navigateTo({ url: "/pages/login/login" });
   },
 
   pickAddress(e: WechatMiniprogram.TouchEvent) {
@@ -107,11 +126,14 @@ Page({
       // 订阅发货通知（用户点击内触发，尽力而为；未配置模板/拒绝订阅均不影响流程）
       await subscribeShipped();
 
+      // 复用同一 requestId：超时/网络失败重试时服务端可识别重复请求
+      const requestId = this.requestId || (this.requestId = genRequestId());
       await api.redeem({
         productId: gift.id,
         addressId,
-        requestId: genRequestId(),
+        requestId,
       });
+      this.requestId = "";
       // 成功提示期间保持 submitting=true，避免 800ms 跳转窗口内重复提交
       wx.showToast({ title: "兑换成功", icon: "success" });
       setTimeout(() => {
@@ -122,6 +144,7 @@ Page({
       this.setData({ submitting: false });
       const err = e as ApiError;
       if (err.status === 401) {
+        this.setData({ needLogin: true });
         wx.navigateTo({ url: "/pages/login/login" });
       } else {
         // 服务端已带 message；错误码文案兜底（网络抖动/网关错误等场景）

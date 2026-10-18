@@ -21,6 +21,13 @@
       </button>
     </view>
 
+    <view class="login-legal muted small">
+      登录即表示同意
+      <text class="legal-link" bindtap="goTerms">《服务条款》</text>
+      和
+      <text class="legal-link" bindtap="goPrivacy">《隐私政策》</text>
+    </view>
+
     <view wx:if="{{bindToken}}" class="card">
       <view class="card-title">或使用短信验证码</view>
       <view class="sms-row">

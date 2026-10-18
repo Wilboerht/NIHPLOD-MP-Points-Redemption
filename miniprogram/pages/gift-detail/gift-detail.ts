@@ -13,6 +13,8 @@ Page({
     notFound: false,
     gift: null as GiftView | null,
     images: [] as string[],
+    /** 当前画廊索引（多图时展示计数） */
+    current: 0,
     benefits: [] as string[],
     canRedeem: false,
     buttonText: "立即兑换",
@@ -20,20 +22,23 @@ Page({
   },
 
   giftId: "",
+  /** 首次 onShow 与 onLoad 共用一次加载；之后从兑换/登录页返回时强制刷新 */
+  hasShown: false,
 
   onLoad(query: Record<string, string | undefined>) {
     this.giftId = query.id ?? "";
-    void this.load();
+    void this.load(false);
   },
 
   onShow() {
-    // 从登录页返回后（needLogin 置位）重试加载
-    if (this.data.needLogin) {
-      void this.load();
+    if (this.hasShown) {
+      void this.load(true);
+      return;
     }
+    this.hasShown = true;
   },
 
-  async load() {
+  async load(force: boolean) {
     if (!this.giftId) {
       this.setData({ loading: false, notFound: true });
       return;
@@ -44,16 +49,18 @@ Page({
       this.setData({ loading: false, needLogin: true });
       return;
     }
-    this.setData({ needLogin: false });
+    this.setData({ loading: true, needLogin: false, error: "" });
     try {
-      let gift = findLastGift(this.giftId);
+      // force=true 时跳过缓存，确保兑换后返回拿到最新积分/可兑状态
+      let gift = force ? null : findLastGift(this.giftId);
       if (!gift) {
         const data = await api.gifts();
         setLastGifts(data.gifts);
         gift = data.gifts.find((g) => g.id === this.giftId) ?? null;
       }
       if (!gift) {
-        this.setData({ loading: false, notFound: true });
+        // 强制刷新时清除旧详情，避免下架后仍展示缓存内容
+        this.setData({ loading: false, notFound: true, gift: null });
         return;
       }
       const detailImages = (gift.detail?.images ?? [])
@@ -68,13 +75,15 @@ Page({
       const canRedeem = gift.cost !== null && gift.affordable;
       this.setData({
         loading: false,
+        notFound: false,
+        error: "",
         gift: {
           ...gift,
-          costText:
-            gift.cost === null ? "普通会员未解锁兑礼" : `${formatPoints(gift.cost)} 积分`,
+          costText: gift.cost === null ? "银卡解锁" : `${formatPoints(gift.cost)} 积分`,
           priceText: `¥${formatPoints(gift.priceYuan)}`,
         },
         images,
+        current: 0,
         // 核心功效标签（detail 全量下发，按需渲染）
         benefits: gift.detail?.benefits ?? [],
         canRedeem,
@@ -87,12 +96,30 @@ Page({
         this.setData({ loading: false, needLogin: true });
         return;
       }
+      // 后台刷新失败时保留已有详情，避免把正常页面打成错误页
+      if (force && this.data.gift) {
+        this.setData({ loading: false, error: "" });
+        return;
+      }
       this.setData({ loading: false, error: err.message || "加载失败" });
     }
   },
 
   goLogin() {
     wx.navigateTo({ url: "/pages/login/login" });
+  },
+
+  /** 画廊滑动：记录当前索引用于计数 */
+  onSwiperChange(e: WechatMiniprogram.CustomEvent<{ current: number }>) {
+    this.setData({ current: e.detail.current });
+  },
+
+  /** 点击图片全屏预览 */
+  previewImage(e: WechatMiniprogram.TouchEvent) {
+    const index = Number(e.currentTarget.dataset.index);
+    const urls = this.data.images;
+    if (urls.length === 0) return;
+    wx.previewImage({ urls, current: urls[index] ?? urls[0] });
   },
 
   goRedeem() {

@@ -2,9 +2,10 @@ page {
   --color-bg: #f7f5f2;
   --color-card: #ffffff;
   --color-text: #2b2b2b;
-  --color-muted: #8a8a8a;
+  --color-muted: #767676;
   --color-primary: #8a6d4b;
   --color-danger: #c25450;
+  --color-success: #3f8f5f;
   --color-border: rgba(43, 43, 43, 0.08);
   background: var(--color-bg);
   color: var(--color-text);
@@ -49,7 +50,7 @@ page {
 }
 
 .plus {
-  color: #3f8f5f;
+  color: var(--color-success);
 }
 
 .minus {
@@ -61,6 +62,42 @@ page {
   color: var(--color-muted);
   padding: 80rpx 0;
   font-size: 26rpx;
+}
+
+/* 状态徽章（兑换记录 / 补录记录共用） */
+.status {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  line-height: 1.4;
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+}
+
+.status-PENDING {
+  color: var(--color-primary);
+  background: rgba(138, 109, 75, 0.1);
+}
+
+.status-APPROVED,
+.status-FULFILLED {
+  color: var(--color-success);
+  background: rgba(63, 143, 95, 0.1);
+}
+
+.status-REJECTED {
+  color: var(--color-danger);
+  background: rgba(194, 84, 80, 0.08);
+}
+
+.status-CANCELLED {
+  color: var(--color-muted);
+  background: rgba(43, 43, 43, 0.06);
+}
+
+/* 列表分页提示（兑换记录 / 积分明细共用） */
+.load-more {
+  text-align: center;
+  padding: 24rpx 0;
 }
 
 .btn-primary {
@@ -86,14 +123,286 @@ page {
   border: none;
 }
 
+/* 重置微信按钮默认描边（避免主色按钮上残留内嵌细线） */
+button::after {
+  border: none;
+}
+
+/* 加载占位（首屏请求期间展示，避免空白页） */
+.loading-block {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 26rpx;
+  padding: 120rpx 0;
+}
+
+/* 文字链热区扩展（视觉位置不变，点击区域更大） */
+.tap-hot {
+  padding: 16rpx 8rpx;
+  margin: -16rpx -8rpx;
+}
+
+/* 列表页共用的登录引导卡与错误提示（页面内可覆盖） */
+.login-card {
+  margin-top: 120rpx;
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.login-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+}
+
+.login-desc {
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 70%;
+}
+
+.error-card {
+  color: var(--color-danger);
+  text-align: center;
+}
+
+/* 警示卡片底色（即将过期 / 补录须知 / 注销须知共用） */
+.warn-card {
+  background: rgba(194, 84, 80, 0.04);
+}
+
+/* 行按下反馈（列表行 / 文字链接共用） */
+.row-hover {
+  background: rgba(43, 43, 43, 0.03);
+}
+
+/* 菜单列表（「我的」与「设置」等二级页共用） */
+.menu-card {
+  padding: 8rpx 28rpx;
+}
+
+/* 表单卡片：与菜单列表同内缩，行高由 .form-row 控制（地址/补录/资料页共用） */
+.form-card {
+  padding: 8rpx 28rpx;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.form-row-col {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24rpx 0;
+}
+
+.label {
+  width: 160rpx;
+  color: var(--color-text);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+}
+
+.picker {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 140rpx;
+  margin-top: 16rpx;
+}
+
+/* 表单必填标记与校验提示（地址编辑 / 补录申请共用） */
+.required {
+  color: var(--color-danger);
+  margin-right: 4rpx;
+}
+
+.form-row-error {
+  border-bottom-color: var(--color-danger);
+}
+
+.field-error {
+  margin: 8rpx 0 16rpx 160rpx;
+  font-size: 24rpx;
+  line-height: 1.4;
+  color: var(--color-danger);
+}
+
+/* 通栏（文本域）行的错误提示不缩进 */
+.field-error-plain {
+  margin-left: 0;
+}
+
+/* 选择器行内容：值 + 右箭头 */
+.picker-inner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.picker-value {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 文本域字数统计 */
+.textarea-meta {
+  width: 100%;
+  margin-top: 8rpx;
+  text-align: right;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  min-width: 0;
+}
+
+.menu-icon {
+  width: 36rpx;
+  height: 36rpx;
+  flex-shrink: 0;
+}
+
+/* 行尾箭头：SVG 线性 chevron */
+.menu-chevron,
+.row-chevron {
+  width: 28rpx;
+  height: 28rpx;
+  flex-shrink: 0;
+}
+
+/* 高风险操作弱警示 */
+.menu-item-danger {
+  color: var(--color-danger);
+}
+
+/* 分段切换（安全中心页签 / 资料页性别选择共用） */
+.seg-bar {
+  display: flex;
+  padding: 6rpx;
+  margin-bottom: 24rpx;
+  background: rgba(43, 43, 43, 0.04);
+  border-radius: 999rpx;
+}
+
+.seg-item {
+  flex: 1;
+  padding: 14rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-muted);
+  border-radius: 999rpx;
+}
+
+.seg-item-active {
+  background: #ffffff;
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(43, 43, 43, 0.06);
+}
+
+/* 积分流水列表（首页 / 积分明细共用） */
+.ledger-row {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.ledger-row:last-child {
+  border-bottom: none;
+}
+
+.ledger-title {
+  font-size: 28rpx;
+}
+
+.ledger-left {
+  flex: 1;
+  min-width: 0;
+  margin-right: 16rpx;
+}
+
+/* 日期 / 备注单行省略，避免长备注撑乱行高 */
+.ledger-sub {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ledger-amount {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+/* 固定底部操作栏（详情/兑换/地址/补录共用） */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+/* 页内保存按钮（地址编辑 / 补录申请共用） */
+.save-btn {
+  margin-top: 40rpx;
+  width: 100%;
+}
+
 /* 自绘导航栏（tab 页 navigationStyle: custom）：logo 替代标题文字。
-   状态栏占位由页面内联 padding-top 提供，内容区与系统导航栏同高 44px */
+   固定悬浮（与微信原生导航栏行为一致）；状态栏占位由内联 padding-top 提供，
+   内容区与系统导航栏同高 44px。页面需在导航栏后放置 {{statusBarHeight + 44}}px 占位。 */
 .nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 44px;
   box-sizing: content-box;
+  background: var(--color-bg);
 }
 
 .nav-logo {

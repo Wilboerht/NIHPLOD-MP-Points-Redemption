@@ -1,4 +1,6 @@
 <view class="container adjust-page">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后申请消费补录</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
@@ -6,43 +8,35 @@
 
   <block wx:if="{{loggedIn}}">
     <view class="card tip-card">
-      <view class="card-title">消费补录说明</view>
+      <view class="row tip-head" bindtap="toggleTips" hover-class="tip-head-hover">
+        <view class="card-title tip-title">消费补录说明</view>
+        <text class="tip-toggle">{{tipExpanded ? '收起' : '展开说明'}}</text>
+      </view>
       <view class="muted small tip-line">· 官方渠道购买但未计入累计消费的订单，可提交凭证申请补录，人工审核通过后累加消费额与积分</view>
-      <view class="muted small tip-line">· 最多同时有 2 条待审核申请；同一订单号不可重复提交</view>
-      <view class="muted small tip-line">· 凭证图片仅用于审核，含个人信息，请勿上传无关内容</view>
+      <block wx:if="{{tipExpanded}}">
+        <view class="muted small tip-line">· 最多同时有 2 条待审核申请；同一订单号不可重复提交</view>
+        <view class="muted small tip-line">· 凭证图片仅用于审核，含个人信息，请勿上传无关内容</view>
+      </block>
     </view>
 
-    <view wx:if="{{rows.length === 0 && !loading}}" class="empty">暂无补录记录</view>
+    <view wx:if="{{rows.length === 0 && !loading}}" class="empty-state">
+      <view class="empty">暂无补录记录</view>
+      <view class="muted small empty-desc">官方渠道漏记的订单，可点击下方按钮提交凭证补录</view>
+    </view>
 
     <view wx:for="{{rows}}" wx:key="id" class="card record-card">
-      <view class="row">
+      <view class="row record-head">
         <text class="channel">{{item.channelLabel}}{{item.dealerName ? ' · ' + item.dealerName : ''}}</text>
         <text class="status status-{{item.status}}">{{item.statusLabel}}</text>
       </view>
       <view class="muted small order-row">订单号：{{item.orderNo}}</view>
-      <view class="row meta-row">
-        <text class="muted small">{{item.dateText}}{{item.amountText ? ' · 申报 ' + item.amountText : ''}}</text>
-      </view>
-      <view wx:if="{{item.reviewText}}" class="review-text small">{{item.reviewText}}</view>
-      <view wx:if="{{item.imageCount > 0}}" class="proof-row">
-        <view
-          wx:for="{{item.displayImages}}"
-          wx:for-item="img"
-          wx:key="*this"
-          class="proof-thumb-wrap"
-          data-urls="{{item.displayImages}}"
-          data-current="{{img}}"
-          bindtap="previewImage"
-        >
-          <image class="proof-thumb" src="{{img}}" mode="aspectFill" />
-        </view>
-        <text class="muted small proof-count">{{item.imageCount}} 张凭证{{item.displayImages.length === 0 ? '（需后台查看）' : item.displayImages.length < item.imageCount ? '（部分需后台查看）' : ''}}</text>
-      </view>
+      <view class="muted small meta-row">提交于 {{item.dateText}}{{item.purchasedAtText ? ' · 消费于 ' + item.purchasedAtText : ''}}{{item.amountText ? ' · 申报 ' + item.amountText : ''}}</view>
+      <view wx:if="{{item.reviewText}}" class="review-text small review-text-{{item.status}}">{{item.reviewText}}</view>
     </view>
 
     <view class="bottom-bar">
-      <button class="btn-primary submit-btn" bindtap="createNew">
-        申请补录{{pendingCount > 0 ? '（' + pendingCount + ' 条待审核）' : ''}}
+      <button class="btn-primary submit-btn" bindtap="createNew" disabled="{{!canSubmit}}">
+        {{submitText}}
       </button>
     </view>
   </block>

@@ -1,32 +1,35 @@
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
-}
+/* 登录引导卡基础样式见 app.wxss */
 
 .login-title {
-  font-size: 34rpx;
-  font-weight: 600;
   margin-bottom: 16rpx;
 }
 
-.login-desc {
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 70%;
-}
-
+/* 个人资料卡：全宽无圆角，保持左右结构；会员等级图片作背景（左右负边距抵消容器 24rpx 内边距） */
 .profile-card {
   display: flex;
   align-items: center;
+  margin: 0 -24rpx 24rpx;
+  padding: 28rpx 52rpx;
+  background-color: #f3ece4;
+  background-size: cover;
+  background-position: center;
+}
+
+/* 头像 + 昵称区域可点击（进入资料编辑） */
+.profile-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .avatar {
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
+  border: 3rpx solid #f7f1e7;
+  box-shadow: 0 2rpx 8rpx rgba(43, 43, 43, 0.12);
+  box-sizing: border-box;
   background: #efeae4;
   flex-shrink: 0;
 }
@@ -50,10 +53,44 @@
   font-size: 32rpx;
   font-weight: 600;
   margin-bottom: 8rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
+/* 积分区域可点击（跳转积分明细） */
 .profile-points {
   text-align: right;
+  flex-shrink: 0;
+  margin-left: 20rpx;
+}
+
+.points-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* 问号按钮：外圈热区 ≥ 44rpx，内圈视觉 30rpx（位于「可用积分」左侧） */
+.help-hit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx;
+  margin: -8rpx 4rpx -8rpx -4rpx;
+}
+
+.help-dot {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 50%;
+  border: 1rpx solid var(--color-muted);
+  color: var(--color-muted);
+  font-size: 20rpx;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .points-value {
@@ -62,44 +99,80 @@
   color: var(--color-primary);
 }
 
-.menu-card {
-  padding: 8rpx 28rpx;
-}
+/* ============ 快捷入口（会员权益 / 兑换记录 / 消费补录 / 积分明细） ============ */
 
-.menu-item {
+/* 不套白卡：四列直接铺在页面底色上，减少卡片叠加 */
+.quick-row {
   display: flex;
+  margin: 24rpx 0 32rpx;
+}
+
+.quick-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  min-height: 100rpx;
-  border-bottom: 1rpx solid var(--color-border);
+  justify-content: center;
+  padding: 8rpx 0;
+  border-radius: 16rpx;
+  transition: opacity 0.15s ease;
 }
 
-.menu-item:last-child {
-  border-bottom: none;
+.quick-item-hover {
+  opacity: 0.6;
 }
 
-.menu-item-btn {
-  background: transparent;
-  padding: 0;
+.quick-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+.quick-label {
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+/* 菜单列表基础样式见 app.wxss（.menu-card/.menu-item/.menu-left/.menu-icon/.menu-chevron） */
+
+/* 联系客服：原生 button 的盒模型（内置宽度/内边距）无法完全归一化为普通行，
+   改为整行 view 渲染 + 透明 button 覆盖层承接 open-type="contact" 点击 */
+.menu-item-relative {
+  position: relative;
+}
+
+.contact-hit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
   margin: 0;
-  font-size: 28rpx;
-  text-align: left;
-  line-height: inherit;
-  color: var(--color-text);
+  padding: 0;
+  background: transparent;
+  border: none;
+  opacity: 0;
+  z-index: 1;
 }
 
-.menu-item-btn::after {
+.contact-hit::after {
   border: none;
 }
 
-.rule-row {
-  margin-top: 12rpx;
+/* ============ 积分规则抽屉 ============ */
+/* 样式与逻辑见组件 components/rules-sheet（「我的」与「积分」页共用） */
+
+/* 页脚：版权与备案号（弱化展示，不抢内容；底部留白由 container 提供） */
+.footer-filing {
+  padding: 48rpx 0 0;
+  text-align: center;
 }
 
-.logout-btn {
-  margin-top: 20rpx;
-  background: #ffffff;
-  color: var(--color-danger);
-  border-radius: 44rpx;
-  font-size: 30rpx;
+.footer-filing-text {
+  font-size: 20rpx;
+  line-height: 1.8;
+  color: var(--color-muted);
+  letter-spacing: 0.5rpx;
 }

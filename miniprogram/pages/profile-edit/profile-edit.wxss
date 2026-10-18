@@ -1,51 +1,52 @@
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
+/* 登录引导卡/.error-card/.form-card/.form-row 基础样式见 app.wxss */
+
+.profile-page {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-.login-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  margin-bottom: 40rpx;
+/* 底部操作栏：与消费补录页一致的由实到虚渐变 */
+.bottom-bar {
+  padding-top: 48rpx;
+  background: linear-gradient(
+    to top,
+    var(--color-bg) 0%,
+    var(--color-bg) 45%,
+    rgba(247, 245, 242, 0) 100%
+  );
+  box-shadow: none;
 }
 
-.login-btn {
-  width: 70%;
-}
-
-.form-row {
-  display: flex;
-  align-items: center;
-  min-height: 100rpx;
-  border-bottom: 1rpx solid var(--color-border);
-}
-
-.form-row:last-child {
-  border-bottom: none;
-}
-
+/* 头像行：头像 + 右侧操作说明，填满行宽，避免右侧留白 */
 .avatar-row {
-  gap: 24rpx;
-}
-
-.label {
-  width: 120rpx;
-  flex-shrink: 0;
+  padding: 24rpx 0;
 }
 
 .avatar-btn {
-  width: 120rpx;
-  height: 120rpx;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
   padding: 0;
   margin: 0;
   background: transparent;
-  border-radius: 50%;
-  line-height: 1;
+  line-height: 1.5;
+  text-align: left;
+  overflow: visible;
 }
 
 .avatar-btn::after {
   border: none;
+}
+
+.avatar-btn[disabled] {
+  background: transparent;
+}
+
+.avatar-wrap {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -59,43 +60,95 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8a6d4b;
+  color: var(--color-primary);
   font-size: 44rpx;
 }
 
-.avatar-tip {
-  margin-left: auto;
+/* 头像右下角相机角标：提示"可更换"（比纯文字更直观） */
+.avatar-badge {
+  position: absolute;
+  right: -4rpx;
+  bottom: -4rpx;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: rgba(43, 43, 43, 0.55);
+  border: 3rpx solid var(--color-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-badge-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.avatar-meta {
+  flex: 1;
+  min-width: 0;
+  margin-left: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.avatar-action {
+  font-size: 28rpx;
+  color: var(--color-primary);
+}
+
+/* 手机号（只读账号信息） */
+.phone-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8rpx;
 }
 
 .input {
   flex: 1;
 }
 
-.gender-group {
-  display: flex;
-  gap: 32rpx;
+/* 性别：复用 app.wxss 的分段切换，占满标签后的剩余宽度 */
+.gender-seg {
+  flex: 1;
+  margin-bottom: 0;
 }
 
-.gender-item {
+/* 生日 */
+.field-value {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 12rpx;
 }
 
-.picker {
-  flex: 1;
+.locked-badge {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: var(--color-muted);
+  background: rgba(43, 43, 43, 0.06);
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
 }
 
-.tip-card {
-  line-height: 1.8;
+.form-tip {
+  padding: 20rpx 0 16rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--color-muted);
 }
 
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
-}
-
-.save-btn {
-  margin-top: 20rpx;
+/* 退出登录（红色文字提示高风险操作） */
+.logout-btn {
   width: 100%;
+  background: var(--color-card);
+  color: var(--color-danger);
+  border: 1rpx solid var(--color-border);
+  border-radius: 44rpx;
+  font-size: 30rpx;
 }

@@ -65,7 +65,7 @@
     <view class="card">
       <view class="card-title">无法自行办理？</view>
       <view class="muted small tip-line">
-        · 可发起客服会话，或邮件至 {{email}}（<text class="link" bindtap="copyEmail">复制</text>）
+        · 可发起客服会话，或邮件至 {{email}}（<text class="link tap-hot" bindtap="copyEmail">复制</text>）
       </view>
       <button class="ghost-btn contact-btn" open-type="contact">联系客服协助注销</button>
     </view>

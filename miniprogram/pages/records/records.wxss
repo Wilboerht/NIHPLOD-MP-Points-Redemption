@@ -2,70 +2,107 @@
   padding-bottom: 48rpx;
 }
 
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
+/* 登录引导卡/.error-card 基础样式见 app.wxss */
+
+/* 记录卡：内容 + 右侧 chevron，整卡可点 */
+.record-card {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  transition: opacity 0.15s ease;
 }
 
-.login-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  margin-bottom: 40rpx;
+.record-card-hover {
+  opacity: 0.7;
 }
 
-.login-btn {
-  width: 70%;
+.record-thumb {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 16rpx;
+  background: #efeae4;
+  flex-shrink: 0;
+}
+
+.record-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b8a992;
+  font-size: 18rpx;
+  letter-spacing: 1rpx;
+}
+
+.record-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.record-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
 }
 
 .product-name {
+  flex: 1;
+  min-width: 0;
   font-size: 30rpx;
   font-weight: 600;
-  max-width: 60%;
+  line-height: 1.4;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.status {
+.record-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.record-date {
   font-size: 24rpx;
-  border-radius: 8rpx;
-  padding: 4rpx 14rpx;
-}
-
-.status-PENDING {
-  color: #8a6d4b;
-  background: rgba(138, 109, 75, 0.1);
-}
-
-.status-FULFILLED {
-  color: #3f8f5f;
-  background: rgba(63, 143, 95, 0.1);
-}
-
-.status-CANCELLED {
   color: var(--color-muted);
-  background: rgba(43, 43, 43, 0.06);
 }
 
-.secondary-row {
-  margin-top: 16rpx;
-}
-
-.points {
+.record-points {
+  font-size: 26rpx;
+  font-weight: 600;
   color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
 }
 
-.waybill {
-  margin-top: 12rpx;
+.record-chevron {
+  width: 24rpx;
+  height: 24rpx;
+  flex-shrink: 0;
 }
 
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0;
+}
+
+.empty-state .empty {
+  padding: 0;
+}
+
+.empty-btn {
+  margin-top: 24rpx;
+  width: 240rpx;
+}
+
+/* 加载更多 */
 .load-more {
+  padding: 16rpx 0 8rpx;
   text-align: center;
-  padding: 24rpx 0;
-}
-
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
+  font-size: 24rpx;
+  color: var(--color-muted);
 }

@@ -1,9 +1,26 @@
 import { api, ApiError } from "../../utils/api";
 import { getLastRedemption } from "../../utils/cache";
-import { formatDateTime, formatPoints, REDEMPTION_STATUS_LABELS } from "../../utils/format";
+import {
+  formatDateTime,
+  formatPoints,
+  REDEMPTION_STATUS_LABELS,
+  resolveImageUrl,
+} from "../../utils/format";
 import type { RedemptionItem, TrackingData, TrackingRoute } from "../../utils/types";
 
-type ItemView = RedemptionItem & { statusText: string; dateText: string; pointsText: string };
+interface ItemView extends RedemptionItem {
+  statusText: string;
+  statusHint: string;
+  dateText: string;
+  pointsText: string;
+  imageUrl: string | null;
+}
+
+const STATUS_HINTS: Record<string, string> = {
+  PENDING: "商家正在备货，发货后可查看物流",
+  FULFILLED: "商品已发货，物流动态见下方",
+  CANCELLED: "兑换已取消，扣减积分已原路退回",
+};
 
 /** 轨迹行：字段可能重复（同一时刻多条），预生成稳定 key 供 wx:for 使用 */
 interface TrackingRow extends TrackingRoute {
@@ -37,8 +54,10 @@ Page({
     return {
       ...item,
       statusText: REDEMPTION_STATUS_LABELS[item.status] ?? item.status,
+      statusHint: STATUS_HINTS[item.status] ?? "",
       dateText: formatDateTime(item.createdAt),
       pointsText: `-${formatPoints(item.points)} 积分`,
+      imageUrl: item.image ? resolveImageUrl(item.image) : null,
     };
   },
 

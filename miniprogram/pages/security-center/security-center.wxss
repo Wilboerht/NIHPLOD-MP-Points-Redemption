@@ -1,0 +1,118 @@
+/* 登录引导卡、错误卡、分段切换的基础样式见 app.wxss */
+
+.security-page {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+}
+
+/* 底部操作栏：由底部实色向上渐隐 */
+.bottom-bar {
+  padding-top: 48rpx;
+  background: linear-gradient(
+    to top,
+    var(--color-bg) 0%,
+    var(--color-bg) 45%,
+    rgba(247, 245, 242, 0) 100%
+  );
+  box-shadow: none;
+}
+
+.deletion-btn {
+  width: 100%;
+  background: var(--color-card);
+  color: var(--color-danger);
+  border: 1rpx solid var(--color-border);
+  border-radius: 44rpx;
+  font-size: 30rpx;
+}
+
+.security-page .seg-bar {
+  margin-bottom: 16rpx;
+}
+
+/* ============ 紧凑列表 ============ */
+
+.sec-list {
+  padding: 0 28rpx;
+}
+
+.sec-row {
+  padding: 20rpx 0;
+  align-items: center;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.sec-row:last-child {
+  border-bottom: none;
+}
+
+.sec-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.sec-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  min-width: 0;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.sec-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sec-sub {
+  margin-top: 8rpx;
+  word-break: break-all;
+}
+
+.tag {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  line-height: 1.4;
+  border-radius: 8rpx;
+  padding: 2rpx 12rpx;
+  font-weight: normal;
+}
+
+.tag-ok {
+  color: var(--color-success);
+  background: rgba(63, 143, 95, 0.1);
+}
+
+.tag-fail {
+  color: var(--color-danger);
+  background: rgba(194, 84, 80, 0.08);
+}
+
+/* 行尾操作：文字链，热区贴合行高 */
+.sec-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 88rpx;
+  min-height: 88rpx;
+  margin-left: 16rpx;
+  padding: 0 8rpx;
+  font-size: 26rpx;
+  color: var(--color-primary);
+}
+
+.sec-action-hover {
+  opacity: 0.6;
+}
+
+.sec-action-danger {
+  color: var(--color-danger);
+}
+
+.sec-tip {
+  margin: 8rpx 8rpx 16rpx;
+  line-height: 1.7;
+}

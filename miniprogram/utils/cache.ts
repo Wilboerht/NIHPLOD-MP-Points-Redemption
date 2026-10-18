@@ -22,3 +22,9 @@ export function setLastGifts(gifts: GiftItem[]): void {
 export function findLastGift(id: string): GiftItem | null {
   return lastGifts.find((g) => g.id === id) ?? null;
 }
+
+/** 清除跨页面临时数据（退出登录、切换账号、会话失效时调用） */
+export function clearTransientCache(): void {
+  lastRedemption = null;
+  lastGifts = [];
+}

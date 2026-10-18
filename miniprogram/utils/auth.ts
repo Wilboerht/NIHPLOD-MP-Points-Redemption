@@ -7,6 +7,7 @@
  */
 import { rawRequest } from "./request";
 import { MP_CLIENT_ID, STORAGE_KEYS } from "./env";
+import { clearTransientCache } from "./cache";
 import type { MpUser } from "./types";
 
 interface LoginResponseData {
@@ -80,6 +81,11 @@ function saveSession(data: {
   refreshToken: string;
   user?: MpUser;
 }): void {
+  // 切换账号时清理上一账号的页面缓存（同账号刷新/续期不清理）
+  const previousUser = getStoredUser();
+  if (data.user && previousUser && previousUser.id !== data.user.id) {
+    clearTransientCache();
+  }
   wx.setStorageSync(STORAGE_KEYS.accessToken, data.accessToken);
   wx.setStorageSync(STORAGE_KEYS.refreshToken, data.refreshToken);
   if (data.user) wx.setStorageSync(STORAGE_KEYS.user, data.user);
@@ -91,6 +97,7 @@ export function clearSession(): void {
   wx.removeStorageSync(STORAGE_KEYS.accessToken);
   wx.removeStorageSync(STORAGE_KEYS.refreshToken);
   wx.removeStorageSync(STORAGE_KEYS.user);
+  clearTransientCache();
 }
 
 /** 用户是否已主动退出（退出后不再静默登录，直到显式重新登录） */
@@ -161,9 +168,17 @@ export async function login(phoneCode?: string): Promise<LoginOutcome> {
 // Token 刷新（public client，refresh_token grant）
 // ============================================
 
-export async function refreshAccessToken(): Promise<boolean> {
+/**
+ * 刷新结果：
+ * - ok：已换发新 token
+ * - invalid：refresh token 明确失效/被撤销，会话应清理
+ * - transient：网络/服务端临时异常，保留会话，稍后重试
+ */
+export type RefreshOutcome = "ok" | "invalid" | "transient";
+
+export async function refreshAccessToken(): Promise<RefreshOutcome> {
   const refreshToken = getRefreshToken();
-  if (!refreshToken) return false;
+  if (!refreshToken) return "invalid";
   try {
     const res = await rawRequest({
       url: "/api/oauth/token",
@@ -180,16 +195,17 @@ export async function refreshAccessToken(): Promise<boolean> {
         accessToken: body.access_token,
         refreshToken: body.refresh_token ?? refreshToken,
       });
-      return true;
+      return "ok";
     }
     if (res.statusCode === 400 || res.statusCode === 401) {
       // invalid_grant：refresh token 已失效/被撤销
       clearSession();
+      return "invalid";
     }
-    return false;
+    return "transient";
   } catch {
     // 网络异常：保留会话，由下次请求重试
-    return false;
+    return "transient";
   }
 }
 
@@ -197,9 +213,9 @@ export async function refreshAccessToken(): Promise<boolean> {
  * 单飞刷新：bootstrap 与 API 401 重放共用同一在途刷新，
  * 避免并发 refresh_token 触发服务端轮换互踢（后到者失败清会话）。
  */
-let refreshingPromise: Promise<boolean> | null = null;
+let refreshingPromise: Promise<RefreshOutcome> | null = null;
 
-export function refreshAccessTokenOnce(): Promise<boolean> {
+export function refreshAccessTokenOnce(): Promise<RefreshOutcome> {
   if (!refreshingPromise) {
     refreshingPromise = refreshAccessToken().finally(() => {
       refreshingPromise = null;
@@ -292,21 +308,20 @@ export async function sendBindSmsCode(
 // ============================================
 
 /** 撤销 refresh token（RFC 7009，public client）+ 清本地会话 + 置退出标记（抑制静默登录） */
-export async function logout(): Promise<void> {
+export function logout(): void {
   const token = getRefreshToken();
   clearSession();
   pendingBindToken = "";
   wx.setStorageSync(STORAGE_KEYS.loggedOut, 1);
   if (!token) return;
-  try {
-    await rawRequest({
-      url: "/api/oauth/revoke",
-      method: "POST",
-      data: { token, token_type_hint: "refresh_token", client_id: MP_CLIENT_ID },
-    });
-  } catch {
-    // 本地会话已清，服务端 token 由 TTL 兜底
-  }
+  // 撤销请求后台静默：本地会话已清，不阻塞退出交互；失败由服务端 TTL 兜底
+  void rawRequest({
+    url: "/api/oauth/revoke",
+    method: "POST",
+    data: { token, token_type_hint: "refresh_token", client_id: MP_CLIENT_ID },
+  }).catch(() => {
+    // 本地会话已清，忽略服务端撤销失败
+  });
 }
 
 // ============================================
@@ -331,8 +346,8 @@ async function doBootstrap(): Promise<void> {
   // 用户主动退出后不静默登录：由「去登录」按钮显式触发
   if (isLoggedOut()) return;
   if (hasSession()) {
-    const ok = await refreshAccessTokenOnce();
-    if (ok) return;
+    const refresh = await refreshAccessTokenOnce();
+    if (refresh === "ok" || refresh === "transient") return;
   }
   const outcome = await login();
   if (outcome.kind === "need-binding") {

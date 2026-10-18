@@ -1,13 +1,14 @@
 import { api, ApiError } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
 import { setLastRedemption } from "../../utils/cache";
-import { formatDateOnly, formatPoints, REDEMPTION_STATUS_LABELS } from "../../utils/format";
+import { formatDateOnly, formatPoints, REDEMPTION_STATUS_LABELS, resolveImageUrl } from "../../utils/format";
 import type { RedemptionItem } from "../../utils/types";
 
 interface RedemptionRow extends RedemptionItem {
   statusText: string;
   dateText: string;
   pointsText: string;
+  imageUrl: string | null;
 }
 
 Page({
@@ -26,6 +27,15 @@ Page({
 
   onReachBottom() {
     void this.loadMore();
+  },
+
+  /** 下拉刷新 */
+  async onPullDownRefresh() {
+    try {
+      await this.refresh();
+    } finally {
+      wx.stopPullDownRefresh();
+    }
   },
 
   async refresh() {
@@ -74,6 +84,7 @@ Page({
       statusText: REDEMPTION_STATUS_LABELS[r.status] ?? r.status,
       dateText: formatDateOnly(r.createdAt),
       pointsText: `-${formatPoints(r.points)} 积分`,
+      imageUrl: r.image ? resolveImageUrl(r.image) : null,
     }));
   },
 

@@ -1,0 +1,61 @@
+.intro {
+  padding-bottom: 24rpx;
+}
+
+.intro-title {
+  margin-bottom: 8rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ============ 二维码 ============ */
+
+.qr-image {
+  display: block;
+  width: 360rpx;
+  height: 360rpx;
+  margin: 0 auto 20rpx;
+  background: var(--color-card);
+}
+
+.qr-failed {
+  padding: 80rpx 0;
+  text-align: center;
+}
+
+.qr-tip {
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ============ 复制搜索（兜底） ============ */
+
+.account-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+/* 独立整宽按钮：88rpx 满足移动端最小热区 */
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 88rpx;
+  margin-top: 20rpx;
+  border-radius: 44rpx;
+  background: rgba(138, 109, 75, 0.1);
+  color: var(--color-primary);
+  font-size: 28rpx;
+}
+
+.copy-btn-hover {
+  opacity: 0.7;
+}
+
+.copy-tip {
+  margin-top: 12rpx;
+  line-height: 1.6;
+}

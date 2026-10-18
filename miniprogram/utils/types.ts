@@ -94,6 +94,8 @@ export type RedemptionStatus = "PENDING" | "FULFILLED" | "CANCELLED";
 export interface RedemptionItem {
   id: string;
   productName: string;
+  /** 产品主图（可能为 null：产品已删除或无图） */
+  image: string | null;
   priceYuan: number;
   points: number;
   status: RedemptionStatus;
@@ -246,6 +248,8 @@ export interface SkinTestUsage {
   };
   /** 剩余次数；null = 不限次 */
   remaining: number | null;
+  /** 今日是否已完成手动打卡（自动测肤日记不计入）；旧版子站可能缺失 */
+  todayCheckedIn?: boolean;
 }
 
 // ============================================
@@ -300,4 +304,53 @@ export interface DeletionRequestInfo {
   scheduledAt: string;
   /** 距离生效剩余天数（向上取整） */
   remainingDays: number;
+}
+
+// ============================================
+// 安全中心（GET/DELETE /api/oauth/security/*）
+// ============================================
+
+/** 活跃设备/会话（脱敏 IP；OAuth 场景最近活跃会话标记为当前） */
+export interface SecurityDeviceItem {
+  id: string;
+  deviceName: string;
+  ipAddress: string;
+  createdAt: string;
+  lastActiveAt: string;
+  expiresAt: string;
+  isCurrent: boolean;
+}
+
+/** 已授权应用（按 client 去重） */
+export interface SecurityAuthorizationItem {
+  clientId: string;
+  clientName: string;
+  scopes: string[];
+  createdAt: string;
+  /** 是否为当前小程序自身 */
+  isCurrentClient: boolean;
+}
+
+/** 第三方绑定身份（不含 openid） */
+export interface SecurityIdentityItem {
+  id: string;
+  provider: string;
+  /** 来源小程序 clientId（仅 wechat_miniprogram 身份可能有；旧服务端可能缺失） */
+  mpClientId?: string | null;
+  nickname: string | null;
+  avatar: string | null;
+  createdAt: string;
+  lastSyncAt: string;
+  canUnbind: boolean;
+}
+
+/** 登录历史（最近 50 条） */
+export interface LoginHistoryItem {
+  id: string;
+  /** password | sms | oauth | admin */
+  type: string;
+  success: boolean;
+  reason: string | null;
+  ipAddress: string;
+  createdAt: string;
 }

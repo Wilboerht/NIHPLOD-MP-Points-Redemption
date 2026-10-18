@@ -2,6 +2,8 @@
   padding-bottom: 180rpx;
 }
 
+/* .bottom-bar/.submit-btn/.error-card 基础样式见 app.wxss */
+
 .gift-summary {
   display: flex;
   align-items: center;
@@ -86,21 +88,15 @@
   background: radial-gradient(circle, var(--color-primary) 0 10rpx, transparent 11rpx);
 }
 
-.bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
-  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+/* 空地址态：直接给出新增入口（原入口在右上角小字，不易发现） */
+.empty-address {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
 }
 
-.submit-btn {
-  width: 100%;
-}
-
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
+.add-address-btn {
+  margin-top: 20rpx;
+  width: 360rpx;
 }

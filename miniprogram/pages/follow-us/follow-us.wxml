@@ -1,0 +1,37 @@
+<view class="container">
+  <view class="intro">
+    <view class="intro-title">关注 NIHPLOD 官方微信公众号</view>
+    <view class="muted small">获取新品发布、会员活动与护肤资讯</view>
+  </view>
+
+  <!-- 扫码 / 长按识别：低操作成本，作为主路径 -->
+  <view class="card">
+    <view class="card-title">长按识别二维码</view>
+    <image
+      wx:if="{{!qrFailed}}"
+      class="qr-image"
+      src="{{qrUrl}}"
+      mode="aspectFit"
+      show-menu-by-longpress
+      binderror="onQrError"
+    />
+    <view wx:else class="qr-failed muted small">二维码加载失败，请使用下方复制搜索</view>
+    <view class="muted small qr-tip">关注 NIHPLOD 官方微信公众号</view>
+  </view>
+
+  <!-- 复制兜底：独立整宽按钮，热区更大 -->
+  <view class="card">
+    <view class="card-title">搜索关注</view>
+    <view class="account-name">{{accountName}}</view>
+    <view
+      class="copy-btn"
+      bindtap="copyAccount"
+      hover-class="copy-btn-hover"
+      aria-role="button"
+      aria-label="复制公众号名称"
+    >
+      复制公众号名称
+    </view>
+    <view class="muted small copy-tip">复制后，前往微信「搜索」粘贴并关注</view>
+  </view>
+</view>

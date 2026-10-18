@@ -1,9 +1,12 @@
-<!-- 自绘导航栏（home.json navigationStyle: custom）：logo 替代标题文字 -->
+<!-- 自绘导航栏（home.json navigationStyle: custom）：logo 替代标题文字，固定悬浮如原生导航栏 -->
 <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
   <image class="nav-logo" src="/images/nihplod-logo.svg" mode="aspectFit" />
 </view>
+<view style="height: {{statusBarHeight + 44}}px;"></view>
 
 <view class="container">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看会员信息</view>
     <view class="muted small login-desc">使用微信一键登录，积分与官网账号同步</view>
@@ -14,61 +17,97 @@
     <view class="balance-card">
       <image wx:if="{{cardBg}}" class="balance-bg" src="{{cardBg}}" mode="aspectFill" />
       <view class="balance-inner">
-        <view class="row member-strip">
-          <view class="level-chip">{{levelName || '会员'}}</view>
-          <text class="muted small" bindtap="goVip">会员权益 ›</text>
+        <view class="member-top">
+          <image
+            class="member-avatar {{avatar ? '' : 'member-avatar-fallback'}}"
+            src="{{avatar || '/images/icons/user.svg'}}"
+            mode="{{avatar ? 'aspectFill' : 'aspectFit'}}"
+          />
+          <view class="member-meta">
+            <view class="member-nickname">{{nickname}}</view>
+            <view class="level-chip">{{levelName || '会员'}}</view>
+          </view>
+          <text wx:if="{{memberId}}" class="member-no">NO. {{memberId}}</text>
         </view>
-        <view class="balance-label">可用积分</view>
-        <view class="balance-value">{{availableText}}</view>
-        <view class="balance-tip small">消费 1 元 = 1 积分 · 有效期 6 个月</view>
-        <view wx:if="{{nextLevelTip}}" class="balance-tip small">{{nextLevelTip}}</view>
-        <button size="mini" class="ghost-btn balance-btn" bindtap="goGifts">去兑礼</button>
+        <view class="balance-row">
+          <text class="balance-label">可用积分</text>
+          <text class="balance-value">{{availableText}}</text>
+        </view>
       </view>
     </view>
 
-    <view wx:if="{{hotGifts.length > 0}}" class="card">
-      <view class="row ledger-head">
-        <view class="card-title card-title-inline">精选好礼</view>
-        <text class="muted small" bindtap="goGifts">全部好礼 ›</text>
+    <!-- 白卡：高频操作（与会员卡形成层次） -->
+    <view class="card quick-card">
+      <view class="quick-item" bindtap="goVip" hover-class="quick-item-hover">
+        <image class="quick-icon" src="/images/icons/crown.svg" mode="aspectFit" />
+        <text class="quick-label">会员权益</text>
       </view>
-      <scroll-view scroll-x class="gift-scroll">
-        <view class="gift-scroll-inner">
+      <view class="quick-item" bindtap="goGifts" hover-class="quick-item-hover">
+        <image class="quick-icon" src="/images/icons/gift.svg" mode="aspectFit" />
+        <text class="quick-label">积分兑换</text>
+      </view>
+      <view class="quick-item" bindtap="goSpentAdjust" hover-class="quick-item-hover">
+        <image class="quick-icon" src="/images/icons/trending-up.svg" mode="aspectFit" />
+        <text class="quick-label">等级提升</text>
+      </view>
+    </view>
+
+    <!-- 肌智派在线测肤（数据来自智能测肤小程序，加载失败时隐藏） -->
+    <view wx:if="{{skinUsage}}" class="card skin-card" bindtap="goSkinTest" hover-class="row-hover">
+      <image class="skin-logo" src="/images/jzp-eyebrow.png" mode="aspectFit" />
+      <view class="skin-main">
+        <view class="skin-title">肌智派在线测肤</view>
+        <view class="skin-status">
+          <view class="skin-chip {{skinUsage.testedToday ? 'skin-chip-on' : ''}}">
+            {{skinUsage.testedToday ? '今日已测肤' : '今日未测肤'}}
+          </view>
           <view
-            wx:for="{{hotGifts}}"
-            wx:key="id"
-            class="hot-gift"
-            data-id="{{item.id}}"
-            bindtap="openGift"
+            wx:if="{{skinUsage.checkedInKnown}}"
+            class="skin-chip {{skinUsage.checkedInToday ? 'skin-chip-on' : ''}}"
           >
-            <image wx:if="{{item.image}}" class="hot-gift-img" src="{{item.image}}" mode="aspectFill" />
-            <view wx:else class="hot-gift-img hot-gift-placeholder">NIHPLOD</view>
-            <view class="hot-gift-name">{{item.name}}</view>
-            <view class="hot-gift-cost">{{item.costText}}</view>
+            {{skinUsage.checkedInToday ? '今日已打卡' : '今日未打卡'}}
           </view>
         </view>
-      </scroll-view>
+      </view>
+      <view class="skin-go">前往测肤</view>
     </view>
 
     <view wx:if="{{expiring.length > 0}}" class="card warn-card">
       <view class="card-title">即将过期</view>
       <view wx:for="{{expiring}}" wx:key="id" class="row expiring-row">
         <text class="small">{{item.title}}</text>
-        <text class="danger small">{{item.points}} 积分 · {{item.expiresAt}} 过期</text>
+        <text class="danger small">{{item.pointsText}} 积分 · {{item.expiresAt}} 过期</text>
       </view>
     </view>
 
-    <view class="card">
+    <view wx:if="{{hotGifts.length > 0}}" class="card">
       <view class="row ledger-head">
-        <view class="card-title card-title-inline">积分明细</view>
-        <text class="muted small" bindtap="goLedger">全部明细 ›</text>
-      </view>
-      <view wx:if="{{recent.length === 0}}" class="empty">暂无积分记录</view>
-      <view wx:for="{{recent}}" wx:key="id" class="row ledger-row">
-        <view class="ledger-left">
-          <view class="ledger-title">{{item.typeLabel}}</view>
-          <view class="muted small">{{item.dateText}}{{item.note ? ' · ' + item.note : ''}}</view>
+        <view class="card-title card-title-inline">精选好礼</view>
+        <view class="text-link tap-hot" bindtap="goGifts" hover-class="row-hover">
+          <text class="muted small">全部好礼</text>
+          <image class="link-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
         </view>
-        <text class="{{item.amount > 0 ? 'plus' : 'minus'}}">{{item.amountText}}</text>
+      </view>
+      <view class="gift-row">
+        <view
+          wx:for="{{hotGifts}}"
+          wx:key="id"
+          class="hot-gift"
+          data-id="{{item.id}}"
+          bindtap="openGift"
+          hover-class="hot-gift-hover"
+        >
+          <image
+            wx:if="{{item.image}}"
+            class="hot-gift-img"
+            src="{{item.image}}"
+            mode="aspectFill"
+            lazy-load
+          />
+          <view wx:else class="hot-gift-img hot-gift-placeholder">NIHPLOD</view>
+          <view class="hot-gift-name">{{item.name}}</view>
+          <view class="hot-gift-cost {{item.costClass}}">{{item.costText}}</view>
+        </view>
       </view>
     </view>
   </block>

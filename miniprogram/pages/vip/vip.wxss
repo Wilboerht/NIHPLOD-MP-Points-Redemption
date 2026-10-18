@@ -1,148 +1,253 @@
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
-}
+/* 登录引导卡/.error-card 基础样式见 app.wxss */
 
-.login-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 70%;
-}
-
-.member-card {
-  position: relative;
-  overflow: hidden;
-  background: #f3ece4;
-  color: var(--color-text);
-  border-radius: 24rpx;
+/* ============ 顶部会员卡：全宽通栏、无圆角 ============ */
+.vip-card {
+  margin-left: -24rpx;
+  margin-right: -24rpx;
   margin-bottom: 24rpx;
+  padding: 32rpx 60rpx;
+  border-radius: 0;
+  background-color: #f3ece4;
+  background-size: cover;
+  background-position: center;
 }
 
-.member-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.vip-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
 }
 
-/* 白色薄纱层：浅色卡面图上保证深色文字可读性（与官网版式一致） */
-.member-inner {
-  position: relative;
-  padding: 44rpx 36rpx;
-  background: rgba(255, 255, 255, 0.22);
+.vip-meta {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  min-width: 0;
 }
 
-.member-level {
-  font-size: 44rpx;
-  font-weight: 600;
-}
-
-.member-id {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-}
-
-.member-bottom {
-  margin-top: 32rpx;
-}
-
-.member-spent {
-  font-size: 40rpx;
-  font-weight: 600;
-}
-
-.card-title-inline {
-  margin-bottom: 0;
-}
-
-.skin-remaining {
+/* 等级胶囊：与积分页 level-tag 一致 */
+.level-tag {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 2rpx 14rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(138, 109, 75, 0.22);
+  background: rgba(255, 255, 255, 0.45);
   color: var(--color-primary);
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.vip-label {
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.vip-link {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  flex-shrink: 0;
+  padding: 8rpx 0 8rpx 12rpx;
+  font-size: 24rpx;
+  color: var(--color-primary);
+}
+
+.vip-link-chevron {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.vip-link-hover {
+  opacity: 0.6;
+}
+
+.vip-value {
+  margin-top: 6rpx;
+  font-size: 52rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.vip-id {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+/* 升级进度并入会员卡底部 */
+.vip-progress {
+  margin-top: 28rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid rgba(43, 43, 43, 0.08);
+}
+
+.vip-progress-head {
+  margin-bottom: 12rpx;
+}
+
+/* ============ 下方信息卡：扁平化 ============ */
+.benefits-card,
+.level-list {
+  border: 1rpx solid var(--color-border);
+  border-radius: 16rpx;
+  box-shadow: none;
+}
+
+/* 当前权益 */
+.benefit-list {
+  margin-top: 4rpx;
+}
+
+.benefit-row {
+  margin-top: 16rpx;
+}
+
+.benefit-list .benefit-row:first-child {
+  margin-top: 0;
+}
+
+.benefit-title {
+  font-size: 26rpx;
   font-weight: 600;
 }
 
-.skin-line {
-  margin-top: 10rpx;
+.benefit-desc {
+  margin-top: 4rpx;
+  line-height: 1.6;
 }
 
-.skin-btn {
-  width: 100%;
+.benefit-row-link {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
   margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--color-border);
 }
 
-.progress-head {
-  margin-bottom: 16rpx;
+.benefit-main {
+  flex: 1;
+  min-width: 0;
 }
 
-.progress-tip {
-  margin-top: 12rpx;
+.benefit-side {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  flex-shrink: 0;
 }
 
-.level-card-current {
-  border: 2rpx solid var(--color-primary);
+.benefit-remaining {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.benefit-chevron {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.benefit-row-hover {
+  opacity: 0.6;
+}
+
+/* ============ 会员等级：单卡片折叠列表 ============ */
+.level-item {
+  margin: 0 -28rpx;
+  padding: 0 28rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.level-item:last-child {
+  border-bottom: none;
+}
+
+.level-item-current {
+  background: rgba(138, 109, 75, 0.05);
+}
+
+.level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 20rpx 0;
+}
+
+.level-row-hover {
+  background: rgba(43, 43, 43, 0.03);
+}
+
+.level-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .level-name {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
 }
 
-.level-badges {
+.level-threshold {
+  margin-top: 4rpx;
+}
+
+.level-side {
   display: flex;
+  align-items: center;
   gap: 12rpx;
+  flex-shrink: 0;
 }
 
-.badge {
-  font-size: 20rpx;
+.level-state {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  line-height: 1.4;
   border-radius: 8rpx;
-  padding: 4rpx 12rpx;
+  padding: 2rpx 10rpx;
 }
 
-.badge-current {
-  color: #ffffff;
-  background: var(--color-primary);
-}
-
-.badge-unlocked {
-  color: #3f8f5f;
+.level-state-unlocked {
+  color: var(--color-success);
   background: rgba(63, 143, 95, 0.1);
 }
 
-.badge-locked {
+.level-state-locked {
   color: var(--color-muted);
   background: rgba(43, 43, 43, 0.06);
 }
 
-.level-threshold {
-  margin-top: 8rpx;
-  margin-bottom: 16rpx;
+.level-chevron {
+  width: 24rpx;
+  height: 24rpx;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
-.benefit-row {
-  display: flex;
-  margin-top: 16rpx;
+.level-chevron-open {
+  transform: rotate(90deg);
 }
 
-.benefit-icon {
-  margin-right: 12rpx;
+.level-benefits {
+  padding: 0 0 20rpx;
 }
 
-.benefit-title {
-  font-size: 27rpx;
-  font-weight: 600;
-  margin-bottom: 4rpx;
+.level-benefits .benefit-row {
+  margin-top: 12rpx;
 }
 
+.level-benefits .benefit-row:first-child {
+  margin-top: 4rpx;
+}
+
+/* ============ 底部说明 ============ */
 .vip-tip {
   padding: 0 8rpx 30rpx;
-}
-
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
 }

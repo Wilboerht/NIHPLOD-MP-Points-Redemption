@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "兑换记录",
-  "onReachBottomDistance": 80
+  "onReachBottomDistance": 80,
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

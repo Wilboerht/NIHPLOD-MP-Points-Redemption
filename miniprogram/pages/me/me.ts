@@ -1,21 +1,36 @@
 import { api } from "../../utils/api";
-import { ensureSession, getStoredUser, logout, updateStoredUser } from "../../utils/auth";
-import { formatPoints, resolveImageUrl } from "../../utils/format";
+import { ensureSession, getStoredUser, updateStoredUser } from "../../utils/auth";
+import {
+  formatPoints,
+  LEVEL_CARD_BG_IMAGES,
+  maskPhone,
+  resolveImageUrl,
+} from "../../utils/format";
 import { getStatusBarHeight } from "../../utils/ui";
 
-function maskPhone(phone: string): string {
-  return phone.length === 11 ? `${phone.slice(0, 3)}****${phone.slice(7)}` : phone;
-}
+/**
+ * 小程序 ICP 备案号：备案通过后填入正式号码（如 "沪ICP备XXXXXXXX号-X"）。
+ * 留空时页脚不展示备案行；小程序备案号与官网主体备案号后缀不同，
+ * 以微信公众平台「小程序备案」查询结果为准。
+ */
+const ICP_BEIAN = "";
 
 Page({
   data: {
     loggedIn: false,
+    /** 首屏会话检查中（避免已登录用户闪现"未登录"卡片） */
+    loading: true,
     /** 自定义导航栏状态栏高度（px） */
     statusBarHeight: 20,
     nickname: "微信用户",
     phoneMasked: "",
     avatar: "",
-    availableText: "",
+    availableText: "--",
+    /** 个人资料卡背景样式（会员等级卡面 + 白色薄纱层） */
+    cardStyle: "",
+    /** 页脚：版权年份与 ICP 备案号（备案通过后替换 ICP_BEIAN） */
+    year: new Date().getFullYear(),
+    filingText: ICP_BEIAN,
   },
 
   onLoad() {
@@ -30,7 +45,7 @@ Page({
   async load() {
     const loggedIn = await ensureSession();
     if (!loggedIn) {
-      this.setData({ loggedIn: false });
+      this.setData({ loggedIn: false, loading: false });
       return;
     }
     // 先用本地缓存的用户信息渲染，再用 userinfo 拉取最新资料覆盖
@@ -38,19 +53,30 @@ Page({
     const user = getStoredUser();
     this.setData({
       loggedIn: true,
+      loading: false,
       nickname: user?.nickname || "微信用户",
       phoneMasked: user?.phone ? maskPhone(user.phone) : "",
       // 官网存储的 avatar 可能是相对路径（本地存储模式），补全为绝对地址
       avatar: user?.avatar ? resolveImageUrl(user.avatar) : "",
-      availableText: "",
     });
 
-    const [points, info] = await Promise.all([
+    const [points, info, membership] = await Promise.all([
       api.points().catch(() => null),
       api.userinfo().catch(() => null),
+      // 会员等级为增强模块：失败时资料卡使用纯色背景
+      api.membership().catch(() => null),
     ]);
     if (points) {
       this.setData({ availableText: formatPoints(points.available) });
+    }
+    if (membership) {
+      const bg = resolveImageUrl(LEVEL_CARD_BG_IMAGES[membership.membershipLevel] ?? "");
+      this.setData({
+        // 浅色卡面上叠加白色薄纱层，保证深色文字可读（与首页会员卡一致）
+        cardStyle: bg
+          ? `background-image: linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)), url("${bg}");`
+          : "",
+      });
     }
     if (info) {
       // userinfo.avatar 为绝对地址（官网 resolveSsoAvatar 保证），无需再补全
@@ -91,21 +117,31 @@ Page({
     wx.navigateTo({ url: "/pages/records/records" });
   },
 
-  goAccountDeletion() {
-    wx.navigateTo({ url: "/pages/account-deletion/account-deletion" });
+  goLedger() {
+    wx.navigateTo({ url: "/pages/points-ledger/points-ledger" });
   },
 
-  onLogout() {
-    wx.showModal({
-      title: "退出登录",
-      content: "确定退出当前账号吗？退出后需重新登录",
-      confirmColor: "#c25450",
-      success: async (res) => {
-        if (!res.confirm) return;
-        await logout();
-        wx.showToast({ title: "已退出", icon: "success" });
-        setTimeout(() => wx.reLaunch({ url: "/pages/home/home" }), 500);
-      },
-    });
+  goPrivacy() {
+    wx.navigateTo({ url: "/pages/legal/legal?type=privacy" });
+  },
+
+  goFollowUs() {
+    wx.navigateTo({ url: "/pages/follow-us/follow-us" });
+  },
+
+  goSecurityCenter() {
+    wx.navigateTo({ url: "/pages/security-center/security-center" });
+  },
+
+  goTerms() {
+    wx.navigateTo({ url: "/pages/legal/legal?type=terms" });
+  },
+
+  /** 打开积分规则抽屉（组件 components/rules-sheet） */
+  openRules() {
+    const sheet = this.selectComponent("#rules-sheet") as unknown as {
+      show: () => void;
+    } | null;
+    sheet?.show();
   },
 });

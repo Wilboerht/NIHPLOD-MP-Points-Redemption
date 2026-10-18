@@ -1,0 +1,109 @@
+/* 组件样式隔离：颜色使用全局变量的回退值，保证跨页面一致 */
+
+.sheet-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  animation: sheet-mask-in 0.2s ease-out;
+}
+
+.sheet-mask-closing {
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  max-height: 72vh;
+  padding: 0 32rpx;
+  background: var(--color-card, #ffffff);
+  border-radius: 32rpx 32rpx 0 0;
+  transform: translateY(0);
+  transition: transform 0.2s ease-in;
+  animation: sheet-in 0.24s ease-out;
+}
+
+.sheet-closing {
+  transform: translateY(100%);
+}
+
+@keyframes sheet-mask-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 0 24rpx;
+}
+
+.sheet-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text, #2b2b2b);
+}
+
+.sheet-close {
+  font-size: 28rpx;
+  color: var(--color-muted, #767676);
+  padding: 12rpx;
+  margin: -12rpx -12rpx -12rpx 0;
+}
+
+.sheet-body {
+  padding-bottom: 16rpx;
+}
+
+.sheet-rule {
+  position: relative;
+  padding-left: 24rpx;
+  font-size: 27rpx;
+  line-height: 1.8;
+  color: var(--color-text, #2b2b2b);
+  margin-bottom: 18rpx;
+}
+
+.sheet-rule::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20rpx;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--color-primary, #8a6d4b);
+  opacity: 0.55;
+}
+
+.sheet-rule:last-child {
+  margin-bottom: 8rpx;
+}
+
+.sheet-safe {
+  height: calc(12rpx + env(safe-area-inset-bottom));
+}

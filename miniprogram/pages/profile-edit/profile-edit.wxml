@@ -1,11 +1,13 @@
-<view class="container profile-edit-page">
-  <view wx:if="{{!loggedIn && !loading}}" class="card login-card">
-    <view class="login-title">登录后编辑资料</view>
+<view class="container profile-page">
+  <view wx:if="{{loading}}" class="loading-block">加载中…</view>
+
+  <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
+    <view class="login-title">登录后管理个人资料</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn}}">
-    <view class="card">
+    <view class="card form-card">
       <view class="form-row avatar-row">
         <text class="label">头像</text>
         <button
@@ -13,11 +15,20 @@
           open-type="chooseAvatar"
           bindchooseavatar="onChooseAvatar"
           disabled="{{uploading}}"
+          hover-class="none"
         >
-          <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
-          <view wx:else class="avatar avatar-fallback">＋</view>
+          <view class="avatar-wrap">
+            <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar avatar-fallback">＋</view>
+            <view class="avatar-badge">
+              <image class="avatar-badge-icon" src="/images/icons/camera-white.svg" mode="aspectFit" />
+            </view>
+          </view>
+          <view class="avatar-meta">
+            <text class="avatar-action">{{uploading ? '上传中…' : '点击更换头像'}}</text>
+            <text class="muted small">JPG / PNG / WebP，≤ 5MB</text>
+          </view>
         </button>
-        <text class="muted small avatar-tip">{{uploading ? '上传中…' : '点击更换'}}</text>
       </view>
 
       <view class="form-row">
@@ -29,49 +40,66 @@
           maxlength="20"
           placeholder="请输入昵称"
           bindinput="onNicknameInput"
+          bindblur="onNicknameBlur"
         />
       </view>
 
       <view class="form-row">
         <text class="label">性别</text>
-        <radio-group class="gender-group" bindchange="onGenderChange">
-          <label wx:for="{{genderOptions}}" wx:key="*this" class="gender-item">
-            <radio value="{{index}}" checked="{{genderIndex === index}}" color="#8a6d4b" />
-            <text>{{item}}</text>
-          </label>
-        </radio-group>
+        <view class="seg-bar gender-seg">
+          <view
+            wx:for="{{genderOptions}}"
+            wx:key="*this"
+            class="seg-item {{genderIndex === index ? 'seg-item-active' : ''}}"
+            data-index="{{index}}"
+            bindtap="onGenderTap"
+          >
+            {{item}}
+          </view>
+        </view>
       </view>
 
-      <view class="form-row">
+      <view wx:if="{{birthdaySet}}" class="form-row">
         <text class="label">生日</text>
-        <text wx:if="{{birthdaySet}}">{{birthdayText}}（已锁定）</text>
-        <picker
-          wx:else
-          mode="date"
-          end="{{today}}"
-          value="{{birthdayText}}"
-          bindchange="onBirthdayChange"
-          class="picker"
-        >
-          <view class="{{birthdayText ? '' : 'muted'}}">{{birthdayText || '请选择生日'}}</view>
-        </picker>
+        <view class="field-value">
+          <text>{{birthdayText}}</text>
+          <text class="locked-badge">已锁定</text>
+        </view>
+      </view>
+      <picker
+        wx:else
+        mode="date"
+        start="1920-01-01"
+        end="{{today}}"
+        value="{{birthdayText}}"
+        bindchange="onBirthdayChange"
+        class="form-row"
+      >
+        <text class="label">生日</text>
+        <view class="field-value {{birthdayText ? '' : 'muted'}}">{{birthdayText || '请选择生日'}}</view>
+        <image class="row-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+      </picker>
+
+      <view class="form-tip">
+        <view>资料修改后自动保存</view>
+        <view>生日用于生日礼遇积分发放，首次设置后不可修改（如需修改请联系客服）</view>
       </view>
     </view>
 
-    <view class="card muted small tip-card">
-      <view>· 生日用于生日礼遇积分发放，首次设置后不可修改（如需修改请联系客服）</view>
-      <view>· 头像支持 JPG / PNG / WebP，不超过 5MB</view>
+    <view class="card form-card">
+      <view class="form-row">
+        <text class="label">手机号</text>
+        <view class="phone-info">
+          <text>{{phoneMasked || '—'}}</text>
+          <text class="muted small">如需换绑请联系客服</text>
+        </view>
+      </view>
     </view>
 
-    <view wx:if="{{error}}" class="card error-card">{{error}}</view>
-
-    <button
-      class="btn-primary save-btn"
-      loading="{{saving}}"
-      disabled="{{saving || uploading}}"
-      bindtap="save"
-    >
-      保存
-    </button>
+    <view class="bottom-bar">
+      <button class="logout-btn" bindtap="onLogout">退出登录</button>
+    </view>
   </block>
+
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 </view>

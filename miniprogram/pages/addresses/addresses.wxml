@@ -1,4 +1,6 @@
 <view class="container addresses-page">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后管理收货地址</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
@@ -9,19 +11,32 @@
       暂无收货地址，点击下方按钮新增
     </view>
 
-    <view wx:for="{{addresses}}" wx:key="id" class="card address-card">
-      <view class="address-body">
-        <view class="row header-row">
+    <view
+      wx:for="{{addresses}}"
+      wx:key="id"
+      class="card address-card"
+      data-id="{{item.id}}"
+      bindtap="edit"
+      hover-class="address-card-hover"
+    >
+      <view class="row header-row">
+        <view class="identity">
           <text class="recipient">{{item.recipient}}</text>
-          <text class="muted small">{{item.phone}}</text>
-          <text wx:if="{{item.isDefault}}" class="default-tag">默认</text>
+          <text class="muted small phone">{{item.phone}}</text>
         </view>
-        <view class="muted small address-text">{{item.region}} {{item.detail}}</view>
+        <text wx:if="{{item.isDefault}}" class="default-tag">默认</text>
+        <view
+          class="delete-hit"
+          data-id="{{item.id}}"
+          catchtap="remove"
+          hover-class="delete-hit-hover"
+          aria-role="button"
+          aria-label="删除地址"
+        >
+          <image class="delete-icon" src="/images/icons/trash.svg" mode="aspectFit" />
+        </view>
       </view>
-      <view class="address-actions">
-        <view class="action" data-id="{{item.id}}" bindtap="edit">编辑</view>
-        <view class="action action-danger" data-id="{{item.id}}" bindtap="remove">删除</view>
-      </view>
+      <view class="muted address-text">{{item.region}} {{item.detail}}</view>
     </view>
 
     <view class="bottom-bar">

@@ -194,6 +194,14 @@ Page({
     this.setData({ error: outcome.message });
   },
 
+  goPrivacy() {
+    wx.navigateTo({ url: "/pages/legal/legal?type=privacy" });
+  },
+
+  goTerms() {
+    wx.navigateTo({ url: "/pages/legal/legal?type=terms" });
+  },
+
   skip() {
     this.leave();
   },

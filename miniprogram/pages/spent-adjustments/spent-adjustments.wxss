@@ -1,55 +1,102 @@
 .adjust-page {
-  padding-bottom: 180rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
-}
+/* 登录引导卡/.error-card/.warn-card 基础样式见 app.wxss */
 
-.login-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 70%;
+/* 底部操作栏：由底部实色向上渐隐，内容滚动时自然淡出 */
+.bottom-bar {
+  padding-top: 48rpx;
+  background: linear-gradient(
+    to top,
+    var(--color-bg) 0%,
+    var(--color-bg) 45%,
+    rgba(247, 245, 242, 0) 100%
+  );
+  box-shadow: none;
 }
 
 .tip-card {
+  margin-left: -24rpx;
+  margin-right: -24rpx;
+  padding-left: 52rpx;
+  padding-right: 52rpx;
+  border-radius: 0;
+  box-shadow: none;
   background: rgba(138, 109, 75, 0.06);
 }
 
+.tip-head {
+  margin: -8rpx -8rpx 12rpx;
+  padding: 8rpx;
+  border-radius: 12rpx;
+}
+
+.tip-head-hover {
+  background: rgba(138, 109, 75, 0.06);
+}
+
+.tip-title {
+  margin-bottom: 0;
+}
+
+.tip-toggle {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: var(--color-primary);
+}
+
 .tip-line {
-  line-height: 1.8;
+  line-height: 1.7;
+  padding-left: 20rpx;
+  text-indent: -20rpx;
+}
+
+.tip-line + .tip-line {
+  margin-top: 4rpx;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72rpx 0;
+}
+
+.empty-state .empty {
+  padding: 0;
+}
+
+.empty-desc {
+  margin-top: 12rpx;
+  text-align: center;
+}
+
+.record-card {
+  padding: 24rpx 28rpx;
+  margin-bottom: 16rpx;
+  border: 1rpx solid var(--color-border);
+  border-radius: 16rpx;
+  box-shadow: none;
+}
+
+.record-head {
+  align-items: flex-start;
+  gap: 16rpx;
 }
 
 .channel {
+  flex: 1;
+  min-width: 0;
   font-size: 30rpx;
   font-weight: 600;
-}
-
-.status {
-  font-size: 24rpx;
-  border-radius: 8rpx;
-  padding: 4rpx 14rpx;
-}
-
-.status-PENDING {
-  color: #8a6d4b;
-  background: rgba(138, 109, 75, 0.1);
-}
-
-.status-APPROVED {
-  color: #3f8f5f;
-  background: rgba(63, 143, 95, 0.1);
-}
-
-.status-REJECTED {
-  color: var(--color-danger);
-  background: rgba(194, 84, 80, 0.08);
+  line-height: 1.4;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .order-row {
@@ -63,43 +110,12 @@
 
 .review-text {
   margin-top: 12rpx;
+}
+
+.review-text-APPROVED {
+  color: var(--color-success);
+}
+
+.review-text-REJECTED {
   color: var(--color-danger);
-}
-
-.proof-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 16rpx;
-}
-
-.proof-thumb {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 12rpx;
-  background: #efeae4;
-}
-
-.proof-count {
-  margin-left: 4rpx;
-}
-
-.bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
-  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
-}
-
-.submit-btn {
-  width: 100%;
-}
-
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
 }

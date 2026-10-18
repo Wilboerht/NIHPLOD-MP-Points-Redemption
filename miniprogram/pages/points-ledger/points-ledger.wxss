@@ -1,56 +1,13 @@
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
-}
-
-.login-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 70%;
-}
+/* 登录引导卡、错误卡、菜单列表、流水行、分页提示的基础样式见 app.wxss */
 
 .summary {
-  padding: 4rpx 8rpx 20rpx;
+  padding-bottom: 20rpx;
 }
 
-.ledger-card {
-  padding: 8rpx 28rpx;
-}
-
-.ledger-row {
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid var(--color-border);
-}
-
-.ledger-row:last-child {
-  border-bottom: none;
-}
-
-.ledger-left {
-  max-width: 70%;
-}
-
-.ledger-title {
-  font-size: 28rpx;
-}
-
+/* 流水号行：扩展点击热区并用下划线提示可复制 */
 .ref-row {
-  margin-top: 10rpx;
-  font-size: 22rpx;
+  margin-bottom: -16rpx;
+  padding: 16rpx 0;
   word-break: break-all;
-}
-
-.load-more {
-  text-align: center;
-  padding: 24rpx 0;
-}
-
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
+  text-decoration: underline;
 }

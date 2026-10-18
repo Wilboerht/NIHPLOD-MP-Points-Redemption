@@ -1,10 +1,8 @@
+/* 登录引导卡/.error-card/.warn-card 基础样式见 app.wxss */
+
 .tip-line {
   line-height: 1.8;
   margin-top: 8rpx;
-}
-
-.warn-card {
-  background: rgba(194, 84, 80, 0.04);
 }
 
 .pending-card {
@@ -39,25 +37,4 @@
 .contact-btn {
   width: 100%;
   margin-top: 20rpx;
-}
-
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
-}
-
-.login-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 70%;
-}
-
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
 }

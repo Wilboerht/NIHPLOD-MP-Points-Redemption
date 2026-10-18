@@ -18,6 +18,7 @@ Page({
     saving: false,
     uploading: false,
     error: "",
+    errorField: "" as "" | "dealerName" | "orderNo" | "amount",
     channelOptions: SPENT_CHANNEL_OPTIONS.map((o) => o.label),
     channelIndex: 0,
     isDealer: false,
@@ -69,30 +70,42 @@ Page({
       channelIndex: index,
       isDealer: SPENT_CHANNEL_OPTIONS[index]?.value === "DEALER",
       error: "",
+      errorField: "",
     });
   },
 
   onDealerInput(e: WechatMiniprogram.Input) {
-    this.setData({ dealerName: e.detail.value, error: "" });
+    this.setData({ dealerName: e.detail.value, error: "", errorField: "" });
   },
 
   onOrderInput(e: WechatMiniprogram.Input) {
-    this.setData({ orderNo: e.detail.value, error: "" });
+    this.setData({ orderNo: e.detail.value, error: "", errorField: "" });
   },
 
   onAmountInput(e: WechatMiniprogram.Input) {
-    this.setData({ amount: e.detail.value, error: "" });
+    this.setData({ amount: e.detail.value, error: "", errorField: "" });
   },
 
   onDateChange(e: WechatMiniprogram.PickerChange) {
-    this.setData({ purchasedAt: String(e.detail.value), error: "" });
+    this.setData({ purchasedAt: String(e.detail.value), error: "", errorField: "" });
+  },
+
+  clearDate() {
+    this.setData({ purchasedAt: "", error: "", errorField: "" });
   },
 
   onNoteInput(e: WechatMiniprogram.Input) {
-    this.setData({ note: e.detail.value, error: "" });
+    this.setData({ note: e.detail.value, error: "", errorField: "" });
+  },
+
+  showFieldError(field: "dealerName" | "orderNo" | "amount", message: string) {
+    this.setData({ error: message, errorField: field }, () => {
+      wx.pageScrollTo({ selector: ".form-row-error", offsetTop: -140, duration: 250 });
+    });
   },
 
   chooseImages() {
+    if (this.data.uploading) return;
     const remaining = MAX_IMAGES - this.data.images.length;
     if (remaining <= 0) return;
     wx.chooseMedia({
@@ -107,7 +120,7 @@ Page({
   },
 
   async uploadAll(paths: string[]) {
-    this.setData({ uploading: true, error: "" });
+    this.setData({ uploading: true, error: "", errorField: "" });
     const uploaded: ProofItem[] = [];
     try {
       for (const path of paths) {
@@ -127,7 +140,11 @@ Page({
 
   removeImage(e: WechatMiniprogram.TouchEvent) {
     const index = Number(e.currentTarget.dataset.index);
-    this.setData({ images: this.data.images.filter((_, i) => i !== index) });
+    this.setData({
+      images: this.data.images.filter((_, i) => i !== index),
+      error: "",
+      errorField: "",
+    });
   },
 
   previewImage(e: WechatMiniprogram.TouchEvent) {
@@ -143,11 +160,11 @@ Page({
     if (saving || uploading) return;
 
     if (isDealer && !dealerName.trim()) {
-      this.setData({ error: "请填写经销商名称" });
+      this.showFieldError("dealerName", "请填写经销商名称");
       return;
     }
     if (!orderNo.trim()) {
-      this.setData({ error: "请填写订单号或小票号" });
+      this.showFieldError("orderNo", "请填写订单号或小票号");
       return;
     }
     const claimedAmount = amount.trim() ? Number(amount.trim()) : undefined;
@@ -155,12 +172,9 @@ Page({
       claimedAmount !== undefined &&
       (!/^\d+$/.test(amount.trim()) || claimedAmount < 1 || claimedAmount > 1_000_000)
     ) {
-      this.setData({ error: "申报金额需为 1~1,000,000 的整数（元）" });
+      this.showFieldError("amount", "申报金额需为 1~1,000,000 的整数（元）");
       return;
     }
-
-    // 订阅审核结果通知（用户点击内触发，尽力而为）
-    await subscribeSpentReview();
 
     const payload: SpentApplicationInput = {
       channel: SPENT_CHANNEL_OPTIONS[channelIndex].value as SpentApplicationInput["channel"],
@@ -172,20 +186,23 @@ Page({
     if (note.trim()) payload.note = note.trim();
     if (images.length > 0) payload.images = images.map((i) => i.raw);
 
-    this.setData({ saving: true, error: "" });
+    // 先置 saving 再弹订阅授权，避免订阅弹窗期间快速二次点击提交
+    this.setData({ saving: true, error: "", errorField: "" });
     try {
+      // 订阅审核结果通知（用户点击内触发，尽力而为）
+      await subscribeSpentReview();
       await api.createSpentAdjustment(payload);
       wx.showToast({ title: "已提交，等待审核", icon: "success" });
+      // 成功期间保持 saving=true，直到页面返回
       setTimeout(() => wx.navigateBack({ delta: 1 }), 800);
     } catch (e) {
+      this.setData({ saving: false });
       const err = e as ApiError;
       if (err.status === 401) {
         wx.navigateTo({ url: "/pages/login/login" });
         return;
       }
       this.setData({ error: err.message || "提交失败，请稍后重试" });
-    } finally {
-      this.setData({ saving: false });
     }
   },
 });

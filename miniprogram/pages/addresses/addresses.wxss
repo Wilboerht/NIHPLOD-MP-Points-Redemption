@@ -1,89 +1,88 @@
 .addresses-page {
-  padding-bottom: 180rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-.login-card {
-  margin-top: 120rpx;
-  text-align: center;
-  padding: 60rpx 40rpx;
-}
+/* 登录引导卡/.error-card/.submit-btn 基础样式见 app.wxss */
 
-.login-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 70%;
+/* 底部操作栏：由底部实色向上渐隐 */
+.bottom-bar {
+  padding-top: 48rpx;
+  background: linear-gradient(
+    to top,
+    var(--color-bg) 0%,
+    var(--color-bg) 45%,
+    rgba(247, 245, 242, 0) 100%
+  );
+  box-shadow: none;
 }
 
 .address-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  transition: background-color 0.15s ease;
 }
 
-.address-body {
-  flex: 1;
-  min-width: 0;
+.address-card-hover {
+  background: #fbf8f4;
 }
 
 .header-row {
-  justify-content: flex-start;
+  gap: 12rpx;
+}
+
+/* 姓名 + 手机号：姓名可省略，手机号不压缩 */
+.identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 16rpx;
 }
 
 .recipient {
+  font-size: 30rpx;
   font-weight: 600;
-  margin-right: 16rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.default-tag {
-  color: var(--color-primary);
-  border: 1rpx solid var(--color-primary);
-  border-radius: 8rpx;
-  font-size: 20rpx;
-  padding: 2rpx 10rpx;
-  margin-left: 16rpx;
-}
-
-.address-text {
-  margin-top: 8rpx;
-}
-
-.address-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 16rpx;
-  margin-left: 20rpx;
+.phone {
   flex-shrink: 0;
 }
 
-.action {
+.default-tag {
+  flex-shrink: 0;
   font-size: 24rpx;
+  line-height: 1.4;
   color: var(--color-primary);
+  background: rgba(138, 109, 75, 0.1);
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
 }
 
-.action-danger {
-  color: var(--color-danger);
+/* 删除图标：独立热区，避免触发整卡编辑 */
+.delete-hit {
+  width: 72rpx;
+  height: 72rpx;
+  margin: -12rpx -20rpx -12rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
 }
 
-.bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
-  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+.delete-hit-hover {
+  background: rgba(194, 84, 80, 0.08);
 }
 
-.submit-btn {
-  width: 100%;
+.delete-icon {
+  width: 32rpx;
+  height: 32rpx;
 }
 
-.error-card {
-  color: var(--color-danger);
-  text-align: center;
+.address-text {
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+  word-break: break-all;
 }

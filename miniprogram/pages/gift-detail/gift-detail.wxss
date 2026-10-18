@@ -1,12 +1,20 @@
 .gift-detail {
-  padding-bottom: 180rpx;
+  padding-bottom: 200rpx;
+}
+
+/* .bottom-bar/.submit-btn 基础样式见 app.wxss */
+
+/* ============ 画廊 ============ */
+
+.gallery-wrap {
+  position: relative;
+  margin-bottom: 24rpx;
 }
 
 .gallery {
-  height: 640rpx;
-  border-radius: 20rpx;
+  height: 680rpx;
+  border-radius: 24rpx;
   overflow: hidden;
-  margin-bottom: 24rpx;
   background: #efeae4;
 }
 
@@ -23,19 +31,79 @@
   letter-spacing: 4rpx;
 }
 
+/* 图片计数（多图时展示，浮于右下角） */
+.gallery-counter {
+  position: absolute;
+  right: 16rpx;
+  bottom: 16rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(43, 43, 43, 0.55);
+  color: #ffffff;
+  font-size: 20rpx;
+  letter-spacing: 1rpx;
+  pointer-events: none;
+}
+
+/* ============ 商品信息卡 ============ */
+
 .gift-name {
   font-size: 36rpx;
   font-weight: 600;
-  margin-bottom: 12rpx;
+  line-height: 1.4;
 }
 
-.gift-name-en {
-  margin-bottom: 8rpx;
-  letter-spacing: 1rpx;
+/* 规格 / 产地等属性行 */
+.gift-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 10rpx;
 }
 
-.gift-desc {
+.meta-sep {
+  color: var(--color-border);
+}
+
+/* 价格行：所需积分主视觉 + 参考价弱化，与上方信息以细线分隔 */
+.price-row {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--color-border);
+  align-items: flex-end;
+}
+
+.cost {
+  font-size: 38rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-primary);
+}
+
+.price {
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+/* ============ 分节内容 ============ */
+
+/* 统一的分节标题：品牌色竖条 + 标题 */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 30rpx;
+  font-weight: 600;
   margin-bottom: 20rpx;
+}
+
+.section-title::before {
+  content: "";
+  width: 6rpx;
+  height: 24rpx;
+  border-radius: 3rpx;
+  background: var(--color-primary);
 }
 
 .benefit-tags {
@@ -53,35 +121,37 @@
 }
 
 .detail-text {
-  line-height: 1.7;
+  font-size: 26rpx;
+  line-height: 1.8;
+  color: var(--color-text);
   white-space: pre-wrap;
 }
 
-.price-row {
-  margin-top: 8rpx;
-}
-
-.price {
-  color: var(--color-muted);
-  font-size: 26rpx;
-}
-
-.cost {
-  color: var(--color-primary);
-  font-size: 32rpx;
-  font-weight: 600;
-}
+/* ============ 底部操作栏（左成本 + 右按钮） ============ */
 
 .bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
-  box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.bar-cost {
+  flex-shrink: 0;
+}
+
+.bar-cost-label {
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.bar-cost-value {
+  margin-top: 2rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-primary);
 }
 
 .submit-btn {
-  width: 100%;
+  flex: 1;
+  width: auto;
 }

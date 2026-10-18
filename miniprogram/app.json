@@ -15,8 +15,12 @@
     "pages/spent-adjustments/spent-adjustments",
     "pages/spent-adjustment-new/spent-adjustment-new",
     "pages/account-deletion/account-deletion",
+    "pages/security-center/security-center",
+    "pages/legal/legal",
+    "pages/follow-us/follow-us",
     "pages/login/login"
   ],
+  "navigateToMiniProgramAppIdList": ["wxb52753aa11ed6654"],
   "window": {
     "navigationBarBackgroundColor": "#f7f5f2",
     "navigationBarTextStyle": "black",
@@ -25,14 +29,29 @@
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#8a8a8a",
+    "color": "#7a7a7a",
     "selectedColor": "#8a6d4b",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "backgroundColor": "#f7f5f2",
+    "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/home/home", "text": "会员" },
-      { "pagePath": "pages/gifts/gifts", "text": "兑礼" },
-      { "pagePath": "pages/me/me", "text": "我的" }
+      {
+        "pagePath": "pages/home/home",
+        "text": "会员",
+        "iconPath": "images/tabbar/home.png",
+        "selectedIconPath": "images/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/gifts/gifts",
+        "text": "积分",
+        "iconPath": "images/tabbar/points.png",
+        "selectedIconPath": "images/tabbar/points-active.png"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的",
+        "iconPath": "images/tabbar/me.png",
+        "selectedIconPath": "images/tabbar/me-active.png"
+      }
     ]
   },
   "style": "v2",

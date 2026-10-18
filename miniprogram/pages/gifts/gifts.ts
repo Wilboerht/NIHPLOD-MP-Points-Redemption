@@ -1,14 +1,15 @@
 import { api } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
-import { formatPoints, resolveImageUrl } from "../../utils/format";
+import {
+  formatPoints,
+  LEVEL_CARD_BG_IMAGES,
+  LEVEL_NAME_LABELS,
+  mapGiftRow,
+  resolveImageUrl,
+} from "../../utils/format";
+import type { GiftRow } from "../../utils/format";
 import { setLastGifts } from "../../utils/cache";
 import { getStatusBarHeight } from "../../utils/ui";
-import type { GiftItem } from "../../utils/types";
-
-interface GiftRow extends GiftItem {
-  costText: string;
-  priceText: string;
-}
 
 Page({
   data: {
@@ -17,7 +18,12 @@ Page({
     /** 自定义导航栏状态栏高度（px） */
     statusBarHeight: 20,
     availableText: "0",
-    redeemTip: "",
+    /** 当前等级是否可参与兑礼（普通会员为 false，展示升级引导） */
+    canRedeem: false,
+    /** 会员等级名称（头部积分卡） */
+    levelName: "",
+    /** 头部积分卡背景样式（会员等级卡面 + 白色薄纱层） */
+    cardStyle: "",
     gifts: [] as GiftRow[],
     error: "",
   },
@@ -31,6 +37,15 @@ Page({
     void this.load();
   },
 
+  /** 下拉刷新 */
+  async onPullDownRefresh() {
+    try {
+      await this.load();
+    } finally {
+      wx.stopPullDownRefresh();
+    }
+  },
+
   async load() {
     const loggedIn = await ensureSession();
     if (!loggedIn) {
@@ -41,20 +56,19 @@ Page({
     try {
       const data = await api.gifts();
       setLastGifts(data.gifts);
+      const canRedeem = data.redeemRate !== null;
+      const cardBg = resolveImageUrl(LEVEL_CARD_BG_IMAGES[data.membershipLevel] ?? "");
       this.setData({
         loading: false,
         loggedIn: true,
         availableText: formatPoints(data.available),
-        redeemTip:
-          data.redeemRate === null
-            ? "普通会员仅累积积分，累计消费满 ¥1,000 升级银卡后解锁兑礼"
-            : `当前兑礼率 1:${data.redeemRate}`,
-        gifts: data.gifts.map((g) => ({
-          ...g,
-          image: g.image ? resolveImageUrl(g.image) : null,
-          costText: g.cost === null ? "未解锁" : `${formatPoints(g.cost)} 积分`,
-          priceText: `¥${formatPoints(g.priceYuan)}`,
-        })),
+        canRedeem,
+        levelName: LEVEL_NAME_LABELS[data.membershipLevel] ?? "",
+        // 卡面左上强、右下弱的薄纱渐变：保证文字可读同时保留卡面纹理
+        cardStyle: cardBg
+          ? `background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.14) 100%), url("${cardBg}");`
+          : "",
+        gifts: data.gifts.map(mapGiftRow),
       });
     } catch (e) {
       const err = e as Error & { status?: number };
@@ -68,6 +82,31 @@ Page({
 
   goLogin() {
     wx.navigateTo({ url: "/pages/login/login" });
+  },
+
+  goVip() {
+    wx.navigateTo({ url: "/pages/vip/vip" });
+  },
+
+  goLedger() {
+    wx.navigateTo({ url: "/pages/points-ledger/points-ledger" });
+  },
+
+  goRecords() {
+    wx.navigateTo({ url: "/pages/records/records" });
+  },
+
+  /** 获取积分：进入消费补录，提交未计入的官方渠道订单 */
+  goSpentAdjust() {
+    wx.navigateTo({ url: "/pages/spent-adjustments/spent-adjustments" });
+  },
+
+  /** 积分规则（组件 components/rules-sheet，与「我的」页共用） */
+  openRules() {
+    const sheet = this.selectComponent("#rules-sheet") as unknown as {
+      show: () => void;
+    } | null;
+    sheet?.show();
   },
 
   onShareAppMessage() {

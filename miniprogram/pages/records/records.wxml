@@ -1,12 +1,15 @@
 <view class="container records-page">
+  <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
+
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看兑换记录</view>
     <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn}}">
-    <view wx:if="{{rows.length === 0 && !loading}}" class="empty">
-      暂无兑换记录
+    <view wx:if="{{rows.length === 0 && !loading}}" class="empty-state">
+      <view class="empty">暂无兑换记录</view>
+      <button class="ghost-btn empty-btn" bindtap="goGifts">去看看好礼</button>
     </view>
 
     <view
@@ -15,19 +18,24 @@
       class="card record-card"
       data-id="{{item.id}}"
       bindtap="open"
+      hover-class="record-card-hover"
     >
-      <view class="row">
-        <text class="product-name">{{item.productName}}</text>
-        <text class="status status-{{item.status}}">{{item.statusText}}</text>
+      <image wx:if="{{item.imageUrl}}" class="record-thumb" src="{{item.imageUrl}}" mode="aspectFill" />
+      <view wx:else class="record-thumb record-thumb-placeholder">NIHPLOD</view>
+      <view class="record-main">
+        <view class="record-head">
+          <text class="product-name">{{item.productName}}</text>
+          <text class="status status-{{item.status}}">{{item.statusText}}</text>
+        </view>
+        <view class="record-meta">
+          <text class="record-date">{{item.dateText}}</text>
+          <text class="record-points">{{item.pointsText}}</text>
+        </view>
       </view>
-      <view class="row secondary-row">
-        <text class="muted small">{{item.dateText}}</text>
-        <text class="points">{{item.pointsText}}</text>
-      </view>
-      <view wx:if="{{item.waybillNo}}" class="muted small waybill">运单号：{{item.waybillNo}}</view>
+      <image class="record-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
     </view>
 
-    <view wx:if="{{hasMore}}" class="load-more muted small">上拉加载更多</view>
+    <view wx:if="{{hasMore}}" class="load-more">{{loadingMore ? '加载中…' : '上拉加载更多'}}</view>
   </block>
 
   <view wx:if="{{error}}" class="card error-card">{{error}}</view>

@@ -14,11 +14,15 @@ import type {
   DeletionRequestInfo,
   GiftsData,
   LedgerPage,
+  LoginHistoryItem,
   MembershipView,
   PointsOverview,
   ProfileUpdateInput,
   RedeemResult,
   RedemptionsData,
+  SecurityAuthorizationItem,
+  SecurityDeviceItem,
+  SecurityIdentityItem,
   SkinTestUsage,
   SpentApplication,
   SpentApplicationInput,
@@ -97,10 +101,16 @@ export async function authRequest<T>(options: AuthRequestOptions): Promise<T> {
   let res = await call();
 
   if (res.statusCode === 401) {
-    const refreshed = await refreshAccessTokenOnce();
-    if (refreshed) {
-      res = await call();
+    const refresh = await refreshAccessTokenOnce();
+    if (refresh === "transient") {
+      // 网络/服务端临时异常：保留会话，避免把用户强制登出
+      throw new ApiError(0, "NETWORK", "网络异常，请稍后重试");
     }
+    if (refresh === "invalid") {
+      clearSession();
+      throw new ApiError(401, "UNAUTHORIZED", "登录已过期，请重新登录");
+    }
+    res = await call();
     if (res.statusCode === 401) {
       clearSession();
       throw new ApiError(401, "UNAUTHORIZED", "登录已过期，请重新登录");
@@ -138,10 +148,15 @@ function uploadRequest<T>(url: string, filePath: string): Promise<T> {
   return (async () => {
     let res = await doUpload();
     if (res.statusCode === 401) {
-      const refreshed = await refreshAccessTokenOnce();
-      if (refreshed) {
-        res = await doUpload();
+      const refresh = await refreshAccessTokenOnce();
+      if (refresh === "transient") {
+        throw new ApiError(0, "NETWORK", "网络异常，请稍后重试");
       }
+      if (refresh === "invalid") {
+        clearSession();
+        throw new ApiError(401, "UNAUTHORIZED", "登录已过期，请重新登录");
+      }
+      res = await doUpload();
       if (res.statusCode === 401) {
         clearSession();
         throw new ApiError(401, "UNAUTHORIZED", "登录已过期，请重新登录");
@@ -257,4 +272,51 @@ export const api = {
   /** 账号注销：撤回申请 */
   cancelDeletion: () =>
     authRequest<{ message: string }>({ url: "/api/oauth/account/deletion", method: "DELETE" }),
+
+  // ============================================
+  // 安全中心（设备 / 授权 / 绑定 / 登录历史）
+  // ============================================
+
+  /** 安全中心：活跃设备列表 */
+  securityDevices: () =>
+    authRequest<{ devices: SecurityDeviceItem[] }>({ url: "/api/oauth/security/devices" }),
+
+  /** 安全中心：强制下线设备 */
+  revokeSecurityDevice: (id: string) =>
+    authRequest<{ message: string }>({
+      url: `/api/oauth/security/devices/${id}`,
+      method: "DELETE",
+    }),
+
+  /** 安全中心：已授权应用列表 */
+  securityAuthorizations: () =>
+    authRequest<{ authorizations: SecurityAuthorizationItem[] }>({
+      url: "/api/oauth/security/authorizations",
+    }),
+
+  /** 安全中心：撤销应用授权 */
+  revokeSecurityAuthorization: (clientId: string) =>
+    authRequest<{ message: string }>({
+      url: `/api/oauth/security/authorizations/${encodeURIComponent(clientId)}`,
+      method: "DELETE",
+    }),
+
+  /** 安全中心：第三方绑定列表 */
+  securityIdentities: () =>
+    authRequest<{ identities: SecurityIdentityItem[] }>({
+      url: "/api/oauth/security/identities",
+    }),
+
+  /** 安全中心：解绑第三方身份 */
+  unbindSecurityIdentity: (id: string) =>
+    authRequest<{ message: string }>({
+      url: `/api/oauth/security/identities/${id}`,
+      method: "DELETE",
+    }),
+
+  /** 安全中心：登录历史（最近 50 条） */
+  securityLoginHistory: () =>
+    authRequest<{ attempts: LoginHistoryItem[] }>({
+      url: "/api/oauth/security/login-history",
+    }),
 };

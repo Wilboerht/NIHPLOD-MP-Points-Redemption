@@ -1,7 +1,8 @@
 import { api, ApiError } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
 import { formatPoints, LEVEL_CARD_BG_IMAGES, LEVEL_THEME_COLORS, resolveImageUrl } from "../../utils/format";
-import type { MembershipLevelInfo, MembershipView, SkinTestUsage } from "../../utils/types";
+import { buildSkinView, type SkinView } from "../../utils/skin";
+import type { MembershipLevelInfo, MembershipView } from "../../utils/types";
 
 /** 测肤小程序 appid（同一开放平台账号，用于跨小程序跳转） */
 const SKIN_MP_APPID = "wxb52753aa11ed6654";
@@ -11,13 +12,7 @@ interface LevelCard extends MembershipLevelInfo {
   unlocked: boolean;
   isCurrent: boolean;
   thresholdText: string;
-}
-
-/** AI 测肤用量展示视图 */
-interface SkinView {
-  remainingText: string;
-  usedText: string;
-  quotaText: string;
+  expanded: boolean;
 }
 
 Page({
@@ -29,11 +24,10 @@ Page({
     currentColor: "#78716c",
     totalSpentText: "0",
     spentNeededText: "",
-    nextMinSpentText: "",
     levels: [] as LevelCard[],
     skinUsage: null as SkinView | null,
-    /** 会员卡背景图（按等级映射官网静态资源） */
-    cardBg: "",
+    /** 会员卡背景样式（等级卡面 + 白色薄纱渐变） */
+    cardStyle: "",
   },
 
   onShow() {
@@ -64,16 +58,20 @@ Page({
         isCurrent: level.level === view.membershipLevel,
         thresholdText:
           level.minSpent === 0 ? "注册即享" : `消费满 ¥${formatPoints(level.minSpent)}`,
+        expanded: false,
       }));
+      const cardBg = resolveImageUrl(LEVEL_CARD_BG_IMAGES[view.membershipLevel] ?? "");
       this.setData({
         loading: false,
         loggedIn: true,
         view,
         currentColor: LEVEL_THEME_COLORS[view.membershipLevel] ?? "#78716c",
-        cardBg: resolveImageUrl(LEVEL_CARD_BG_IMAGES[view.membershipLevel] ?? ""),
+        // 与积分页一致：左上强、右下弱的薄纱渐变，保证文字可读并保留卡面纹理
+        cardStyle: cardBg
+          ? `background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.14) 100%), url("${cardBg}");`
+          : "",
         totalSpentText: formatPoints(view.totalSpent),
         spentNeededText: view.nextLevel ? formatPoints(view.nextLevel.spentNeeded) : "",
-        nextMinSpentText: view.nextLevel ? formatPoints(view.nextLevel.minSpent) : "",
         levels,
         // 先重置，测肤用量异步补充（不阻塞会员主内容：子站降级时官网查询最长 3s）
         skinUsage: null,
@@ -93,28 +91,10 @@ Page({
   async loadSkinUsage() {
     try {
       const data = await api.skinTestUsage();
-      this.setData({ skinUsage: this.buildSkinView(data.usage) });
+      this.setData({ skinUsage: buildSkinView(data.usage) });
     } catch {
       this.setData({ skinUsage: null });
     }
-  },
-
-  /** 组装 AI 测肤用量展示文案（usage 为 null 时返回 null，隐藏卡片） */
-  buildSkinView(usage: SkinTestUsage | null): SkinView | null {
-    if (!usage) return null;
-    const unlimited = usage.quota.unlimited || usage.remaining === null;
-    const quotaParts: string[] = [];
-    if (usage.quota.dailyLimit !== null) {
-      quotaParts.push(`每日最多 ${usage.quota.dailyLimit} 次`);
-    }
-    if (!unlimited && usage.quota.lifetimeLimit !== null) {
-      quotaParts.push(`累计上限 ${usage.quota.lifetimeLimit} 次`);
-    }
-    return {
-      remainingText: unlimited ? "不限次" : `剩余 ${usage.remaining} 次`,
-      usedText: `已使用 ${usage.totalUsed} 次 · 今日 ${usage.todayUsed} 次`,
-      quotaText: quotaParts.join(" · "),
-    };
   },
 
   goLogin() {
@@ -123,6 +103,16 @@ Page({
 
   goGifts() {
     wx.switchTab({ url: "/pages/gifts/gifts" });
+  },
+
+  /** 展开/收起等级权益（同时只展开一个） */
+  toggleLevel(e: WechatMiniprogram.TouchEvent) {
+    const level = e.currentTarget.dataset.level as string;
+    const levels = this.data.levels.map((item) => ({
+      ...item,
+      expanded: item.level === level ? !item.expanded : false,
+    }));
+    this.setData({ levels });
   },
 
   /** 跳转测肤小程序去使用测肤权益（未关联/未安装时引导搜索） */

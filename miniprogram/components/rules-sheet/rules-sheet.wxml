@@ -1,0 +1,16 @@
+<view
+  wx:if="{{open}}"
+  class="sheet-mask {{closing ? 'sheet-mask-closing' : ''}}"
+  bindtap="close"
+  catchtouchmove="noop"
+></view>
+<view wx:if="{{open}}" class="sheet {{closing ? 'sheet-closing' : ''}}" catchtouchmove="noop">
+  <view class="sheet-head">
+    <text class="sheet-title">积分规则</text>
+    <view class="sheet-close" bindtap="close">✕</view>
+  </view>
+  <view class="sheet-body">
+    <view wx:for="{{rules}}" wx:key="*this" class="sheet-rule">{{item}}</view>
+  </view>
+  <view class="sheet-safe"></view>
+</view>
