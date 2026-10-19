@@ -71,6 +71,29 @@ function extractError(statusCode: number, body: unknown): ApiError {
   return new ApiError(statusCode, code, message);
 }
 
+let redirectingToLogin = false;
+
+/** 账号禁用：清会话 + 防并发跳登录页（登录页自身触发的错误不跳，避免循环） */
+function forceLogout(message: string): void {
+  clearSession();
+  if (redirectingToLogin) return;
+  const pages = getCurrentPages();
+  const top = pages && pages.length ? pages[pages.length - 1] : null;
+  if (top && top.route === "pages/login/login") return;
+  redirectingToLogin = true;
+  wx.showToast({ title: message, icon: "none" });
+  setTimeout(() => {
+    wx.reLaunch({
+      url: "/pages/login/login",
+      complete: () => {
+        setTimeout(() => {
+          redirectingToLogin = false;
+        }, 1000);
+      },
+    });
+  }, 600);
+}
+
 /** 响应信封统一解析：业务端点 { success, data } 取 data；OAuth 扁平响应直接返回 */
 function resolveEnvelope<T>(res: RawResponse): T {
   const body = res.data as {
@@ -85,8 +108,8 @@ function resolveEnvelope<T>(res: RawResponse): T {
   }
 
   const error = extractError(res.statusCode, body);
-  if (error.code === "account_disabled") {
-    clearSession();
+  if (error.code === "account_disabled" || error.code === "ACCOUNT_DISABLED") {
+    forceLogout("账号已被禁用，请联系客服");
   }
   throw error;
 }
