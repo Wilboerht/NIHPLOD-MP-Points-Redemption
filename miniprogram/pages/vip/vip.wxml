@@ -7,74 +7,152 @@
   </view>
 
   <block wx:if="{{loggedIn && view}}">
-    <view class="vip-card" style="{{cardStyle}}">
-      <view class="vip-top">
-        <view class="vip-meta">
-          <view class="level-tag">{{view.currentLevel.name}}</view>
-          <text class="vip-label">累计消费</text>
-        </view>
-        <view class="vip-link" bindtap="goGifts" hover-class="vip-link-hover">
-          <text>去兑礼</text>
-          <image class="vip-link-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
-        </view>
-      </view>
-      <view class="vip-value">¥{{totalSpentText}}</view>
-      <view class="vip-id">会员编号 {{view.memberId}}</view>
-
-      <view class="vip-progress">
-        <block wx:if="{{view.nextLevel}}">
-          <view class="row vip-progress-head">
-            <text class="small">距 {{view.nextLevel.name}}</text>
-            <text class="muted small">还差 ¥{{spentNeededText}}</text>
+    <!-- 会员卡：与首页 balance-card 同一套壳（圆角/阴影/白纱/32rpx 内边距） -->
+    <view class="vip-card">
+      <image wx:if="{{cardBg}}" class="vip-card-bg" src="{{cardBg}}" mode="aspectFill" />
+      <view class="vip-card-inner">
+        <view class="vip-top">
+          <view class="vip-level-block">
+            <text class="vip-label">当前等级</text>
+            <text class="vip-level">{{view.currentLevel.name}}</text>
           </view>
-          <progress percent="{{view.nextLevel.progress}}" stroke-width="6" activeColor="{{currentColor}}" border-radius="6" />
-        </block>
-        <view wx:else class="muted small">已达最高等级，感谢您的支持</view>
+          <view class="vip-link" bindtap="goGifts" hover-class="vip-link-hover">
+            <text>去兑礼</text>
+            <image class="vip-link-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="vip-spend">
+          <text class="vip-label">累计消费</text>
+          <text class="vip-value">¥{{totalSpentText}}</text>
+        </view>
+        <view class="vip-id">会员编号 {{view.memberId}}</view>
       </view>
     </view>
 
+    <!-- 提升会员等级：进度 + 三步说明 + 录入入口 -->
+    <view class="card upgrade-card">
+      <view class="card-title upgrade-title">
+        <image class="upgrade-icon" src="/images/icons/trending-up.svg" mode="aspectFit" />
+        <text>提升会员等级</text>
+      </view>
+
+      <view wx:if="{{view.nextLevel}}" class="upgrade-progress">
+        <view class="upgrade-progress-head">
+          <view class="upgrade-progress-text">
+            再消费 <text class="upgrade-amount">¥{{spentNeededText}}</text> 升级 {{view.nextLevel.name}}
+          </view>
+          <text class="upgrade-percent">{{view.nextLevel.progress}}%</text>
+        </view>
+        <progress percent="{{view.nextLevel.progress}}" stroke-width="6" activeColor="{{currentColor}}" border-radius="6" />
+      </view>
+      <view wx:else class="upgrade-complete">您已是最高等级会员，感谢您的支持。</view>
+
+      <view class="upgrade-steps">
+        <view class="upgrade-step">
+          <text class="step-num">1</text>
+          <text class="step-text">在官方渠道下单消费</text>
+        </view>
+        <view class="upgrade-step">
+          <text class="step-num">2</text>
+          <text class="step-text">签收后复制订单编号</text>
+        </view>
+        <view class="upgrade-step">
+          <text class="step-num">3</text>
+          <text class="step-text">录入订单编号与消费凭证</text>
+        </view>
+      </view>
+      <view class="upgrade-channel">官方渠道：天猫国际、小红书、抖音、微信小店等官方旗舰店及授权门店。</view>
+
+      <view class="upgrade-actions">
+        <button class="btn-primary upgrade-btn" bindtap="goSpendForm">录入消费</button>
+        <view class="upgrade-history" bindtap="goSpendHistory" hover-class="upgrade-history-hover">查看录入历史</view>
+      </view>
+    </view>
+
+    <!-- 当前等级权益 -->
     <view class="card benefits-card">
-      <view class="card-title">当前权益</view>
-      <view class="benefit-list">
+      <view class="card-title">当前等级权益</view>
+      <view wx:if="{{view.currentLevel.benefits.length > 0}}" class="benefit-list">
         <view wx:for="{{view.currentLevel.benefits}}" wx:for-item="benefit" wx:key="title" class="benefit-row">
-          <view class="benefit-title">{{benefit.title}}</view>
-          <view wx:if="{{benefit.desc}}" class="muted small benefit-desc">{{benefit.desc}}</view>
+          <view class="benefit-dot"></view>
+          <view class="benefit-main">
+            <view class="benefit-title">{{benefit.title}}</view>
+            <view wx:if="{{benefit.desc}}" class="muted small benefit-desc">{{benefit.desc}}</view>
+          </view>
         </view>
       </view>
-
-      <view wx:if="{{skinUsage}}" class="benefit-row benefit-row-link" bindtap="goSkinTest" hover-class="benefit-row-hover">
-        <view class="benefit-main">
-          <view class="benefit-title">AI 测肤权益</view>
-          <view class="muted small benefit-desc">{{skinUsage.usedText}}{{skinUsage.quotaText ? ' · ' + skinUsage.quotaText : ''}}</view>
-        </view>
-        <view class="benefit-side">
-          <text class="benefit-remaining">{{skinUsage.remainingText}}</text>
-          <image class="benefit-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
-        </view>
-      </view>
-
-      <view wx:if="{{view.currentLevel.benefits.length === 0 && !skinUsage}}" class="muted small">当前等级暂无额外权益</view>
+      <view wx:else class="muted small">当前等级暂无额外权益</view>
     </view>
 
+    <!-- AI 测肤权益：固定展示，失败可重试 -->
+    <view class="card skin-usage-card" bindtap="goSkinTest" hover-class="row-hover">
+      <view class="skin-usage-head">
+        <image class="skin-usage-logo" src="/images/jzp-eyebrow.png" mode="aspectFit" />
+        <view class="skin-usage-title">AI 测肤权益</view>
+        <view class="skin-usage-go">
+          <text>去测肤</text>
+          <image class="skin-usage-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
+      </view>
+
+      <view wx:if="{{skinUsageLoading}}" class="muted small skin-usage-loading">测肤用量加载中…</view>
+      <view wx:elif="{{skinUsage}}" class="skin-usage-body">
+        <view class="skin-usage-main">
+          <text class="skin-usage-remaining">{{skinUsage.remainingText}}</text>
+          <text class="muted small skin-usage-used">{{skinUsage.usedText}}</text>
+          <text wx:if="{{skinUsage.quotaText}}" class="muted small skin-usage-quota">{{skinUsage.quotaText}}</text>
+        </view>
+      </view>
+      <view wx:else class="skin-usage-empty">
+        <text class="muted small">测肤用量暂不可用</text>
+        <text class="skin-usage-retry" catchtap="reloadSkinUsage">重试</text>
+      </view>
+    </view>
+
+    <!-- 会员等级 -->
     <view class="card level-list">
       <view class="card-title">会员等级</view>
       <view wx:for="{{levels}}" wx:key="level" class="level-item {{item.isCurrent ? 'level-item-current' : ''}}">
         <view class="level-row" data-level="{{item.level}}" bindtap="toggleLevel" hover-class="level-row-hover">
           <view class="level-main">
-            <view class="level-name" style="color: {{item.color}};">{{item.name}}</view>
+            <view class="level-name" style="color: {{item.textColor}};">{{item.name}}</view>
             <view class="muted small level-threshold">{{item.thresholdText}}</view>
+            <view wx:if="{{!item.isCurrent && !item.unlocked}}" class="level-gap">还差 ¥{{item.spentNeededText}}</view>
           </view>
           <view class="level-side">
-            <text wx:if="{{!item.isCurrent}}" class="level-state {{item.unlocked ? 'level-state-unlocked' : 'level-state-locked'}}">{{item.unlocked ? '已解锁' : '未解锁'}}</text>
+            <view wx:if="{{item.isCurrent}}" class="level-current-badge">
+              <image class="level-current-icon" src="/images/icons/crown.svg" mode="aspectFit" />
+              <text>当前</text>
+            </view>
+            <text wx:elif="{{item.unlocked}}" class="level-state level-state-unlocked">已解锁</text>
+            <text wx:else class="level-state level-state-locked">未解锁</text>
             <image class="level-chevron {{item.expanded ? 'level-chevron-open' : ''}}" src="/images/icons/chevron-right.svg" mode="aspectFit" />
           </view>
         </view>
+
         <view wx:if="{{item.expanded}}" class="level-benefits">
           <view wx:for="{{item.benefits}}" wx:for-item="benefit" wx:key="title" class="benefit-row">
-            <view class="benefit-title">{{benefit.title}}</view>
-            <view wx:if="{{benefit.desc}}" class="muted small benefit-desc">{{benefit.desc}}</view>
+            <view class="benefit-dot"></view>
+            <view class="benefit-main">
+              <view class="benefit-title">{{benefit.title}}</view>
+              <view wx:if="{{benefit.desc}}" class="muted small benefit-desc">{{benefit.desc}}</view>
+            </view>
           </view>
           <view wx:if="{{item.benefits.length === 0}}" class="muted small">暂无权益说明</view>
+
+          <view wx:if="{{!item.isCurrent && !item.unlocked}}" class="level-unlock">
+            <view class="level-unlock-text">
+              <image class="level-lock-icon" src="/images/icons/lock.svg" mode="aspectFit" />
+              <text>还差 ¥{{item.spentNeededText}} 解锁</text>
+            </view>
+            <view class="level-progress">
+              <view class="level-progress-bar">
+                <view class="level-progress-inner" style="width: {{item.progress}}%; background: {{item.color}};"></view>
+              </view>
+              <text class="muted small level-progress-text">{{item.progress}}%</text>
+            </view>
+            <button class="btn-primary level-unlock-btn" catchtap="goSpendForm">录入消费</button>
+          </view>
         </view>
       </view>
     </view>
@@ -82,5 +160,8 @@
     <view class="muted small vip-tip">等级永久有效、按累计消费实时重算（退款可降级）；权益跟随当前等级。</view>
   </block>
 
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+  <view wx:if="{{error}}" class="card error-card">
+    <view>{{error}}</view>
+    <button class="btn-plain retry-btn" bindtap="load">重试</button>
+  </view>
 </view>

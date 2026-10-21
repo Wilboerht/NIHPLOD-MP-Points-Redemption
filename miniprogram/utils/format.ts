@@ -133,12 +133,20 @@ export const SPENT_STATUS_LABELS: Record<string, string> = {
   REJECTED: "已驳回",
 };
 
-/** 会员等级主题色（WXSS 不便直接使用 Tailwind 类名，按等级映射） */
+/** 会员等级主题色（进度条/徽标等强调色；WXSS 不便直接使用 Tailwind 类名，按等级映射） */
 export const LEVEL_THEME_COLORS: Record<string, string> = {
   REGULAR: "#78716c",
   SILVER: "#8a8a8a",
   GOLD: "#c98a1f",
   DIAMOND: "#5f63c7",
+};
+
+/** 等级名称文字色：比主题色更深，保证白底/浅色卡面上的可读性 */
+export const LEVEL_TEXT_COLORS: Record<string, string> = {
+  REGULAR: "#5f5a54",
+  SILVER: "#5f6368",
+  GOLD: "#8a5a00",
+  DIAMOND: "#4649a3",
 };
 
 /** 会员等级短名称（标签展示用） */

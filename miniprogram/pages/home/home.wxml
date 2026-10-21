@@ -52,12 +52,13 @@
       </view>
     </view>
 
-    <!-- 肌智派在线测肤（数据来自智能测肤小程序，加载失败时隐藏） -->
-    <view wx:if="{{skinUsage}}" class="card skin-card" bindtap="goSkinTest" hover-class="row-hover">
+    <!-- 肌智派在线测肤（固定展示；数据源异常时保留卡片并允许重试） -->
+    <view class="card skin-card" bindtap="goSkinTest" hover-class="row-hover">
       <image class="skin-logo" src="/images/jzp-eyebrow.png" mode="aspectFit" />
       <view class="skin-main">
         <view class="skin-title">肌智派在线测肤</view>
-        <view class="skin-status">
+        <view wx:if="{{skinUsageLoading}}" class="muted small skin-loading">测肤状态加载中…</view>
+        <view wx:elif="{{skinUsage}}" class="skin-status">
           <view class="skin-chip {{skinUsage.testedToday ? 'skin-chip-on' : ''}}">
             {{skinUsage.testedToday ? '今日已测肤' : '今日未测肤'}}
           </view>
@@ -67,6 +68,10 @@
           >
             {{skinUsage.checkedInToday ? '今日已打卡' : '今日未打卡'}}
           </view>
+        </view>
+        <view wx:else class="skin-status">
+          <text class="muted small">测肤状态暂不可用</text>
+          <text class="skin-retry" catchtap="reloadSkinUsage">重试</text>
         </view>
       </view>
       <view class="skin-go">前往测肤</view>

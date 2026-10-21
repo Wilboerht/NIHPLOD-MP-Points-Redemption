@@ -177,11 +177,23 @@
   line-height: 1.4;
 }
 
+.skin-loading {
+  margin-top: 8rpx;
+}
+
 .skin-status {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8rpx;
   margin-top: 8rpx;
+}
+
+.skin-retry {
+  padding: 4rpx 0 4rpx 8rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-primary);
 }
 
 .skin-chip {

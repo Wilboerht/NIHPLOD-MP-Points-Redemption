@@ -30,7 +30,7 @@
     <view class="gift-meta-row muted small">
       <text wx:if="{{gift.detail.capacity}}">规格：{{gift.detail.capacity}}</text>
       <text wx:if="{{gift.detail.capacity}}" class="meta-sep">·</text>
-      <text>产地：法国</text>
+      <text>产地：{{gift.detail.origin || '法国'}}</text>
     </view>
     <view class="row price-row">
       <text class="cost">{{gift.costText}}</text>
@@ -43,6 +43,23 @@
     <view class="benefit-tags">
       <text wx:for="{{benefits}}" wx:key="*this" class="benefit-tag">{{item}}</text>
     </view>
+  </view>
+
+  <view wx:if="{{purchaseLinks.length > 0}}" class="card">
+    <view class="section-title">购买渠道</view>
+    <view class="purchase-links">
+      <button
+        wx:for="{{purchaseLinks}}"
+        wx:key="id"
+        class="purchase-link"
+        data-index="{{index}}"
+        bindtap="openPurchaseLink"
+        hover-class="purchase-link-hover"
+      >
+        {{item.platform}}
+      </button>
+    </view>
+    <view class="muted small purchase-hint">点击前往对应平台购买；无法打开时会复制链接。</view>
   </view>
 
   <view wx:if="{{gift.description}}" class="card">

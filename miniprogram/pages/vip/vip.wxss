@@ -1,48 +1,55 @@
-/* 登录引导卡/.error-card 基础样式见 app.wxss */
-
-/* ============ 顶部会员卡：全宽通栏、无圆角 ============ */
+/* ============ 会员卡：与首页 balance-card / balance-inner 同一套壳 ============ */
 .vip-card {
-  margin-left: -24rpx;
-  margin-right: -24rpx;
-  margin-bottom: 24rpx;
-  padding: 32rpx 60rpx;
-  border-radius: 0;
-  background-color: #f3ece4;
-  background-size: cover;
-  background-position: center;
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 24rpx;
+  border-radius: 24rpx;
+  background: #f3ece4;
+  color: var(--color-text);
+  box-shadow: 0 10rpx 24rpx rgba(43, 43, 43, 0.08);
+}
+
+.vip-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vip-card-inner {
+  position: relative;
+  min-height: 240rpx;
+  box-sizing: border-box;
+  padding: 32rpx;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .vip-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16rpx;
 }
 
-.vip-meta {
+.vip-level-block {
   display: flex;
-  align-items: center;
-  gap: 10rpx;
+  flex-direction: column;
   min-width: 0;
 }
 
-/* 等级胶囊：与积分页 level-tag 一致 */
-.level-tag {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  padding: 2rpx 14rpx;
-  border-radius: 999rpx;
-  border: 1rpx solid rgba(138, 109, 75, 0.22);
-  background: rgba(255, 255, 255, 0.45);
-  color: var(--color-primary);
-  font-size: 22rpx;
-  line-height: 1.6;
+.vip-label {
+  font-size: 24rpx;
+  line-height: 1.4;
+  color: #5f5a54;
 }
 
-.vip-label {
-  font-size: 22rpx;
-  color: var(--color-muted);
+.vip-level {
+  margin-top: 4rpx;
+  font-size: 40rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text);
 }
 
 .vip-link {
@@ -50,7 +57,7 @@
   align-items: center;
   gap: 4rpx;
   flex-shrink: 0;
-  padding: 8rpx 0 8rpx 12rpx;
+  padding: 16rpx 0 16rpx 12rpx;
   font-size: 24rpx;
   color: var(--color-primary);
 }
@@ -64,47 +71,154 @@
   opacity: 0.6;
 }
 
+.vip-spend {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20rpx;
+}
+
 .vip-value {
-  margin-top: 6rpx;
-  font-size: 52rpx;
+  margin-top: 2rpx;
+  font-size: 44rpx;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--color-primary);
+  color: #00263e;
   font-variant-numeric: tabular-nums;
 }
 
 .vip-id {
-  margin-top: 8rpx;
-  font-size: 22rpx;
+  margin-top: 16rpx;
+  font-size: 24rpx;
   line-height: 1.4;
-  color: var(--color-muted);
+  color: #5f5a54;
 }
 
-/* 升级进度并入会员卡底部 */
-.vip-progress {
-  margin-top: 28rpx;
-  padding-top: 20rpx;
-  border-top: 1rpx solid rgba(43, 43, 43, 0.08);
-}
-
-.vip-progress-head {
-  margin-bottom: 12rpx;
-}
-
-/* ============ 下方信息卡：扁平化 ============ */
+/* ============ 下方信息卡：扁平化，统一圆角 ============ */
+.upgrade-card,
 .benefits-card,
+.skin-usage-card,
 .level-list {
   border: 1rpx solid var(--color-border);
-  border-radius: 16rpx;
+  border-radius: 20rpx;
   box-shadow: none;
 }
 
-/* 当前权益 */
+/* ============ 提升会员等级 ============ */
+.upgrade-title {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 16rpx;
+}
+
+.upgrade-icon {
+  width: 32rpx;
+  height: 32rpx;
+  flex-shrink: 0;
+}
+
+.upgrade-progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.upgrade-progress-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #5f5a54;
+}
+
+.upgrade-amount {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.upgrade-percent {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.upgrade-complete {
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.upgrade-steps {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--color-border);
+}
+
+.upgrade-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.upgrade-step:first-child {
+  margin-top: 0;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 28rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--color-primary);
+}
+
+.step-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #5f5a54;
+}
+
+.upgrade-channel {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.upgrade-actions {
+  margin-top: 20rpx;
+}
+
+.upgrade-btn {
+  width: 100%;
+}
+
+.upgrade-history {
+  margin-top: 8rpx;
+  padding: 12rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--color-primary);
+}
+
+.upgrade-history-hover {
+  opacity: 0.6;
+}
+
+/* ============ 当前等级权益 / 等级展开权益 ============ */
 .benefit-list {
   margin-top: 4rpx;
 }
 
 .benefit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
   margin-top: 16rpx;
 }
 
@@ -112,23 +226,13 @@
   margin-top: 0;
 }
 
-.benefit-title {
-  font-size: 26rpx;
-  font-weight: 600;
-}
-
-.benefit-desc {
-  margin-top: 4rpx;
-  line-height: 1.6;
-}
-
-.benefit-row-link {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-top: 20rpx;
-  padding-top: 20rpx;
-  border-top: 1rpx solid var(--color-border);
+.benefit-dot {
+  flex-shrink: 0;
+  width: 8rpx;
+  height: 8rpx;
+  margin-top: 13rpx;
+  border-radius: 50%;
+  background: var(--color-primary);
 }
 
 .benefit-main {
@@ -136,29 +240,91 @@
   min-width: 0;
 }
 
-.benefit-side {
+.benefit-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.benefit-desc {
+  margin-top: 4rpx;
+  line-height: 1.6;
+}
+
+/* ============ AI 测肤权益 ============ */
+.skin-usage-head {
   display: flex;
   align-items: center;
-  gap: 4rpx;
+  gap: 12rpx;
+}
+
+.skin-usage-logo {
+  width: 84rpx;
+  height: 52rpx;
   flex-shrink: 0;
 }
 
-.benefit-remaining {
-  font-size: 24rpx;
+.skin-usage-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
   font-weight: 600;
+}
+
+.skin-usage-go {
+  display: flex;
+  align-items: center;
+  gap: 2rpx;
+  flex-shrink: 0;
+  font-size: 24rpx;
   color: var(--color-primary);
 }
 
-.benefit-chevron {
+.skin-usage-chevron {
   width: 24rpx;
   height: 24rpx;
 }
 
-.benefit-row-hover {
-  opacity: 0.6;
+.skin-usage-loading {
+  margin-top: 20rpx;
 }
 
-/* ============ 会员等级：单卡片折叠列表 ============ */
+.skin-usage-body {
+  margin-top: 16rpx;
+}
+
+.skin-usage-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.skin-usage-remaining {
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #00263e;
+}
+
+.skin-usage-used,
+.skin-usage-quota {
+  line-height: 1.6;
+}
+
+.skin-usage-empty {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.skin-usage-retry {
+  font-size: 24rpx;
+  color: var(--color-primary);
+  padding: 8rpx 0 8rpx 8rpx;
+}
+
+/* ============ 会员等级列表 ============ */
 .level-item {
   margin: 0 -28rpx;
   padding: 0 28rpx;
@@ -170,7 +336,8 @@
 }
 
 .level-item-current {
-  background: rgba(138, 109, 75, 0.05);
+  background: rgba(138, 109, 75, 0.07);
+  box-shadow: inset 4rpx 0 0 var(--color-primary);
 }
 
 .level-row {
@@ -199,11 +366,36 @@
   margin-top: 4rpx;
 }
 
+.level-gap {
+  margin-top: 2rpx;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
 .level-side {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 10rpx;
   flex-shrink: 0;
+}
+
+.level-current-badge {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  flex-shrink: 0;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  background: rgba(138, 109, 75, 0.1);
+  color: var(--color-primary);
+  font-size: 22rpx;
+  line-height: 1.4;
+}
+
+.level-current-icon {
+  width: 22rpx;
+  height: 22rpx;
 }
 
 .level-state {
@@ -247,7 +439,62 @@
   margin-top: 4rpx;
 }
 
-/* ============ 底部说明 ============ */
+.level-unlock {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--color-border);
+}
+
+.level-unlock-text {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: #5f5a54;
+}
+
+.level-lock-icon {
+  width: 24rpx;
+  height: 24rpx;
+  flex-shrink: 0;
+}
+
+.level-progress {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.level-progress-bar {
+  flex: 1;
+  height: 6rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: rgba(43, 43, 43, 0.08);
+}
+
+.level-progress-inner {
+  height: 100%;
+  border-radius: 999rpx;
+}
+
+.level-progress-text {
+  flex-shrink: 0;
+}
+
+.level-unlock-btn {
+  width: 100%;
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  padding: 16rpx 0;
+}
+
+/* ============ 底部说明 / 错误重试 ============ */
 .vip-tip {
   padding: 0 8rpx 30rpx;
+}
+
+.retry-btn {
+  margin-top: 20rpx;
 }

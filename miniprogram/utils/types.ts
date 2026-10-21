@@ -39,6 +39,20 @@ export interface ProductImage {
   alt?: string;
 }
 
+export type GiftPurchaseJump =
+  | { type: "miniprogram"; shortLink?: string; appId?: string; path?: string }
+  | { type: "copy" };
+
+export interface GiftPurchaseLink {
+  id: string;
+  platform: string;
+  platformKey?: string | null;
+  url: string;
+  miniProgramShortLink?: string | null;
+  miniProgramPath?: string | null;
+  jump?: GiftPurchaseJump;
+}
+
 /** 礼品详情（与官网 ProductData 对齐；服务端 detail 字段的完整形状） */
 export interface GiftDetail {
   id: string;
@@ -50,14 +64,14 @@ export interface GiftDetail {
   /** 参考价（元） */
   price?: number;
   capacity?: string | null;
+  origin?: string | null;
   images?: ProductImage[];
   category?: { name: string };
   ingredients?: string | null;
   usage?: string | null;
   /** 核心功效标签 */
   benefits?: string[];
-  /** 官网购买链接（小程序内不展示） */
-  purchaseLinks?: Array<{ id: string; platform: string; url: string }>;
+  purchaseLinks?: GiftPurchaseLink[];
 }
 
 export interface GiftItem {

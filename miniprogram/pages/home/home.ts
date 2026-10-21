@@ -40,6 +40,8 @@ Page({
     hotGifts: [] as GiftRow[],
     expiring: [] as ExpiringRow[],
     skinUsage: null as SkinView | null,
+    skinUsageLoading: false,
+    skinUsageError: false,
     error: "",
   },
 
@@ -69,10 +71,19 @@ Page({
   async load() {
     const loggedIn = await ensureSession();
     if (!loggedIn) {
-      this.setData({ loading: false, loggedIn: false, error: "", skinUsage: null });
+      this.setData({
+        loading: false,
+        loggedIn: false,
+        error: "",
+        skinUsage: null,
+        skinUsageLoading: false,
+        skinUsageError: false,
+      });
       return;
     }
-    this.setData({ loading: true, error: "" });
+    this.setData({ loading: true, error: "", skinUsageLoading: true, skinUsageError: false });
+    // 测肤为独立数据源：与积分主体并行请求，积分失败也不影响其展示
+    void this.loadSkinUsage();
     try {
       const [data, giftsData, membershipData, userinfoData] = await Promise.all([
         api.points(),
@@ -107,26 +118,46 @@ Page({
           : "",
         hotGifts,
       });
-      // 即将过期与测肤用量均为增强模块：异步补充，不阻塞首页主体
+      // 即将过期为增强模块：异步补充，不阻塞首页主体
       void this.loadExpiring(data.recent);
-      void this.loadSkinUsage();
     } catch (e) {
       const err = e as Error & { status?: number };
       if (err.status === 401) {
-        this.setData({ loading: false, loggedIn: false, skinUsage: null });
+        this.setData({
+          loading: false,
+          loggedIn: false,
+          skinUsage: null,
+          skinUsageLoading: false,
+          skinUsageError: false,
+        });
         return;
       }
-      this.setData({ loading: false, error: err.message || "积分加载失败" });
+      this.setData({
+        loading: false,
+        error: err.message || "积分加载失败",
+        skinUsageLoading: false,
+        skinUsageError: true,
+      });
     }
   },
 
   async loadSkinUsage() {
+    this.setData({ skinUsageLoading: true, skinUsageError: false });
     try {
       const data = await api.skinTestUsage();
-      this.setData({ skinUsage: buildSkinView(data.usage) });
+      const usage = buildSkinView(data.usage);
+      this.setData({
+        skinUsage: usage,
+        skinUsageLoading: false,
+        skinUsageError: !usage,
+      });
     } catch {
-      this.setData({ skinUsage: null });
+      this.setData({ skinUsage: null, skinUsageLoading: false, skinUsageError: true });
     }
+  },
+
+  reloadSkinUsage() {
+    void this.loadSkinUsage();
   },
 
   /**
