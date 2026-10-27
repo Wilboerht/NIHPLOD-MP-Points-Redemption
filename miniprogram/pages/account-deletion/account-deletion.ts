@@ -19,6 +19,10 @@ Page({
     request: null as DeletionView | null,
     warnings: [] as string[],
     reason: "",
+    smsCode: "",
+    codeSending: false,
+    codeCountdown: 0,
+    codeSent: false,
     confirmed: false,
     error: "",
     email: SERVICE_EMAIL,
@@ -27,9 +31,17 @@ Page({
   /** 登录引导是否已触发（用户跳过登录返回时不再反复跳转） */
   loginPrompted: false,
   checking: false,
+  codeTimer: 0 as ReturnType<typeof setInterval> | 0,
 
   onLoad() {
     void this.check();
+  },
+
+  onUnload() {
+    if (this.codeTimer) {
+      clearInterval(this.codeTimer);
+      this.codeTimer = 0;
+    }
   },
 
   onShow() {
@@ -83,14 +95,55 @@ Page({
     this.setData({ reason: e.detail.value, error: "" });
   },
 
+  onSmsCodeInput(e: WechatMiniprogram.Input) {
+    this.setData({ smsCode: e.detail.value.replace(/\D/g, "").slice(0, 6), error: "" });
+  },
+
   onConfirmChange(e: WechatMiniprogram.CheckboxGroupChange) {
     this.setData({ confirmed: e.detail.value.length > 0 });
+  },
+
+  startCodeCountdown(seconds = 60) {
+    if (this.codeTimer) clearInterval(this.codeTimer);
+    this.setData({ codeCountdown: seconds });
+    this.codeTimer = setInterval(() => {
+      const next = Math.max(0, this.data.codeCountdown - 1);
+      this.setData({ codeCountdown: next });
+      if (next <= 0 && this.codeTimer) {
+        clearInterval(this.codeTimer);
+        this.codeTimer = 0;
+      }
+    }, 1000);
+  },
+
+  async sendCode() {
+    if (this.data.codeSending || this.data.codeCountdown > 0) return;
+    this.setData({ codeSending: true, error: "" });
+    try {
+      await api.sendDeletionCode();
+      this.setData({ codeSending: false, codeSent: true });
+      this.startCodeCountdown(60);
+      wx.showToast({ title: "验证码已发送", icon: "success" });
+    } catch (e) {
+      this.setData({ codeSending: false, codeSent: false });
+      const err = e as ApiError;
+      if (err.status === 401) {
+        this.setData({ loggedIn: false });
+        wx.navigateTo({ url: "/pages/login/login" });
+        return;
+      }
+      this.setData({ error: err.message || "验证码发送失败，请稍后重试" });
+    }
   },
 
   submit() {
     if (this.data.submitting) return;
     if (!this.data.confirmed) {
       wx.showToast({ title: "请先勾选确认", icon: "none" });
+      return;
+    }
+    if (!/^\d{6}$/.test(this.data.smsCode)) {
+      wx.showToast({ title: "请输入 6 位短信验证码", icon: "none" });
       return;
     }
     wx.showModal({
@@ -108,13 +161,18 @@ Page({
     this.setData({ submitting: true, error: "" });
     try {
       const reason = this.data.reason.trim();
-      const data = await api.requestDeletion(reason ? { reason } : {});
+      const data = await api.requestDeletion({
+        smsCode: this.data.smsCode,
+        ...(reason ? { reason } : {}),
+      });
       this.setData({
         submitting: false,
         request: this.decorate(data.request),
         warnings: data.warnings ?? [],
         confirmed: false,
         reason: "",
+        smsCode: "",
+        codeSent: false,
       });
       wx.showToast({ title: "已提交注销申请", icon: "success" });
     } catch (e) {

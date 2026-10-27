@@ -284,8 +284,15 @@ export const api = {
   deletionStatus: () =>
     authRequest<{ request: DeletionRequestInfo | null }>({ url: "/api/oauth/account/deletion" }),
 
+  /** 账号注销：发送二次验证短信（发到本人手机号） */
+  sendDeletionCode: () =>
+    authRequest<{ expiresIn: number }>({
+      url: "/api/oauth/account/deletion/send-code",
+      method: "POST",
+    }),
+
   /** 账号注销：提交申请（冷静期默认 7 天，可随时撤回；幂等） */
-  requestDeletion: (data: { reason?: string }) =>
+  requestDeletion: (data: { reason?: string; smsCode: string }) =>
     authRequest<{ request: DeletionRequestInfo; warnings: string[] }>({
       url: "/api/oauth/account/deletion",
       method: "POST",
