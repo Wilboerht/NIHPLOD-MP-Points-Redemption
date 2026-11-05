@@ -1,5 +1,5 @@
 .redeem-page {
-  padding-bottom: 180rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
 /* .bottom-bar/.submit-btn/.error-card 基础样式见 app.wxss */
@@ -18,12 +18,19 @@
 }
 
 .gift-meta {
+  flex: 1;
+  min-width: 0;
   margin-left: 24rpx;
 }
 
 .gift-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   font-size: 30rpx;
   font-weight: 600;
+  line-height: 1.4;
   margin-bottom: 8rpx;
 }
 
@@ -53,13 +60,25 @@
   min-width: 0;
 }
 
-.recipient {
-  font-weight: 600;
-  margin-right: 16rpx;
+.address-head {
+  align-items: baseline;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 4rpx 12rpx;
 }
 
-.phone {
-  margin-right: 16rpx;
+.recipient {
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.phone,
+.default-tag {
+  flex-shrink: 0;
 }
 
 .default-tag {

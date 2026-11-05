@@ -69,13 +69,22 @@
 }
 
 .sheet-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  height: 88rpx;
   font-size: 28rpx;
-  color: var(--color-muted, #767676);
-  padding: 12rpx;
-  margin: -12rpx -12rpx -12rpx 0;
+  color: var(--color-muted, #6c6c6c);
+  padding: 0;
+  margin: -24rpx -24rpx -24rpx 0;
 }
 
 .sheet-body {
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
   padding-bottom: 16rpx;
 }
 

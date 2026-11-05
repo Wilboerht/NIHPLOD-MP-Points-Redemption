@@ -4,18 +4,6 @@
   padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-/* 底部操作栏：与消费补录列表页一致的由实到虚渐变 */
-.bottom-bar {
-  padding-top: 48rpx;
-  background: linear-gradient(
-    to top,
-    var(--color-bg) 0%,
-    var(--color-bg) 45%,
-    rgba(247, 245, 242, 0) 100%
-  );
-  box-shadow: none;
-}
-
 .amount-field {
   flex: 1;
   min-width: 0;
@@ -33,8 +21,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56rpx;
-  height: 56rpx;
+  width: 88rpx;
+  height: 88rpx;
   margin-left: 8rpx;
   color: var(--color-muted);
   font-size: 30rpx;
@@ -74,10 +62,10 @@
 
 .proof-delete {
   position: absolute;
-  top: -20rpx;
-  right: -20rpx;
-  width: 64rpx;
-  height: 64rpx;
+  top: -32rpx;
+  right: -32rpx;
+  width: 88rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;

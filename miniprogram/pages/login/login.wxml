@@ -23,9 +23,9 @@
 
     <view class="login-legal muted small">
       登录即表示同意
-      <text class="legal-link" bindtap="goTerms">《服务条款》</text>
+      <text class="legal-link" aria-role="button" bindtap="goTerms">《服务条款》</text>
       和
-      <text class="legal-link" bindtap="goPrivacy">《隐私政策》</text>
+      <text class="legal-link" aria-role="button" bindtap="goPrivacy">《隐私政策》</text>
     </view>
 
     <view wx:if="{{bindToken}}" class="card">
@@ -44,7 +44,7 @@
           class="ghost-btn sms-btn"
           loading="{{codeSending}}"
           disabled="{{codeSending || counting > 0 || busy}}"
-          bindtap="sendCode"
+          aria-role="button" bindtap="sendCode"
         >
           {{counting > 0 ? counting + 's 后重试' : '获取验证码'}}
         </button>
@@ -57,19 +57,19 @@
         value="{{code}}"
         bindinput="onCodeInput"
       />
-      <button class="btn-primary sms-submit" loading="{{busy}}" disabled="{{busy}}" bindtap="submitSms">
+      <button class="btn-primary sms-submit" loading="{{busy}}" disabled="{{busy}}" aria-role="button" bindtap="submitSms">
         绑定并登录
       </button>
     </view>
 
     <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 
-    <view class="skip muted small" bindtap="skip">暂不登录，先逛逛</view>
+    <view class="skip muted small" aria-role="button" bindtap="skip">暂不登录，先逛逛</view>
   </block>
 
   <block wx:if="{{phase === 'error'}}">
     <view class="card error-card">{{error}}</view>
-    <button class="btn-primary error-retry" bindtap="retry">重试</button>
-    <view class="skip muted small" bindtap="skip">返回首页</view>
+    <button class="btn-primary error-retry" aria-role="button" bindtap="retry">重试</button>
+    <view class="skip muted small" aria-role="button" bindtap="skip">返回首页</view>
   </block>
 </view>

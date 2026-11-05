@@ -4,5 +4,6 @@
 interface IAppOption {
   globalData: {
     statusBarHeight: number;
+    navigationBarHeight: number;
   };
 }

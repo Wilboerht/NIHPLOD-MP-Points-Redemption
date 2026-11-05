@@ -57,7 +57,9 @@
   align-items: center;
   gap: 4rpx;
   flex-shrink: 0;
-  padding: 16rpx 0 16rpx 12rpx;
+  min-height: 88rpx;
+  margin: -10rpx 0;
+  padding: 0 0 0 12rpx;
   font-size: 24rpx;
   color: var(--color-primary);
 }
@@ -91,6 +93,8 @@
   font-size: 24rpx;
   line-height: 1.4;
   color: #5f5a54;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ============ 下方信息卡：扁平化，统一圆角 ============ */
@@ -199,8 +203,12 @@
 }
 
 .upgrade-history {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
   margin-top: 8rpx;
-  padding: 12rpx 0;
+  padding: 0;
   text-align: center;
   font-size: 24rpx;
   color: var(--color-primary);
@@ -319,9 +327,13 @@
 }
 
 .skin-usage-retry {
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  margin: -20rpx 0;
+  padding: 0 0 0 8rpx;
   font-size: 24rpx;
   color: var(--color-primary);
-  padding: 8rpx 0 8rpx 8rpx;
 }
 
 /* ============ 会员等级列表 ============ */
@@ -485,9 +497,10 @@
 
 .level-unlock-btn {
   width: 100%;
+  min-height: 88rpx;
   margin-top: 16rpx;
   font-size: 26rpx;
-  padding: 16rpx 0;
+  padding: 0;
 }
 
 /* ============ 底部说明 / 错误重试 ============ */

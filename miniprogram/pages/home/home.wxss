@@ -87,6 +87,10 @@
   align-self: flex-start;
   margin-top: 6rpx;
   flex-shrink: 0;
+  max-width: 220rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 22rpx;
   line-height: 1.4;
   color: var(--color-muted);
@@ -190,7 +194,11 @@
 }
 
 .skin-retry {
-  padding: 4rpx 0 4rpx 8rpx;
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  margin: -24rpx 0;
+  padding: 0 0 0 8rpx;
   font-size: 22rpx;
   line-height: 1.4;
   color: var(--color-primary);
@@ -267,15 +275,6 @@
   background: #efeae4;
 }
 
-.hot-gift-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #b8a992;
-  font-size: 22rpx;
-  letter-spacing: 2rpx;
-}
-
 .hot-gift-name {
   margin-top: 12rpx;
   font-size: 26rpx;
@@ -298,9 +297,35 @@
 
 /* 未解锁 / 积分不足：弱化为浅棕，避免看起来可兑 */
 .hot-gift-cost.muted {
-  color: #9c8365;
+  color: var(--color-primary-muted);
 }
 
 .expiring-row {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4rpx 16rpx;
   padding: 12rpx 0;
+}
+
+.expiring-title {
+  flex-shrink: 0;
+}
+
+.expiring-value {
+  flex: 1;
+  min-width: 280rpx;
+  text-align: right;
+  line-height: 1.5;
+}
+
+@media (max-width: 350px) {
+  .expiring-row {
+    flex-direction: column;
+    gap: 4rpx;
+  }
+
+  .expiring-value {
+    min-width: 0;
+    text-align: left;
+  }
 }

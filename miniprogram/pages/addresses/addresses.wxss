@@ -4,18 +4,6 @@
 
 /* 登录引导卡/.error-card/.submit-btn 基础样式见 app.wxss */
 
-/* 底部操作栏：由底部实色向上渐隐 */
-.bottom-bar {
-  padding-top: 48rpx;
-  background: linear-gradient(
-    to top,
-    var(--color-bg) 0%,
-    var(--color-bg) 45%,
-    rgba(247, 245, 242, 0) 100%
-  );
-  box-shadow: none;
-}
-
 .address-card {
   transition: background-color 0.15s ease;
 }
@@ -61,9 +49,9 @@
 
 /* 删除图标：独立热区，避免触发整卡编辑 */
 .delete-hit {
-  width: 72rpx;
-  height: 72rpx;
-  margin: -12rpx -20rpx -12rpx 0;
+  width: 88rpx;
+  height: 88rpx;
+  margin: -20rpx -28rpx -20rpx 0;
   display: flex;
   align-items: center;
   justify-content: center;

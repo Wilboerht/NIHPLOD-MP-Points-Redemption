@@ -1,16 +1,21 @@
 <!-- 自绘导航栏（home.json navigationStyle: custom）：logo 替代标题文字，固定悬浮如原生导航栏 -->
-<view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+<view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navigationBarHeight}}px;">
   <image class="nav-logo" src="/images/nihplod-logo.svg" mode="aspectFit" />
 </view>
-<view style="height: {{statusBarHeight + 44}}px;"></view>
+<view style="height: {{statusBarHeight + navigationBarHeight}}px;"></view>
 
 <view class="container">
+  <view wx:if="{{error}}" class="card error-card">
+    <view>{{error}}</view>
+    <button class="ghost-btn retry-btn" aria-role="button" bindtap="load">重试</button>
+  </view>
+
   <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
 
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看会员信息</view>
     <view class="muted small login-desc">使用微信一键登录，积分与官网账号同步</view>
-    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+    <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn}}">
@@ -18,10 +23,12 @@
       <image wx:if="{{cardBg}}" class="balance-bg" src="{{cardBg}}" mode="aspectFill" />
       <view class="balance-inner">
         <view class="member-top">
-          <image
-            class="member-avatar {{avatar ? '' : 'member-avatar-fallback'}}"
-            src="{{avatar || '/images/icons/user.svg'}}"
-            mode="{{avatar ? 'aspectFill' : 'aspectFit'}}"
+          <app-image
+            custom-class="member-avatar {{avatar ? '' : 'member-avatar-fallback'}}"
+            src="{{avatar}}"
+            mode="aspectFill"
+            fallback="{{nickname[0] || 'NI'}}"
+            alt="当前头像"
           />
           <view class="member-meta">
             <view class="member-nickname">{{nickname}}</view>
@@ -38,22 +45,22 @@
 
     <!-- 白卡：高频操作（与会员卡形成层次） -->
     <view class="card quick-card">
-      <view class="quick-item" bindtap="goVip" hover-class="quick-item-hover">
+      <view class="quick-item" aria-role="button" bindtap="goVip" hover-class="quick-item-hover">
         <image class="quick-icon" src="/images/icons/crown.svg" mode="aspectFit" />
         <text class="quick-label">会员权益</text>
       </view>
-      <view class="quick-item" bindtap="goGifts" hover-class="quick-item-hover">
+      <view class="quick-item" aria-role="button" bindtap="goGifts" hover-class="quick-item-hover">
         <image class="quick-icon" src="/images/icons/gift.svg" mode="aspectFit" />
         <text class="quick-label">积分兑换</text>
       </view>
-      <view class="quick-item" bindtap="goSpentAdjust" hover-class="quick-item-hover">
+      <view class="quick-item" aria-role="button" bindtap="goSpentAdjust" hover-class="quick-item-hover">
         <image class="quick-icon" src="/images/icons/trending-up.svg" mode="aspectFit" />
         <text class="quick-label">等级提升</text>
       </view>
     </view>
 
     <!-- 肌智派在线测肤（固定展示；数据源异常时保留卡片并允许重试） -->
-    <view class="card skin-card" bindtap="goSkinTest" hover-class="row-hover">
+    <view class="card skin-card" aria-role="button" bindtap="goSkinTest" hover-class="row-hover">
       <image class="skin-logo" src="/images/jzp-eyebrow.png" mode="aspectFit" />
       <view class="skin-main">
         <view class="skin-title">肌智派在线测肤</view>
@@ -71,7 +78,7 @@
         </view>
         <view wx:else class="skin-status">
           <text class="muted small">测肤状态暂不可用</text>
-          <text class="skin-retry" catchtap="reloadSkinUsage">重试</text>
+          <text class="skin-retry" aria-role="button" catchtap="reloadSkinUsage">重试</text>
         </view>
       </view>
       <view class="skin-go">前往测肤</view>
@@ -80,15 +87,15 @@
     <view wx:if="{{expiring.length > 0}}" class="card warn-card">
       <view class="card-title">即将过期</view>
       <view wx:for="{{expiring}}" wx:key="id" class="row expiring-row">
-        <text class="small">{{item.title}}</text>
-        <text class="danger small">{{item.pointsText}} 积分 · {{item.expiresAt}} 过期</text>
+        <text class="small expiring-title">{{item.title}}</text>
+        <text class="danger small expiring-value">{{item.pointsText}} 积分 · {{item.expiresAt}} 过期</text>
       </view>
     </view>
 
     <view wx:if="{{hotGifts.length > 0}}" class="card">
       <view class="row ledger-head">
         <view class="card-title card-title-inline">精选好礼</view>
-        <view class="text-link tap-hot" bindtap="goGifts" hover-class="row-hover">
+        <view class="text-link tap-hot" aria-role="button" bindtap="goGifts" hover-class="row-hover">
           <text class="muted small">全部好礼</text>
           <image class="link-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
         </view>
@@ -99,26 +106,20 @@
           wx:key="id"
           class="hot-gift"
           data-id="{{item.id}}"
-          bindtap="openGift"
+          aria-role="button" bindtap="openGift"
           hover-class="hot-gift-hover"
         >
-          <image
-            wx:if="{{item.image}}"
-            class="hot-gift-img"
+          <app-image
+            custom-class="hot-gift-img"
             src="{{item.image}}"
             mode="aspectFill"
-            lazy-load
+            alt="{{item.name}}"
+            lazy="{{true}}"
           />
-          <view wx:else class="hot-gift-img hot-gift-placeholder">NIHPLOD</view>
           <view class="hot-gift-name">{{item.name}}</view>
           <view class="hot-gift-cost {{item.costClass}}">{{item.costText}}</view>
         </view>
       </view>
     </view>
   </block>
-
-  <view wx:if="{{error}}" class="card error-card">
-    <view>{{error}}</view>
-    <button class="ghost-btn retry-btn" bindtap="load">重试</button>
-  </view>
 </view>

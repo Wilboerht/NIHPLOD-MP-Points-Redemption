@@ -1,15 +1,17 @@
 <view class="container records-page">
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
   <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
 
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看兑换记录</view>
-    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+    <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn}}">
     <view wx:if="{{rows.length === 0 && !loading}}" class="empty-state">
       <view class="empty">暂无兑换记录</view>
-      <button class="ghost-btn empty-btn" bindtap="goGifts">去看看好礼</button>
+      <button class="ghost-btn empty-btn" aria-role="button" bindtap="goGifts">去看看好礼</button>
     </view>
 
     <view
@@ -17,11 +19,16 @@
       wx:key="id"
       class="card record-card"
       data-id="{{item.id}}"
-      bindtap="open"
+      aria-role="button" bindtap="open"
       hover-class="record-card-hover"
     >
-      <image wx:if="{{item.imageUrl}}" class="record-thumb" src="{{item.imageUrl}}" mode="aspectFill" />
-      <view wx:else class="record-thumb record-thumb-placeholder">NIHPLOD</view>
+      <app-image
+        custom-class="record-thumb"
+        src="{{item.imageUrl}}"
+        mode="aspectFill"
+        alt="{{item.productName}}"
+        lazy="{{true}}"
+      />
       <view class="record-main">
         <view class="record-head">
           <text class="product-name">{{item.productName}}</text>
@@ -35,10 +42,8 @@
       <image class="record-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
     </view>
 
-    <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMore">
+    <view wx:if="{{hasMore}}" class="load-more" aria-role="button" bindtap="loadMore">
       {{loadingMore ? '加载中…' : (loadMoreError || '上拉加载更多')}}
     </view>
   </block>
-
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 </view>

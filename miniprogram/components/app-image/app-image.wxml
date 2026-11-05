@@ -1,0 +1,10 @@
+<image
+  wx:if="{{src && !failed}}"
+  class="app-image custom-class"
+  src="{{src}}"
+  mode="{{mode}}"
+  lazy-load="{{lazy}}"
+  binderror="onError"
+  aria-label="{{alt}}"
+/>
+<view wx:else class="app-image app-image-placeholder custom-class" aria-label="{{alt || fallback}}">{{fallback}}</view>

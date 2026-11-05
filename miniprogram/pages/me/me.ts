@@ -6,7 +6,7 @@ import {
   maskPhone,
   resolveImageUrl,
 } from "../../utils/format";
-import { getStatusBarHeight } from "../../utils/ui";
+import { getNavigationBarHeight, getStatusBarHeight } from "../../utils/ui";
 
 /**
  * 小程序 ICP 备案号：备案通过后填入正式号码（如 "沪ICP备XXXXXXXX号-X"）。
@@ -22,6 +22,7 @@ Page({
     loading: true,
     /** 自定义导航栏状态栏高度（px） */
     statusBarHeight: 20,
+    navigationBarHeight: 44,
     nickname: "微信用户",
     phoneMasked: "",
     avatar: "",
@@ -37,8 +38,10 @@ Page({
   requestVersion: 0,
 
   onLoad() {
-    // 页面为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
-    this.setData({ statusBarHeight: getStatusBarHeight() });
+    this.setData({
+      statusBarHeight: getStatusBarHeight(),
+      navigationBarHeight: getNavigationBarHeight(),
+    });
   },
 
   onShow() {

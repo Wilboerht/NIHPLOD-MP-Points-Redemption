@@ -52,8 +52,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6rpx;
-  margin: -6rpx 0;
+  width: 88rpx;
+  height: 88rpx;
+  padding: 0;
+  margin: -30rpx 0;
   flex-shrink: 0;
 }
 
@@ -77,7 +79,9 @@
   align-items: center;
   gap: 4rpx;
   flex-shrink: 0;
-  padding: 8rpx 0 8rpx 12rpx;
+  min-height: 88rpx;
+  margin: -24rpx 0;
+  padding: 0 0 0 12rpx;
   font-size: 24rpx;
   color: var(--color-primary);
 }
@@ -198,15 +202,6 @@
   background: #efeae4;
 }
 
-.gift-image-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #b8a992;
-  font-size: 22rpx;
-  letter-spacing: 2rpx;
-}
-
 .gift-info {
   flex: 1;
   margin-left: 24rpx;
@@ -252,13 +247,14 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 16rpx;
+  flex-wrap: wrap;
+  gap: 4rpx 16rpx;
   margin-top: auto;
   padding-top: 12rpx;
 }
 
 .gift-cost {
-  flex-shrink: 0;
+  min-width: 0;
   color: var(--color-primary);
   font-size: 32rpx;
   font-weight: 600;
@@ -267,11 +263,13 @@
 
 /* 积分不足 / 未解锁：用浅棕弱化，避免发灰 */
 .gift-cost.muted {
-  color: #9c8365;
+  color: var(--color-primary-muted);
 }
 
 .gift-price {
-  flex-shrink: 0;
+  min-width: 0;
+  margin-left: auto;
+  text-align: right;
   font-size: 22rpx;
   color: var(--color-muted);
 }

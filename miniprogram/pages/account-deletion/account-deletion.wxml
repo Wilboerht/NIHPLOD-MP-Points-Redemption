@@ -1,4 +1,6 @@
 <view class="container deletion-page">
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
   <view wx:if="{{loading}}" class="empty">加载中…</view>
 
   <block wx:elif="{{loggedIn}}">
@@ -13,7 +15,7 @@
           class="btn-primary action-btn"
           loading="{{submitting}}"
           disabled="{{submitting}}"
-          bindtap="withdraw"
+          aria-role="button" bindtap="withdraw"
         >
           撤回注销申请
         </button>
@@ -60,7 +62,7 @@
             class="ghost-btn code-btn"
             loading="{{codeSending}}"
             disabled="{{codeSending || codeCountdown > 0}}"
-            bindtap="sendCode"
+            aria-role="button" bindtap="sendCode"
           >
             {{codeCountdown > 0 ? codeCountdown + "s" : (codeSent ? "重新发送" : "获取验证码")}}
           </button>
@@ -78,7 +80,7 @@
           class="btn-primary action-btn"
           loading="{{submitting}}"
           disabled="{{submitting || !confirmed}}"
-          bindtap="submit"
+          aria-role="button" bindtap="submit"
         >
           申请注销账号
         </button>
@@ -88,7 +90,7 @@
     <view class="card">
       <view class="card-title">无法自行办理？</view>
       <view class="muted small tip-line">
-        · 可发起客服会话，或邮件至 {{email}}（<text class="link tap-hot" bindtap="copyEmail">复制</text>）
+        · 可发起客服会话，或邮件至 {{email}}（<text class="link tap-hot" aria-role="button" bindtap="copyEmail">复制</text>）
       </view>
       <button class="ghost-btn contact-btn" open-type="contact">联系客服协助注销</button>
     </view>
@@ -96,8 +98,6 @@
 
   <view wx:else class="card login-card">
     <view class="login-title">登录后管理账号注销</view>
-    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+    <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
   </view>
-
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 </view>

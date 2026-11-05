@@ -1,0 +1,14 @@
+.app-image {
+  display: block;
+  background: #efeae4;
+}
+
+.app-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8a765b;
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
+  text-align: center;
+}

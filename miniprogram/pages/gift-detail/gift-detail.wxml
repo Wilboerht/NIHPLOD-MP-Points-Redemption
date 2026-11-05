@@ -3,11 +3,13 @@
 <view wx:if="{{needLogin && !loading}}" class="container">
   <view class="card login-card">
     <view class="login-title">登录后查看礼品详情</view>
-    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+    <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
   </view>
 </view>
 
 <view class="container gift-detail" wx:elif="{{gift}}">
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
   <view class="gallery-wrap">
     <swiper
       wx:if="{{images.length > 0}}"
@@ -19,11 +21,14 @@
       bindchange="onSwiperChange"
     >
       <swiper-item wx:for="{{images}}" wx:key="*this">
-        <image
-          class="gallery-image"
+        <app-image
+          custom-class="gallery-image"
           src="{{item}}"
           mode="aspectFit"
+          alt="{{gift.name}}"
           data-index="{{index}}"
+          aria-role="button"
+          aria-label="预览{{gift.name}}图片"
           bindtap="previewImage"
         />
       </swiper-item>
@@ -60,7 +65,7 @@
         wx:key="id"
         class="purchase-link"
         data-index="{{index}}"
-        bindtap="openPurchaseLink"
+        aria-role="button" bindtap="openPurchaseLink"
         hover-class="purchase-link-hover"
       >
         {{item.platform}}
@@ -84,14 +89,12 @@
     <view class="detail-text">{{gift.detail.usage}}</view>
   </view>
 
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
-
   <view class="bottom-bar">
     <view class="bar-cost">
       <view class="bar-cost-label">所需积分</view>
       <view class="bar-cost-value">{{gift.costText}}</view>
     </view>
-    <button class="btn-primary submit-btn" disabled="{{!canRedeem}}" bindtap="goRedeem">
+    <button class="btn-primary submit-btn" disabled="{{!canRedeem}}" aria-role="button" bindtap="goRedeem">
       {{buttonText}}
     </button>
   </view>

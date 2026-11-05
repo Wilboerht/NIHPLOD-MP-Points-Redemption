@@ -1,5 +1,5 @@
 .legal-page {
-  padding-bottom: 60rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
 }
 
 .legal-meta {

@@ -6,6 +6,10 @@
 
 /* 流水号行：扩展点击热区并用下划线提示可复制 */
 .ref-row {
+  display: flex;
+  align-items: center;
+  min-height: 88rpx;
+  box-sizing: border-box;
   margin-bottom: -16rpx;
   padding: 16rpx 0;
   word-break: break-all;

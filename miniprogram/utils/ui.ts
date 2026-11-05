@@ -10,3 +10,9 @@ export function getStatusBarHeight(): number {
   const app = getApp<IAppOption>();
   return app?.globalData?.statusBarHeight || 20;
 }
+
+/** 自定义导航栏内容高度：按微信胶囊的位置与高度计算 */
+export function getNavigationBarHeight(): number {
+  const app = getApp<IAppOption>();
+  return app?.globalData?.navigationBarHeight || 44;
+}

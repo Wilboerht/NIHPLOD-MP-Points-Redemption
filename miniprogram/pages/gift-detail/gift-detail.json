@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "礼品详情"
+  "navigationBarTitleText": "礼品详情",
+  "usingComponents": {
+    "app-image": "/components/app-image/app-image"
+  }
 }

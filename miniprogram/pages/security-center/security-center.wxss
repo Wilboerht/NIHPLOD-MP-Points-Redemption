@@ -4,18 +4,6 @@
   padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-/* 底部操作栏：由底部实色向上渐隐 */
-.bottom-bar {
-  padding-top: 48rpx;
-  background: linear-gradient(
-    to top,
-    var(--color-bg) 0%,
-    var(--color-bg) 45%,
-    rgba(247, 245, 242, 0) 100%
-  );
-  box-shadow: none;
-}
-
 .deletion-btn {
   width: 100%;
   background: var(--color-card);

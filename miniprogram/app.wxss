@@ -2,9 +2,10 @@ page {
   --color-bg: #f7f5f2;
   --color-card: #ffffff;
   --color-text: #2b2b2b;
-  --color-muted: #767676;
-  --color-primary: #8a6d4b;
-  --color-danger: #c25450;
+  --color-muted: #6c6c6c;
+  --color-primary: #7f623f;
+  --color-primary-muted: #806747;
+  --color-danger: #b24743;
   --color-success: #3f8f5f;
   --color-border: rgba(43, 43, 43, 0.08);
   background: var(--color-bg);
@@ -14,7 +15,7 @@ page {
 }
 
 .container {
-  padding: 24rpx 24rpx 48rpx;
+  padding: 24rpx 24rpx calc(48rpx + env(safe-area-inset-bottom));
 }
 
 .card {
@@ -96,6 +97,10 @@ page {
 
 /* 列表分页提示（兑换记录 / 积分明细共用） */
 .load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
   text-align: center;
   padding: 24rpx 0;
 }
@@ -138,8 +143,13 @@ button::after {
 
 /* 文字链热区扩展（视觉位置不变，点击区域更大） */
 .tap-hot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  box-sizing: border-box;
   padding: 16rpx 8rpx;
-  margin: -16rpx -8rpx;
+  margin: -26rpx -8rpx;
 }
 
 /* 列表页共用的登录引导卡与错误提示（页面内可覆盖） */
@@ -320,7 +330,12 @@ button::after {
 }
 
 .seg-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 1;
+  min-height: 88rpx;
+  box-sizing: border-box;
   padding: 14rpx 0;
   text-align: center;
   font-size: 26rpx;
@@ -373,9 +388,27 @@ button::after {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 90;
   padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
   background: #ffffff;
   box-shadow: 0 -4rpx 20rpx rgba(43, 43, 43, 0.05);
+}
+
+/* 渐变只作为视觉装饰，不扩大底栏本身的点击遮挡区域 */
+.bottom-bar-fade {
+  background: var(--color-bg);
+  box-shadow: none;
+}
+
+.bottom-bar-fade::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -48rpx;
+  height: 48rpx;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--color-bg), rgba(247, 245, 242, 0));
 }
 
 .submit-btn {
@@ -388,9 +421,7 @@ button::after {
   width: 100%;
 }
 
-/* 自绘导航栏（tab 页 navigationStyle: custom）：logo 替代标题文字。
-   固定悬浮（与微信原生导航栏行为一致）；状态栏占位由内联 padding-top 提供，
-   内容区与系统导航栏同高 44px。页面需在导航栏后放置 {{statusBarHeight + 44}}px 占位。 */
+/* 自绘导航栏：状态栏和内容高度由页面按微信胶囊位置内联设置。 */
 .nav-bar {
   position: fixed;
   top: 0;

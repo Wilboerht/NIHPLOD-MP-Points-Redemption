@@ -2,6 +2,7 @@
   "navigationBarTitleText": "我的",
   "navigationStyle": "custom",
   "usingComponents": {
-    "rules-sheet": "/components/rules-sheet/rules-sheet"
+    "rules-sheet": "/components/rules-sheet/rules-sheet",
+    "app-image": "/components/app-image/app-image"
   }
 }

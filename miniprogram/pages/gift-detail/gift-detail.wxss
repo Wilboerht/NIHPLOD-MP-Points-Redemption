@@ -1,5 +1,5 @@
 .gift-detail {
-  padding-bottom: 200rpx;
+  padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
 }
 
 /* .bottom-bar/.submit-btn 基础样式见 app.wxss */
@@ -131,8 +131,9 @@
   align-items: center;
   justify-content: center;
   width: auto;
+  min-height: 88rpx;
   margin: 0;
-  padding: 14rpx 28rpx;
+  padding: 0 28rpx;
   border-radius: 999rpx;
   background: rgba(138, 109, 75, 0.08);
   color: var(--color-primary);
@@ -157,6 +158,8 @@
   line-height: 1.8;
   color: var(--color-text);
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ============ 底部操作栏（左成本 + 右按钮） ============ */

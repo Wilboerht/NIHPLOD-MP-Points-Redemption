@@ -1,9 +1,11 @@
 <view class="container profile-page">
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
   <view wx:if="{{loading}}" class="loading-block">加载中…</view>
 
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后管理个人资料</view>
-    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+    <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn}}">
@@ -18,8 +20,13 @@
           hover-class="none"
         >
           <view class="avatar-wrap">
-            <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
-            <view wx:else class="avatar avatar-fallback">＋</view>
+            <app-image
+              custom-class="avatar {{avatarUrl ? '' : 'avatar-fallback'}}"
+              src="{{avatarUrl}}"
+              mode="aspectFill"
+              fallback="＋"
+              alt="当前头像"
+            />
             <view class="avatar-badge">
               <image class="avatar-badge-icon" src="/images/icons/camera-white.svg" mode="aspectFit" />
             </view>
@@ -52,6 +59,8 @@
             wx:key="*this"
             class="seg-item {{genderIndex === index ? 'seg-item-active' : ''}}"
             data-index="{{index}}"
+            aria-role="button"
+            aria-label="{{item}}{{genderIndex === index ? '，已选中' : ''}}"
             bindtap="onGenderTap"
           >
             {{item}}
@@ -96,10 +105,8 @@
       </view>
     </view>
 
-    <view class="bottom-bar">
-      <button class="logout-btn" bindtap="onLogout">退出登录</button>
+    <view class="bottom-bar bottom-bar-fade">
+      <button class="logout-btn" aria-role="button" bindtap="onLogout">退出登录</button>
     </view>
   </block>
-
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 </view>

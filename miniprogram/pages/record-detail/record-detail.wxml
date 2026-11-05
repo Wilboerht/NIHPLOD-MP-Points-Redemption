@@ -3,15 +3,19 @@
 <view wx:elif="{{needLogin}}" class="container">
   <view class="card login-card">
     <view class="login-title">登录后查看兑换详情</view>
-    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+    <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
   </view>
 </view>
 
 <view class="container record-detail" wx:elif="{{item}}">
   <view class="card">
     <view class="detail-head">
-      <image wx:if="{{item.imageUrl}}" class="detail-thumb" src="{{item.imageUrl}}" mode="aspectFill" />
-      <view wx:else class="detail-thumb detail-thumb-placeholder">NIHPLOD</view>
+      <app-image
+        custom-class="detail-thumb"
+        src="{{item.imageUrl}}"
+        mode="aspectFill"
+        alt="{{item.productName}}"
+      />
       <view class="detail-head-main">
         <view class="detail-name-row">
           <view class="product-name">{{item.productName}}</view>
@@ -42,7 +46,7 @@
   <view class="card">
     <view class="row logistics-head">
       <view class="card-title card-title-inline">物流信息</view>
-      <view wx:if="{{item.waybillNo}}" class="copy-hit" bindtap="copyWaybill" hover-class="copy-hit-hover">
+      <view wx:if="{{item.waybillNo}}" class="copy-hit" aria-role="button" bindtap="copyWaybill" hover-class="copy-hit-hover">
         复制运单号
       </view>
     </view>
@@ -79,5 +83,5 @@
 
 <view wx:elif="{{error && !loading}}" class="container">
   <view class="empty">{{error}}</view>
-  <button class="ghost-btn" bindtap="retry">重试</button>
+  <button class="ghost-btn" aria-role="button" bindtap="retry">重试</button>
 </view>

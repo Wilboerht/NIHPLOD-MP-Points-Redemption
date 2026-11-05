@@ -12,7 +12,7 @@ import {
 import type { GiftRow } from "../../utils/format";
 import { buildSkinView, type SkinView } from "../../utils/skin";
 import type { PointLedgerItem } from "../../utils/types";
-import { getStatusBarHeight } from "../../utils/ui";
+import { getNavigationBarHeight, getStatusBarHeight } from "../../utils/ui";
 
 const SKIN_MP_APPID = "wxb52753aa11ed6654";
 const EXPIRING_CACHE_TTL = 5 * 60 * 1000;
@@ -31,6 +31,7 @@ Page({
     loggedIn: false,
     /** 自定义导航栏状态栏高度（px），onLoad 时由全局缓存填充 */
     statusBarHeight: 20,
+    navigationBarHeight: 44,
     availableText: "0",
     nickname: "微信用户",
     avatar: "",
@@ -53,8 +54,10 @@ Page({
   expiringLoadedAt: 0,
 
   onLoad() {
-    // 首页为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
-    this.setData({ statusBarHeight: getStatusBarHeight() });
+    this.setData({
+      statusBarHeight: getStatusBarHeight(),
+      navigationBarHeight: getNavigationBarHeight(),
+    });
   },
 
   onShow() {

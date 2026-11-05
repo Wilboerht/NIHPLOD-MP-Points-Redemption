@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "申请消费补录"
+  "navigationBarTitleText": "申请消费补录",
+  "usingComponents": {
+    "app-image": "/components/app-image/app-image"
+  }
 }

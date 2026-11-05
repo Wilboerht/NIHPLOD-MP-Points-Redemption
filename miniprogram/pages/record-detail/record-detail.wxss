@@ -1,5 +1,5 @@
 .record-detail {
-  padding-bottom: 48rpx;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
 }
 
 /* 商品信息卡 */
@@ -15,15 +15,6 @@
   border-radius: 20rpx;
   background: #efeae4;
   flex-shrink: 0;
-}
-
-.detail-thumb-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #b8a992;
-  font-size: 20rpx;
-  letter-spacing: 1rpx;
 }
 
 .detail-head-main {
@@ -111,8 +102,14 @@
 }
 
 .copy-hit {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
-  padding: 6rpx 0 6rpx 16rpx;
+  min-width: 88rpx;
+  min-height: 88rpx;
+  margin: -20rpx 0;
+  padding: 0 0 0 16rpx;
   font-size: 24rpx;
   color: var(--color-primary);
 }

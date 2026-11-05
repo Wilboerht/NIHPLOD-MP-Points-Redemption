@@ -1,5 +1,5 @@
 .records-page {
-  padding-bottom: 48rpx;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
 }
 
 /* 登录引导卡/.error-card 基础样式见 app.wxss */
@@ -22,15 +22,6 @@
   border-radius: 16rpx;
   background: #efeae4;
   flex-shrink: 0;
-}
-
-.record-thumb-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #b8a992;
-  font-size: 18rpx;
-  letter-spacing: 1rpx;
 }
 
 .record-main {

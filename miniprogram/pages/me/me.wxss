@@ -71,13 +71,15 @@
   justify-content: flex-end;
 }
 
-/* 问号按钮：外圈热区 ≥ 44rpx，内圈视觉 30rpx（位于「可用积分」左侧） */
+/* 问号按钮：外圈热区 88rpx，内圈视觉 30rpx（位于「可用积分」左侧） */
 .help-hit {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8rpx;
-  margin: -8rpx 4rpx -8rpx -4rpx;
+  width: 88rpx;
+  height: 88rpx;
+  padding: 0;
+  margin: -29rpx 4rpx -29rpx -4rpx;
 }
 
 .help-dot {

@@ -39,7 +39,13 @@
       <picker mode="date" end="{{today}}" value="{{purchasedAt}}" bindchange="onDateChange" class="picker">
         <view class="picker-inner">
           <text class="picker-value {{purchasedAt ? '' : 'muted'}}">{{purchasedAt || '选填，选择消费日期'}}</text>
-          <view wx:if="{{purchasedAt}}" class="field-clear" catchtap="clearDate">×</view>
+          <view
+            wx:if="{{purchasedAt}}"
+            class="field-clear"
+            aria-role="button"
+            aria-label="清除消费日期"
+            catchtap="clearDate"
+          >×</view>
           <image class="row-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
         </view>
       </picker>
@@ -80,12 +86,15 @@
 
     <view class="proof-grid">
       <view wx:for="{{images}}" wx:key="raw" class="proof-item">
-        <image
+        <app-image
           wx:if="{{item.display}}"
-          class="proof-img"
+          custom-class="proof-img"
           src="{{item.display}}"
           mode="aspectFill"
+          fallback="已上传"
+          alt="消费补录凭证"
           data-current="{{item.display}}"
+          aria-role="button"
           bindtap="previewImage"
         />
         <view
@@ -93,7 +102,13 @@
           class="proof-img proof-img-private"
           data-current="{{item.display}}"
         >已上传</view>
-        <view class="proof-delete" data-index="{{index}}" catchtap="removeImage">
+        <view
+          class="proof-delete"
+          data-index="{{index}}"
+          aria-role="button"
+          aria-label="删除第 {{index + 1}} 张凭证"
+          catchtap="removeImage"
+        >
           <text class="proof-delete-icon">×</text>
         </view>
       </view>
@@ -101,7 +116,7 @@
         wx:if="{{images.length < maxImages}}"
         class="proof-add {{uploading ? 'proof-add-uploading' : ''}}"
         hover-class="{{uploading ? 'none' : 'proof-add-hover'}}"
-        bindtap="chooseImages"
+        aria-role="button" bindtap="chooseImages"
       >
         <text class="proof-add-icon">+</text>
         <text class="proof-add-text">{{uploading ? '上传中…' : '添加凭证'}}</text>
@@ -112,8 +127,8 @@
 
   <view wx:if="{{error && !errorField}}" class="card error-card">{{error}}</view>
 
-  <view class="bottom-bar">
-    <button class="btn-primary submit-btn" loading="{{saving}}" disabled="{{saving || uploading}}" bindtap="submit">
+  <view class="bottom-bar bottom-bar-fade">
+    <button class="btn-primary submit-btn" loading="{{saving}}" disabled="{{saving || uploading}}" aria-role="button" bindtap="submit">
       提交申请
     </button>
   </view>

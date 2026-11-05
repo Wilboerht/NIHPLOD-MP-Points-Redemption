@@ -4,18 +4,6 @@
   padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-/* 底部操作栏：与消费补录页一致的由实到虚渐变 */
-.bottom-bar {
-  padding-top: 48rpx;
-  background: linear-gradient(
-    to top,
-    var(--color-bg) 0%,
-    var(--color-bg) 45%,
-    rgba(247, 245, 242, 0) 100%
-  );
-  box-shadow: none;
-}
-
 /* 头像行：头像 + 右侧操作说明，填满行宽，避免右侧留白 */
 .avatar-row {
   padding: 24rpx 0;

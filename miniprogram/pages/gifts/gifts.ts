@@ -9,7 +9,7 @@ import {
 } from "../../utils/format";
 import type { GiftRow } from "../../utils/format";
 import { setLastGifts } from "../../utils/cache";
-import { getStatusBarHeight } from "../../utils/ui";
+import { getNavigationBarHeight, getStatusBarHeight } from "../../utils/ui";
 
 Page({
   data: {
@@ -17,6 +17,7 @@ Page({
     loggedIn: false,
     /** 自定义导航栏状态栏高度（px） */
     statusBarHeight: 20,
+    navigationBarHeight: 44,
     availableText: "0",
     /** 当前等级是否可参与兑礼（普通会员为 false，展示升级引导） */
     canRedeem: false,
@@ -31,8 +32,10 @@ Page({
   requestVersion: 0,
 
   onLoad() {
-    // 页面为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
-    this.setData({ statusBarHeight: getStatusBarHeight() });
+    this.setData({
+      statusBarHeight: getStatusBarHeight(),
+      navigationBarHeight: getNavigationBarHeight(),
+    });
   },
 
   onShow() {

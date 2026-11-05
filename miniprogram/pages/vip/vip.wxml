@@ -1,9 +1,14 @@
 <view class="container vip-page">
+  <view wx:if="{{error}}" class="card error-card">
+    <view>{{error}}</view>
+    <button class="btn-plain retry-btn" aria-role="button" bindtap="load">重试</button>
+  </view>
+
   <view wx:if="{{loading && !loggedIn}}" class="loading-block">加载中…</view>
 
   <view wx:if="{{!loggedIn && !loading && !error}}" class="card login-card">
     <view class="login-title">登录后查看会员权益</view>
-    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+    <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
   </view>
 
   <block wx:if="{{loggedIn && view}}">
@@ -16,7 +21,7 @@
             <text class="vip-label">当前等级</text>
             <text class="vip-level">{{view.currentLevel.name}}</text>
           </view>
-          <view class="vip-link" bindtap="goGifts" hover-class="vip-link-hover">
+          <view class="vip-link" aria-role="button" bindtap="goGifts" hover-class="vip-link-hover">
             <text>去兑礼</text>
             <image class="vip-link-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
           </view>
@@ -64,8 +69,8 @@
       <view class="upgrade-channel">官方渠道：天猫国际、小红书、抖音、微信小店等官方旗舰店及授权门店。</view>
 
       <view class="upgrade-actions">
-        <button class="btn-primary upgrade-btn" bindtap="goSpendForm">录入消费</button>
-        <view class="upgrade-history" bindtap="goSpendHistory" hover-class="upgrade-history-hover">查看录入历史</view>
+        <button class="btn-primary upgrade-btn" aria-role="button" bindtap="goSpendForm">录入消费</button>
+        <view class="upgrade-history" aria-role="button" bindtap="goSpendHistory" hover-class="upgrade-history-hover">查看录入历史</view>
       </view>
     </view>
 
@@ -85,7 +90,7 @@
     </view>
 
     <!-- AI 测肤权益：固定展示，失败可重试 -->
-    <view class="card skin-usage-card" bindtap="goSkinTest" hover-class="row-hover">
+    <view class="card skin-usage-card" aria-role="button" bindtap="goSkinTest" hover-class="row-hover">
       <view class="skin-usage-head">
         <image class="skin-usage-logo" src="/images/jzp-eyebrow.png" mode="aspectFit" />
         <view class="skin-usage-title">AI 测肤权益</view>
@@ -105,7 +110,7 @@
       </view>
       <view wx:else class="skin-usage-empty">
         <text class="muted small">测肤用量暂不可用</text>
-        <text class="skin-usage-retry" catchtap="reloadSkinUsage">重试</text>
+        <text class="skin-usage-retry" aria-role="button" catchtap="reloadSkinUsage">重试</text>
       </view>
     </view>
 
@@ -113,7 +118,14 @@
     <view class="card level-list">
       <view class="card-title">会员等级</view>
       <view wx:for="{{levels}}" wx:key="level" class="level-item {{item.isCurrent ? 'level-item-current' : ''}}">
-        <view class="level-row" data-level="{{item.level}}" bindtap="toggleLevel" hover-class="level-row-hover">
+        <view
+          class="level-row"
+          data-level="{{item.level}}"
+          aria-role="button"
+          aria-label="{{item.name}}，{{item.expanded ? '收起' : '展开'}}权益"
+          bindtap="toggleLevel"
+          hover-class="level-row-hover"
+        >
           <view class="level-main">
             <view class="level-name" style="color: {{item.textColor}};">{{item.name}}</view>
             <view class="muted small level-threshold">{{item.thresholdText}}</view>
@@ -151,7 +163,7 @@
               </view>
               <text class="muted small level-progress-text">{{item.progress}}%</text>
             </view>
-            <button class="btn-primary level-unlock-btn" catchtap="goSpendForm">录入消费</button>
+            <button class="btn-primary level-unlock-btn" aria-role="button" catchtap="goSpendForm">录入消费</button>
           </view>
         </view>
       </view>
@@ -159,9 +171,4 @@
 
     <view class="muted small vip-tip">等级永久有效、按累计消费实时重算（退款可降级）；权益跟随当前等级。</view>
   </block>
-
-  <view wx:if="{{error}}" class="card error-card">
-    <view>{{error}}</view>
-    <button class="btn-plain retry-btn" bindtap="load">重试</button>
-  </view>
 </view>

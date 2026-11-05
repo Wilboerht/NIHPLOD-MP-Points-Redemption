@@ -3,12 +3,14 @@
 <view wx:elif="{{needLogin && !loading}}" class="card login-card">
   <view class="login-title">登录后继续兑换</view>
   <view class="muted small login-desc">登录即可选择收货地址并提交兑换</view>
-  <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  <button class="btn-primary login-btn" aria-role="button" bindtap="goLogin">去登录</button>
 </view>
 
 <view class="container redeem-page" wx:elif="{{gift}}">
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
   <view class="card row gift-summary">
-    <image wx:if="{{gift.image}}" class="gift-thumb" src="{{gift.image}}" mode="aspectFill" />
+    <app-image custom-class="gift-thumb" src="{{gift.image}}" mode="aspectFill" alt="{{gift.name}}" />
     <view class="gift-meta">
       <view class="gift-name">{{gift.name}}</view>
       <view class="cost">{{gift.costText}}</view>
@@ -18,12 +20,12 @@
   <view class="card">
     <view class="row">
       <view class="card-title">收货地址</view>
-      <view class="muted small tap-hot" bindtap="addAddress">+ 新增地址</view>
+      <view class="muted small tap-hot" aria-role="button" bindtap="addAddress">+ 新增地址</view>
     </view>
 
     <view wx:if="{{addresses.length === 0}}" class="empty-address">
       <text class="muted small">暂无收货地址</text>
-      <button class="ghost-btn add-address-btn" bindtap="addAddress">新增收货地址</button>
+      <button class="ghost-btn add-address-btn" aria-role="button" bindtap="addAddress">新增收货地址</button>
     </view>
 
     <view
@@ -31,10 +33,12 @@
       wx:key="id"
       class="address-row {{item.id === addressId ? 'address-row-active' : ''}}"
       data-id="{{item.id}}"
+      aria-role="button"
+      aria-label="{{item.recipient}}，{{item.phone}}，{{item.region}}{{item.detail}}{{item.id === addressId ? '，已选择' : '，未选择'}}"
       bindtap="pickAddress"
     >
       <view class="address-main">
-        <view class="row">
+        <view class="row address-head">
           <text class="recipient">{{item.recipient}}</text>
           <text class="muted small phone">{{item.phone}}</text>
           <text wx:if="{{item.isDefault}}" class="default-tag">默认</text>
@@ -45,14 +49,12 @@
     </view>
   </view>
 
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
-
   <view class="bottom-bar">
     <button
       class="btn-primary submit-btn"
       loading="{{submitting}}"
       disabled="{{submitting || !canRedeem || addresses.length === 0}}"
-      bindtap="submit"
+      aria-role="button" bindtap="submit"
     >
       {{buttonText}}
     </button>
