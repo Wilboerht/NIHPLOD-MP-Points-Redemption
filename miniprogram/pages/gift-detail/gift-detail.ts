@@ -5,6 +5,33 @@ import { formatPoints, resolveImageUrl } from "../../utils/format";
 import type { GiftItem, GiftPurchaseLink } from "../../utils/types";
 
 type GiftView = GiftItem & { costText: string; priceText: string };
+type PurchaseLinkView = GiftPurchaseLink & { icon: string; actionLabel: string };
+
+const PURCHASE_PLATFORM_ICONS: Record<string, string> = {
+  tmall: "/images/platforms/tmall.svg",
+  xiaohongshu: "/images/platforms/xiaohongshu.svg",
+  douyin: "/images/platforms/douyin.svg",
+};
+
+function decoratePurchaseLink(link: GiftPurchaseLink): PurchaseLinkView {
+  const platform = link.platform.trim().toLowerCase();
+  let key = link.platformKey?.trim().toLowerCase() ?? "";
+  if (!key) {
+    if (platform.includes("天猫") || platform.includes("tmall")) key = "tmall";
+    else if (platform.includes("小红书") || platform.includes("xiaohongshu") || platform.includes("xhs")) {
+      key = "xiaohongshu";
+    } else if (platform.includes("抖音") || platform.includes("douyin") || platform.includes("tiktok")) {
+      key = "douyin";
+    } else if (platform.includes("微信小店") || platform.includes("微信小铺")) {
+      key = "wechat-shop";
+    }
+  }
+  return {
+    ...link,
+    icon: PURCHASE_PLATFORM_ICONS[key] ?? "",
+    actionLabel: `在${link.platform}购买`,
+  };
+}
 
 Page({
   data: {
@@ -16,7 +43,7 @@ Page({
     /** 当前画廊索引（多图时展示计数） */
     current: 0,
     benefits: [] as string[],
-    purchaseLinks: [] as GiftPurchaseLink[],
+    purchaseLinks: [] as PurchaseLinkView[],
     canRedeem: false,
     buttonText: "立即兑换",
     canExpandIngredients: false,
@@ -100,7 +127,7 @@ Page({
         current: 0,
         // 核心功效标签（detail 全量下发，按需渲染）
         benefits: gift.detail?.benefits ?? [],
-        purchaseLinks: gift.detail?.purchaseLinks ?? [],
+        purchaseLinks: (gift.detail?.purchaseLinks ?? []).map(decoratePurchaseLink),
         canRedeem,
         buttonText: gift.cost === null ? "升级后解锁" : gift.affordable ? "立即兑换" : "积分不足",
         canExpandIngredients: shouldExpand(ingredients),

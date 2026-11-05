@@ -99,10 +99,21 @@
         class="purchase-link"
         data-index="{{index}}"
         aria-role="button"
+        aria-label="{{item.actionLabel}}"
         bindtap="openPurchaseLink"
         hover-class="purchase-link-hover"
       >
-        {{item.platform}}
+        <image
+          wx:if="{{item.icon}}"
+          class="purchase-platform-icon"
+          src="{{item.icon}}"
+          mode="aspectFit"
+          aria-hidden="true"
+        />
+        <view wx:else class="purchase-fallback">
+          <image class="purchase-fallback-icon" src="/images/icons/package.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="purchase-fallback-label">{{item.platform}}</text>
+        </view>
       </button>
     </view>
     <view class="muted small purchase-hint">点击前往对应平台购买；无法打开时会复制链接。</view>
