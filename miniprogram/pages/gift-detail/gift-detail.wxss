@@ -137,8 +137,13 @@
 }
 
 .detail-section-title {
-  justify-content: space-between;
+  justify-content: flex-start;
   margin-bottom: 12rpx;
+}
+
+.detail-section-title > text {
+  flex: 1;
+  min-width: 0;
 }
 
 .detail-toggle {
