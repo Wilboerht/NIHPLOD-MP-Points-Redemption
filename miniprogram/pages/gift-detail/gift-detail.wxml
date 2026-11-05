@@ -8,15 +8,13 @@
 </view>
 
 <view class="container gift-detail" wx:elif="{{gift}}">
+  <view wx:if="{{loading}}" class="refresh-note muted small">正在更新礼品信息…</view>
   <view wx:if="{{error}}" class="card error-card">{{error}}</view>
 
   <view class="gallery-wrap">
     <swiper
       wx:if="{{images.length > 0}}"
       class="gallery"
-      indicator-dots="{{images.length > 1}}"
-      indicator-color="rgba(43, 43, 43, 0.12)"
-      indicator-active-color="#8a6d4b"
       circular
       bindchange="onSwiperChange"
     >
@@ -34,6 +32,7 @@
       </swiper-item>
     </swiper>
     <view wx:else class="gallery gallery-placeholder">NIHPLOD</view>
+    <view wx:if="{{images.length > 0}}" class="gallery-preview-hint">点击放大</view>
     <view wx:if="{{images.length > 1}}" class="gallery-counter">{{current + 1}} / {{images.length}}</view>
   </view>
 
@@ -43,10 +42,7 @@
       <text wx:if="{{gift.detail.capacity}}">规格：{{gift.detail.capacity}}</text>
       <text wx:if="{{gift.detail.capacity}}" class="meta-sep">·</text>
       <text>产地：{{gift.detail.origin || '法国'}}</text>
-    </view>
-    <view class="row price-row">
-      <text class="cost">{{gift.costText}}</text>
-      <text class="price">参考价 {{gift.priceText}}</text>
+      <text class="reference-price">参考价 {{gift.priceText}}</text>
     </view>
   </view>
 
@@ -57,36 +53,59 @@
     </view>
   </view>
 
+  <view wx:if="{{gift.description}}" class="card">
+    <view class="section-title">产品描述</view>
+    <view class="detail-text">{{gift.description}}</view>
+  </view>
+
+  <view wx:if="{{gift.detail.ingredients || gift.detail.usage}}" class="card details-card">
+    <view wx:if="{{gift.detail.ingredients}}" class="detail-section">
+      <view class="section-title detail-section-title">
+        <text>成分说明</text>
+        <view
+          wx:if="{{canExpandIngredients}}"
+          class="detail-toggle"
+          data-key="ingredients"
+          aria-role="button"
+          aria-label="{{expandedDetails.ingredients ? '收起成分说明' : '展开成分说明'}}"
+          bindtap="toggleDetail"
+        >{{expandedDetails.ingredients ? '收起' : '展开'}}</view>
+      </view>
+      <view class="detail-text {{canExpandIngredients && !expandedDetails.ingredients ? 'detail-text-clamped' : ''}}">{{gift.detail.ingredients}}</view>
+    </view>
+
+    <view wx:if="{{gift.detail.usage}}" class="detail-section">
+      <view class="section-title detail-section-title">
+        <text>使用方法</text>
+        <view
+          wx:if="{{canExpandUsage}}"
+          class="detail-toggle"
+          data-key="usage"
+          aria-role="button"
+          aria-label="{{expandedDetails.usage ? '收起使用方法' : '展开使用方法'}}"
+          bindtap="toggleDetail"
+        >{{expandedDetails.usage ? '收起' : '展开'}}</view>
+      </view>
+      <view class="detail-text {{canExpandUsage && !expandedDetails.usage ? 'detail-text-clamped' : ''}}">{{gift.detail.usage}}</view>
+    </view>
+  </view>
+
   <view wx:if="{{purchaseLinks.length > 0}}" class="card">
-    <view class="section-title">购买渠道</view>
+    <view class="section-title">其他购买方式</view>
     <view class="purchase-links">
       <button
         wx:for="{{purchaseLinks}}"
         wx:key="id"
         class="purchase-link"
         data-index="{{index}}"
-        aria-role="button" bindtap="openPurchaseLink"
+        aria-role="button"
+        bindtap="openPurchaseLink"
         hover-class="purchase-link-hover"
       >
         {{item.platform}}
       </button>
     </view>
     <view class="muted small purchase-hint">点击前往对应平台购买；无法打开时会复制链接。</view>
-  </view>
-
-  <view wx:if="{{gift.description}}" class="card">
-    <view class="section-title">产品描述</view>
-    <view class="detail-text">{{gift.description}}</view>
-  </view>
-
-  <view wx:if="{{gift.detail.ingredients}}" class="card">
-    <view class="section-title">成分说明</view>
-    <view class="detail-text">{{gift.detail.ingredients}}</view>
-  </view>
-
-  <view wx:if="{{gift.detail.usage}}" class="card">
-    <view class="section-title">使用方法</view>
-    <view class="detail-text">{{gift.detail.usage}}</view>
   </view>
 
   <view class="bottom-bar">
@@ -100,5 +119,12 @@
   </view>
 </view>
 
-<view wx:elif="{{notFound && !loading}}" class="empty">礼品不存在或已下架</view>
-<view wx:elif="{{error}}" class="empty">{{error}}</view>
+<view wx:elif="{{notFound && !loading}}" class="container empty-page">
+  <view class="empty">礼品不存在或已下架</view>
+  <button class="ghost-btn empty-action" aria-role="button" bindtap="goGifts">返回礼品列表</button>
+</view>
+
+<view wx:elif="{{error}}" class="container empty-page">
+  <view class="empty">{{error}}</view>
+  <button class="ghost-btn empty-action" aria-role="button" bindtap="retry">重试</button>
+</view>

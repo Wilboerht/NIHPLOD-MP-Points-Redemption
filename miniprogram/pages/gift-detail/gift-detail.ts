@@ -19,6 +19,12 @@ Page({
     purchaseLinks: [] as GiftPurchaseLink[],
     canRedeem: false,
     buttonText: "立即兑换",
+    canExpandIngredients: false,
+    canExpandUsage: false,
+    expandedDetails: {
+      ingredients: false,
+      usage: false,
+    },
     error: "",
   },
 
@@ -78,6 +84,9 @@ Page({
             ? [resolveImageUrl(gift.image)]
             : [];
       const canRedeem = gift.cost !== null && gift.affordable;
+      const ingredients = gift.detail?.ingredients ?? "";
+      const usage = gift.detail?.usage ?? "";
+      const shouldExpand = (text: string) => text.length > 160 || text.split(/\r?\n/).length > 3;
       this.setData({
         loading: false,
         notFound: false,
@@ -93,8 +102,13 @@ Page({
         benefits: gift.detail?.benefits ?? [],
         purchaseLinks: gift.detail?.purchaseLinks ?? [],
         canRedeem,
-        buttonText:
-          gift.cost === null ? "升级银卡后解锁" : gift.affordable ? "立即兑换" : "积分不足",
+        buttonText: gift.cost === null ? "升级后解锁" : gift.affordable ? "立即兑换" : "积分不足",
+        canExpandIngredients: shouldExpand(ingredients),
+        canExpandUsage: shouldExpand(usage),
+        expandedDetails: {
+          ingredients: false,
+          usage: false,
+        },
       });
     } catch (e) {
       if (version !== this.requestVersion) return;
@@ -123,6 +137,24 @@ Page({
       canRedeem: false,
       error: "",
     });
+  },
+
+  toggleDetail(e: WechatMiniprogram.TouchEvent) {
+    const key = e.currentTarget.dataset.key as "ingredients" | "usage";
+    if (key !== "ingredients" && key !== "usage") return;
+    const canExpand = key === "ingredients" ? this.data.canExpandIngredients : this.data.canExpandUsage;
+    if (!canExpand) return;
+    this.setData({
+      [`expandedDetails.${key}`]: !this.data.expandedDetails[key],
+    });
+  },
+
+  retry() {
+    void this.load(true);
+  },
+
+  goGifts() {
+    wx.switchTab({ url: "/pages/gifts/gifts" });
   },
 
   goLogin() {

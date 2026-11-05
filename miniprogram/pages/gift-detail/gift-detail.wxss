@@ -2,7 +2,10 @@
   padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
 }
 
-/* .bottom-bar/.submit-btn 基础样式见 app.wxss */
+.refresh-note {
+  margin: -8rpx 8rpx 16rpx;
+  text-align: right;
+}
 
 /* ============ 画廊 ============ */
 
@@ -12,7 +15,7 @@
 }
 
 .gallery {
-  height: 680rpx;
+  height: 630rpx;
   border-radius: 24rpx;
   overflow: hidden;
   background: #efeae4;
@@ -31,18 +34,26 @@
   letter-spacing: 4rpx;
 }
 
-/* 图片计数（多图时展示，浮于右下角） */
-.gallery-counter {
+.gallery-counter,
+.gallery-preview-hint {
   position: absolute;
-  right: 16rpx;
   bottom: 16rpx;
   padding: 4rpx 14rpx;
   border-radius: 999rpx;
   background: rgba(43, 43, 43, 0.55);
   color: #ffffff;
   font-size: 20rpx;
+  line-height: 1.4;
   letter-spacing: 1rpx;
   pointer-events: none;
+}
+
+.gallery-counter {
+  right: 16rpx;
+}
+
+.gallery-preview-hint {
+  left: 16rpx;
 }
 
 /* ============ 商品信息卡 ============ */
@@ -51,44 +62,29 @@
   font-size: 36rpx;
   font-weight: 600;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
-/* 规格 / 产地等属性行 */
 .gift-meta-row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8rpx;
-  margin-top: 10rpx;
+  margin-top: 12rpx;
 }
 
 .meta-sep {
   color: var(--color-border);
 }
 
-/* 价格行：所需积分主视觉 + 参考价弱化，与上方信息以细线分隔 */
-.price-row {
-  margin-top: 24rpx;
-  padding-top: 24rpx;
-  border-top: 1rpx solid var(--color-border);
-  align-items: flex-end;
-}
-
-.cost {
-  font-size: 38rpx;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--color-primary);
-}
-
-.price {
-  font-size: 24rpx;
+.reference-price {
+  margin-left: auto;
   color: var(--color-muted);
+  white-space: nowrap;
 }
 
 /* ============ 分节内容 ============ */
 
-/* 统一的分节标题：品牌色竖条 + 标题 */
 .section-title {
   display: flex;
   align-items: center;
@@ -104,6 +100,7 @@
   height: 24rpx;
   border-radius: 3rpx;
   background: var(--color-primary);
+  flex-shrink: 0;
 }
 
 .benefit-tags {
@@ -113,11 +110,54 @@
 }
 
 .benefit-tag {
+  max-width: 100%;
+  box-sizing: border-box;
   background: rgba(138, 109, 75, 0.08);
   color: var(--color-primary);
   border-radius: 8rpx;
   padding: 6rpx 18rpx;
   font-size: 24rpx;
+  overflow-wrap: anywhere;
+}
+
+.detail-text {
+  font-size: 26rpx;
+  line-height: 1.8;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.detail-text-clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.detail-section-title {
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.detail-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 88rpx;
+  min-height: 88rpx;
+  margin: -26rpx 0;
+  padding-left: 16rpx;
+  color: var(--color-primary);
+  font-size: 24rpx;
+  font-weight: normal;
+}
+
+.detail-section + .detail-section {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--color-border);
 }
 
 .purchase-links {
@@ -131,6 +171,7 @@
   align-items: center;
   justify-content: center;
   width: auto;
+  max-width: 100%;
   min-height: 88rpx;
   margin: 0;
   padding: 0 28rpx;
@@ -153,16 +194,7 @@
   margin-top: 16rpx;
 }
 
-.detail-text {
-  font-size: 26rpx;
-  line-height: 1.8;
-  color: var(--color-text);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* ============ 底部操作栏（左成本 + 右按钮） ============ */
+/* ============ 底部操作栏 ============ */
 
 .bottom-bar {
   display: flex;
@@ -171,7 +203,8 @@
 }
 
 .bar-cost {
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 120rpx;
 }
 
 .bar-cost-label {
@@ -183,10 +216,50 @@
   margin-top: 2rpx;
   font-size: 30rpx;
   font-weight: 600;
+  line-height: 1.3;
   color: var(--color-primary);
+  white-space: nowrap;
 }
 
 .submit-btn {
-  flex: 1;
+  flex: 0 1 auto;
+  min-width: 280rpx;
   width: auto;
+}
+
+.empty-page {
+  text-align: center;
+}
+
+.empty-action {
+  min-width: 280rpx;
+  margin-top: -40rpx;
+}
+
+@media (max-width: 350px) {
+  .gift-detail {
+    padding-bottom: calc(280rpx + env(safe-area-inset-bottom));
+  }
+
+  .reference-price {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .bottom-bar {
+    flex-wrap: wrap;
+    gap: 12rpx;
+  }
+
+  .bar-cost {
+    display: flex;
+    align-items: baseline;
+    flex: 1 0 100%;
+    gap: 12rpx;
+  }
+
+  .submit-btn {
+    flex: 1 0 100%;
+    min-width: 0;
+  }
 }
