@@ -44,6 +44,9 @@ Page({
     skinUsageError: false,
   },
 
+  requestVersion: 0,
+  skinRequestVersion: 0,
+
   onShow() {
     void this.load();
   },
@@ -65,14 +68,18 @@ Page({
   },
 
   async load() {
+    const version = ++this.requestVersion;
     const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
     if (!loggedIn) {
-      this.setData({ loading: false, loggedIn: false, skinUsageLoading: false });
+      this.skinRequestVersion += 1;
+      this.setData({ loading: false, loggedIn: false, skinUsage: null, skinUsageLoading: false });
       return;
     }
     this.setData({ loading: true, error: "", skinUsageLoading: true, skinUsageError: false });
     try {
       const view = await api.membership();
+      if (version !== this.requestVersion) return;
       const levels: LevelCard[] = view.allLevels.map((level) => {
         const spentNeeded = Math.max(0, level.minSpent - view.totalSpent);
         const progress =
@@ -108,25 +115,28 @@ Page({
       });
       void this.loadSkinUsage();
     } catch (e) {
+      if (version !== this.requestVersion) return;
+      this.skinRequestVersion += 1;
       const err = e as ApiError;
       if (err.status === 401) {
-        this.setData({ loading: false, loggedIn: false, skinUsageLoading: false });
+        this.setData({ loading: false, loggedIn: false, skinUsage: null, skinUsageLoading: false });
         return;
       }
       this.setData({
         loading: false,
         error: err.message || "会员信息加载失败",
         skinUsageLoading: false,
-        skinUsageError: true,
       });
     }
   },
 
   /** 测肤用量为增强模块：接口/子站异常时保留卡片并允许重试（fail-soft） */
   async loadSkinUsage() {
+    const version = ++this.skinRequestVersion;
     this.setData({ skinUsageLoading: true, skinUsageError: false });
     try {
       const data = await api.skinTestUsage();
+      if (version !== this.skinRequestVersion) return;
       const usage = buildSkinView(data.usage);
       this.setData({
         skinUsage: usage,
@@ -134,12 +144,13 @@ Page({
         skinUsageError: !usage,
       });
     } catch {
+      if (version !== this.skinRequestVersion) return;
       this.setData({ skinUsage: null, skinUsageLoading: false, skinUsageError: true });
     }
   },
 
   reloadSkinUsage() {
-    void this.loadSkinUsage();
+    if (this.data.loggedIn) void this.loadSkinUsage();
   },
 
   goLogin() {

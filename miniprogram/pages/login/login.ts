@@ -16,6 +16,7 @@ Page({
     phone: "",
     code: "",
     counting: 0,
+    codeSending: false,
     busy: false,
     error: "",
   },
@@ -86,6 +87,7 @@ Page({
   },
 
   async onGetPhoneNumber(e: WechatMiniprogram.CustomEvent<{ code?: string }>) {
+    if (this.data.busy) return;
     const code = e.detail.code;
     if (!code) {
       this.setData({
@@ -130,33 +132,48 @@ Page({
   },
 
   async sendCode() {
+    if (this.data.codeSending || this.data.counting > 0 || this.data.busy) return;
     const phone = this.data.phone.trim();
     if (!/^1[3-9]\d{9}$/.test(phone)) {
       this.setData({ error: "请输入正确的手机号" });
       return;
     }
-    if (this.data.counting > 0) return;
-
-    const result = await sendBindSmsCode(phone, this.data.bindToken);
-    if (!result.ok) {
-      this.setData({ error: result.message ?? "验证码发送失败" });
+    if (!this.data.bindToken) {
+      this.setData({ error: "绑定会话已失效，请重试登录" });
       return;
     }
-    wx.showToast({ title: "验证码已发送", icon: "none" });
-    this.setData({ counting: 60, error: "" });
-    this.timer = setInterval(() => {
-      const next = this.data.counting - 1;
-      this.setData({ counting: Math.max(0, next) });
-      if (next <= 0 && this.timer) {
-        clearInterval(this.timer);
-        this.timer = 0;
+
+    this.setData({ codeSending: true, error: "" });
+    try {
+      const result = await sendBindSmsCode(phone, this.data.bindToken);
+      if (!result.ok) {
+        this.setData({ error: result.message ?? "验证码发送失败" });
+        return;
       }
-    }, 1000);
+      wx.showToast({ title: "验证码已发送", icon: "none" });
+      if (this.timer) clearInterval(this.timer);
+      this.setData({ counting: 60 });
+      this.timer = setInterval(() => {
+        const next = Math.max(0, this.data.counting - 1);
+        this.setData({ counting: next });
+        if (next <= 0 && this.timer) {
+          clearInterval(this.timer);
+          this.timer = 0;
+        }
+      }, 1000);
+    } finally {
+      this.setData({ codeSending: false });
+    }
   },
 
   async submitSms() {
+    if (this.data.busy) return;
     const phone = this.data.phone.trim();
     const code = this.data.code.trim();
+    if (!this.data.bindToken) {
+      this.setData({ error: "绑定会话已失效，请重试登录" });
+      return;
+    }
     if (!/^1[3-9]\d{9}$/.test(phone)) {
       this.setData({ error: "请输入正确的手机号" });
       return;

@@ -23,6 +23,7 @@ Page({
   },
 
   giftId: "",
+  requestVersion: 0,
   /** 首次 onShow 与 onLoad 共用一次加载；之后从兑换/登录页返回时强制刷新 */
   hasShown: false,
 
@@ -40,14 +41,16 @@ Page({
   },
 
   async load(force: boolean) {
+    const version = ++this.requestVersion;
     if (!this.giftId) {
-      this.setData({ loading: false, notFound: true });
+      this.setData({ loading: false, notFound: true, gift: null });
       return;
     }
     // 分享/订阅消息可冷启动直达本页：等待启动期登录完成，未登录时展示登录引导
     const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
     if (!loggedIn) {
-      this.setData({ loading: false, needLogin: true });
+      this.showLogin();
       return;
     }
     this.setData({ loading: true, needLogin: false, error: "" });
@@ -56,12 +59,13 @@ Page({
       let gift = force ? null : findLastGift(this.giftId);
       if (!gift) {
         const data = await api.gifts();
+        if (version !== this.requestVersion) return;
         setLastGifts(data.gifts);
         gift = data.gifts.find((g) => g.id === this.giftId) ?? null;
       }
       if (!gift) {
         // 强制刷新时清除旧详情，避免下架后仍展示缓存内容
-        this.setData({ loading: false, notFound: true, gift: null });
+        this.setData({ loading: false, notFound: true, gift: null, canRedeem: false });
         return;
       }
       const detailImages = (gift.detail?.images ?? [])
@@ -93,18 +97,32 @@ Page({
           gift.cost === null ? "升级银卡后解锁" : gift.affordable ? "立即兑换" : "积分不足",
       });
     } catch (e) {
+      if (version !== this.requestVersion) return;
       const err = e as ApiError;
       if (err.status === 401) {
-        this.setData({ loading: false, needLogin: true });
+        this.showLogin();
         return;
       }
-      // 后台刷新失败时保留已有详情，避免把正常页面打成错误页
+      // 后台刷新失败时保留已有详情，但明确提示数据可能滞后
       if (force && this.data.gift) {
-        this.setData({ loading: false, error: "" });
+        this.setData({ loading: false, error: "刷新失败，当前展示的信息可能不是最新" });
         return;
       }
       this.setData({ loading: false, error: err.message || "加载失败" });
     }
+  },
+
+  showLogin() {
+    this.setData({
+      loading: false,
+      needLogin: true,
+      gift: null,
+      images: [],
+      benefits: [],
+      purchaseLinks: [],
+      canRedeem: false,
+      error: "",
+    });
   },
 
   goLogin() {
@@ -148,10 +166,10 @@ Page({
 
   tryAppIdJump(link: GiftPurchaseLink) {
     const jump = link.jump;
-    if (jump?.type === "miniprogram" && jump.appId && jump.path) {
+    if (jump?.type === "miniprogram" && jump.appId) {
       wx.navigateToMiniProgram({
         appId: jump.appId,
-        path: jump.path,
+        ...(jump.path ? { path: jump.path } : {}),
         fail: () => this.copyPurchaseLink(link.url),
       });
       return;

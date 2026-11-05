@@ -1,6 +1,13 @@
 <view wx:if="{{loading}}" class="loading-block">加载中…</view>
 
-<view class="container record-detail" wx:if="{{item}}">
+<view wx:elif="{{needLogin}}" class="container">
+  <view class="card login-card">
+    <view class="login-title">登录后查看兑换详情</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+</view>
+
+<view class="container record-detail" wx:elif="{{item}}">
   <view class="card">
     <view class="detail-head">
       <image wx:if="{{item.imageUrl}}" class="detail-thumb" src="{{item.imageUrl}}" mode="aspectFill" />
@@ -70,4 +77,7 @@
   </view>
 </view>
 
-<view wx:elif="{{error && !loading}}" class="empty">{{error}}</view>
+<view wx:elif="{{error && !loading}}" class="container">
+  <view class="empty">{{error}}</view>
+  <button class="ghost-btn" bindtap="retry">重试</button>
+</view>

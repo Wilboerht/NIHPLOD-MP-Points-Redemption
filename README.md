@@ -26,7 +26,7 @@ miniprogram/
 1. **AppID**：`project.config.json` 中已配置正式 AppID（`wx9fb8f3d1c719c4ed`），更换主体时在此替换；
 2. **后端地址**：`miniprogram/utils/env.ts` 的 `ENV`（`prod` 连线上 `https://nihplod.cn`，`dev` 连本地 `http://127.0.0.1:3000`，需在开发者工具「详情 → 本地设置」勾选「不校验合法域名」）；
 3. **微信平台**：小程序需绑定与官网同一微信开放平台账号（UnionID 聚合），并配置 request 合法域名 `https://nihplod.cn`；使用一键手机号需在「用户隐私保护指引」声明收集手机号与收货地址；
-4. **官网侧**：SSO 后台创建 public OAuth Client `wechat-mp-points`（scopes 建议: `openid profile phone membership profile:write birthday`——`profile:write`/`birthday` 供「编辑资料」页；redirectUris 需填一个 https 公网占位回调地址；建议 `accessTokenTtlSeconds=900`），并在 `MINIPROGRAM_CLIENTS` 登记该 client 的 AppID/AppSecret。
+4. **官网侧**：SSO 后台创建 public OAuth Client `wechat-mp-points`（scopes 建议: `openid profile phone membership profile:write birthday`——`profile:write`/`birthday` 供「编辑资料」页；redirectUris 需填一个 https 公网占位回调地址；建议 `accessTokenTtlSeconds=900`），并在 `MINIPROGRAM_CLIENTS` 登记该 client 的 AppID/AppSecret。消费补录接口需接收 `requestId`，并按用户与 `requestId` 对网络重试做幂等去重。
 
 ## 开发
 
@@ -40,5 +40,5 @@ npm run typecheck # tsc --noEmit
 ## 登录链路
 
 1. 启动/进入页面 → `wx.login` → `POST /api/auth/wechat/miniprogram-login`（`clientId: wechat-mp-points`）；
-2. 已绑定用户：直接获得 accessToken（8h，RS256）+ refreshToken（30 天），access 过期由 `utils/api.ts` 静默刷新重放一次；
+2. 已绑定用户：直接获得 accessToken（建议 15 分钟，RS256）+ refreshToken（30 天），access 过期由 `utils/api.ts` 静默刷新重放一次；
 3. 未绑定用户（新用户/微信占位号）：跳转登录页——「一键手机号」携带 phoneCode 再次调 `miniprogram-login` 一步完成；短信通道走 `POST /api/auth/wechat/bind`（bindToken），绑定成功后自动重新静默登录换取 OAuth 双 Token（bind 返回的内部会话 token 不用于业务接口，见 `utils/auth.ts` 注释）。

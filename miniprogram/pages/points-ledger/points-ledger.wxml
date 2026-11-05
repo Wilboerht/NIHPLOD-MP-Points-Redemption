@@ -30,8 +30,12 @@
       </view>
     </view>
 
-    <view wx:if="{{rows.length > 0}}" class="load-more muted small">
-      {{loadingMore ? '加载中…' : (hasMore ? '上拉加载更多' : '没有更多了')}}
+    <view
+      wx:if="{{rows.length > 0}}"
+      class="load-more muted small"
+      bindtap="loadMore"
+    >
+      {{loadingMore ? '加载中…' : (loadMoreError || (hasMore ? '上拉加载更多' : '没有更多了'))}}
     </view>
   </block>
 

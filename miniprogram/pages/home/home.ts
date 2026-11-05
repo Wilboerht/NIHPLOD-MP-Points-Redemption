@@ -15,7 +15,7 @@ import type { PointLedgerItem } from "../../utils/types";
 import { getStatusBarHeight } from "../../utils/ui";
 
 const SKIN_MP_APPID = "wxb52753aa11ed6654";
-
+const EXPIRING_CACHE_TTL = 5 * 60 * 1000;
 
 interface ExpiringRow {
   id: string;
@@ -45,10 +45,12 @@ Page({
     error: "",
   },
 
-  /** 即将过期积分扫描中的防重入标记（不参与渲染） */
+  requestVersion: 0,
+  skinRequestVersion: 0,
   expiringLoading: false,
-  /** 扫描期间又触发了刷新：记录最新 recent，当前扫描结束后补扫一次 */
-  expiringPending: null as PointLedgerItem[] | null,
+  expiringPending: null as { items: PointLedgerItem[]; version: number } | null,
+  expiringCacheKey: "",
+  expiringLoadedAt: 0,
 
   onLoad() {
     // 首页为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
@@ -69,12 +71,20 @@ Page({
   },
 
   async load() {
+    const version = ++this.requestVersion;
     const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
     if (!loggedIn) {
+      this.skinRequestVersion += 1;
+      this.expiringPending = null;
+      this.expiringCacheKey = "";
+      this.expiringLoadedAt = 0;
       this.setData({
         loading: false,
         loggedIn: false,
         error: "",
+        hotGifts: [],
+        expiring: [],
         skinUsage: null,
         skinUsageLoading: false,
         skinUsageError: false,
@@ -82,20 +92,16 @@ Page({
       return;
     }
     this.setData({ loading: true, error: "", skinUsageLoading: true, skinUsageError: false });
-    // 测肤为独立数据源：与积分主体并行请求，积分失败也不影响其展示
     void this.loadSkinUsage();
     try {
       const [data, giftsData, membershipData, userinfoData] = await Promise.all([
         api.points(),
-        // 精选好礼为增强模块：加载失败不影响积分主体展示
         api.gifts().catch(() => null),
-        // 会员等级信息为增强模块：失败时不展示等级条
         api.membership().catch(() => null),
-        // 昵称展示为增强模块：失败时回退本地缓存
         api.userinfo().catch(() => null),
       ]);
+      if (version !== this.requestVersion) return;
 
-      // 精选好礼固定展示 3 个；同时写入缓存，详情页可直接复用
       let hotGifts: GiftRow[] = [];
       if (giftsData) {
         setLastGifts(giftsData.gifts);
@@ -112,39 +118,41 @@ Page({
         avatar: avatar ? resolveImageUrl(avatar) : "",
         levelName: membershipData?.currentLevel.name ?? "",
         memberId: membershipData?.memberId ?? "",
-        // 会员卡背景图（按等级映射官网静态资源）；等级信息加载失败时为空白卡面
         cardBg: membershipData
           ? resolveImageUrl(LEVEL_CARD_BG_IMAGES[membershipData.membershipLevel] ?? "")
           : "",
         hotGifts,
       });
-      // 即将过期为增强模块：异步补充，不阻塞首页主体
-      void this.loadExpiring(data.recent);
+      void this.loadExpiring(data.recent, version);
     } catch (e) {
+      if (version !== this.requestVersion) return;
       const err = e as Error & { status?: number };
       if (err.status === 401) {
+        this.skinRequestVersion += 1;
+        this.expiringPending = null;
+        this.expiringCacheKey = "";
+        this.expiringLoadedAt = 0;
         this.setData({
           loading: false,
           loggedIn: false,
+          hotGifts: [],
+          expiring: [],
           skinUsage: null,
           skinUsageLoading: false,
           skinUsageError: false,
         });
         return;
       }
-      this.setData({
-        loading: false,
-        error: err.message || "积分加载失败",
-        skinUsageLoading: false,
-        skinUsageError: true,
-      });
+      this.setData({ loading: false, error: err.message || "积分加载失败" });
     }
   },
 
   async loadSkinUsage() {
+    const version = ++this.skinRequestVersion;
     this.setData({ skinUsageLoading: true, skinUsageError: false });
     try {
       const data = await api.skinTestUsage();
+      if (version !== this.skinRequestVersion) return;
       const usage = buildSkinView(data.usage);
       this.setData({
         skinUsage: usage,
@@ -152,51 +160,62 @@ Page({
         skinUsageError: !usage,
       });
     } catch {
+      if (version !== this.skinRequestVersion) return;
       this.setData({ skinUsage: null, skinUsageLoading: false, skinUsageError: true });
     }
   },
 
   reloadSkinUsage() {
-    void this.loadSkinUsage();
+    if (this.data.loggedIn) void this.loadSkinUsage();
   },
 
   /**
-   * 收集 30 天内即将过期积分（含剩余量）。
-   * 异步补齐：recent 不足 20 条时即近一年全量；否则翻积分明细页，
-   * 直到超出一年窗口或翻完（安全上限 50 页，避免异常数据导致无限请求）。
+   * 收集 30 天内即将过期积分。流水未变化时缓存 5 分钟，避免每次返回首页都翻页扫描。
    */
-  async loadExpiring(recent: PointLedgerItem[]): Promise<void> {
+  async loadExpiring(recent: PointLedgerItem[], version: number): Promise<void> {
+    if (version !== this.requestVersion) return;
+    const cacheKey = recent.length > 0 ? `${recent[0].id}:${recent.length}` : "empty";
+    if (
+      cacheKey === this.expiringCacheKey &&
+      Date.now() - this.expiringLoadedAt < EXPIRING_CACHE_TTL
+    ) return;
     if (this.expiringLoading) {
-      // 扫描期间数据可能已变化（如刚完成兑换），记录最新数据，结束后补扫
-      this.expiringPending = recent;
+      this.expiringPending = { items: recent, version };
       return;
     }
     this.expiringLoading = true;
     try {
       if (recent.length < 20) {
+        if (version !== this.requestVersion) return;
         this.setData({ expiring: this.filterExpiring(recent) });
+        this.expiringCacheKey = cacheKey;
+        this.expiringLoadedAt = Date.now();
         return;
       }
       const items: PointLedgerItem[] = [];
-      // 积分有效期 6 个月（日历月 181~184 天）：早于 190 天的流水必然已过期，可提前截止
       const cutoff = Date.now() - 190 * 24 * 60 * 60 * 1000;
       let offset = 0;
       for (let page = 0; page < 50; page++) {
         const data = await api.pointsLedger(offset);
+        if (version !== this.requestVersion) return;
         items.push(...data.items);
         const oldest = data.items[data.items.length - 1];
         if (!data.hasMore || !oldest || new Date(oldest.createdAt).getTime() < cutoff) break;
         offset += data.items.length;
       }
+      if (version !== this.requestVersion) return;
       this.setData({ expiring: this.filterExpiring(items) });
+      this.expiringCacheKey = cacheKey;
+      this.expiringLoadedAt = Date.now();
     } catch {
-      // 明细接口异常时退回 recent（可能遗漏较早记录，不影响主体展示）
-      this.setData({ expiring: this.filterExpiring(recent) });
+      if (version === this.requestVersion) {
+        this.setData({ expiring: this.filterExpiring(recent) });
+      }
     } finally {
       this.expiringLoading = false;
       const pending = this.expiringPending;
       this.expiringPending = null;
-      if (pending) void this.loadExpiring(pending);
+      if (pending) void this.loadExpiring(pending.items, pending.version);
     }
   },
 

@@ -34,10 +34,12 @@ Page({
     birthdayText: "",
   },
 
-  /** 最近一次保存成功的昵称 / 头像 / 生日，用于变更判断与失败回滚 */
+  /** 最近一次保存成功的资料，用于变更判断与失败回滚 */
   savedNickname: "",
   savedAvatarUrl: "",
   savedBirthday: "",
+  savedGenderIndex: 0,
+  loggingOut: false,
   /** 合并待提交字段，避免连续编辑时并发请求乱序 */
   pendingPatch: {} as ProfileUpdateInput,
   patchQueueRunning: false,
@@ -59,8 +61,7 @@ Page({
   },
 
   onHide() {
-    // 离开页面前提交尚未触发的昵称防抖保存（会话失效时不再提交）
-    if (this.data.loggedIn) {
+    if (this.data.loggedIn && !this.loggingOut) {
       this.commitNickname(false);
     } else if (this.nicknameTimer) {
       clearTimeout(this.nicknameTimer);
@@ -74,6 +75,7 @@ Page({
       this.setData({ loading: false, loggedIn: false, error: "" });
       return;
     }
+    this.loggingOut = false;
     this.setData({ loading: true, error: "" });
     try {
       const info = await api.userinfo();
@@ -84,12 +86,12 @@ Page({
       this.savedNickname = info.nickname ?? "";
       this.savedAvatarUrl = avatar;
       this.savedBirthday = info.birthday ? info.birthday.slice(0, 10) : "";
+      this.savedGenderIndex = index;
       this.setData({
         loading: false,
         loggedIn: true,
         error: "",
         avatarUrl: avatar,
-        // 手机号来自登录时缓存的用户信息（userinfo 不含完整号码）
         phoneMasked: storedUser?.phone ? maskPhone(storedUser.phone) : "",
         nickname: info.nickname ?? "",
         genderIndex: index,
@@ -119,7 +121,8 @@ Page({
       confirmColor: "#8a6d4b",
       success: (res) => {
         if (!res.confirm) return;
-        // 退出前丢弃未提交的修改，避免退出后仍有自动保存请求
+        this.loggingOut = true;
+        this.setData({ loggedIn: false });
         if (this.nicknameTimer) {
           clearTimeout(this.nicknameTimer);
           this.nicknameTimer = 0;
@@ -134,8 +137,7 @@ Page({
 
   onChooseAvatar(e: WechatMiniprogram.CustomEvent<{ avatarUrl: string }>) {
     const tempPath = e.detail.avatarUrl;
-    if (!tempPath || this.data.uploading) return;
-    // 立即上传并预览；上传失败回滚到上次保存的头像
+    if (!tempPath || this.data.uploading || !this.data.loggedIn || this.loggingOut) return;
     this.setData({ avatarUrl: tempPath, uploading: true });
     void this.uploadAvatar(tempPath);
   },
@@ -143,10 +145,12 @@ Page({
   async uploadAvatar(tempPath: string) {
     try {
       const result = await api.uploadAvatar(tempPath);
+      if (this.loggingOut || !this.data.loggedIn) return;
       const url = resolveImageUrl(result.url);
       this.setData({ avatarUrl: url, uploading: false });
       this.queuePatch({ avatar: url });
     } catch (err) {
+      if (this.loggingOut) return;
       this.setData({ avatarUrl: this.savedAvatarUrl, uploading: false });
       wx.showToast({ title: (err as ApiError).message || "头像上传失败", icon: "none" });
     }
@@ -170,7 +174,7 @@ Page({
   },
 
   commitNickname(showHint: boolean) {
-    if (!this.data.loggedIn) return;
+    if (!this.data.loggedIn || this.loggingOut) return;
     if (this.nicknameTimer) {
       clearTimeout(this.nicknameTimer);
       this.nicknameTimer = 0;
@@ -178,7 +182,8 @@ Page({
     const nickname = this.data.nickname.trim();
     if (nickname === (this.pendingPatch.nickname ?? this.savedNickname)) return;
     if (!nickname) {
-      if (showHint) wx.showToast({ title: "昵称不能为空", icon: "none" });
+      this.setData({ nickname: this.pendingPatch.nickname ?? this.savedNickname });
+      if (showHint) wx.showToast({ title: "昵称不能为空，已恢复原昵称", icon: "none" });
       return;
     }
     this.queuePatch({ nickname });
@@ -186,21 +191,22 @@ Page({
 
   onGenderTap(e: WechatMiniprogram.TouchEvent) {
     const index = Number(e.currentTarget.dataset.index);
-    if (index === this.data.genderIndex) return;
+    const option = GENDER_OPTIONS[index];
+    if (!option || index === this.data.genderIndex || this.loggingOut) return;
     this.setData({ genderIndex: index });
-    this.queuePatch({ gender: GENDER_OPTIONS[index].value });
+    this.queuePatch({ gender: option.value });
   },
 
   onBirthdayChange(e: WechatMiniprogram.PickerChange) {
     const birthday = String(e.detail.value);
-    if (!birthday || this.data.birthdaySet) return;
-    // 先锁定界面避免重复选择；保存失败时回滚为可编辑
+    if (!birthday || this.data.birthdaySet || this.loggingOut) return;
     this.setData({ birthdayText: birthday, birthdaySet: true });
     this.queuePatch({ birthday });
   },
 
   /** 合并同一时间窗口内的修改，串行提交，避免字段互相覆盖 */
   queuePatch(patch: ProfileUpdateInput) {
+    if (!this.data.loggedIn || this.loggingOut) return;
     this.pendingPatch = { ...this.pendingPatch, ...patch };
     if (!this.patchQueueRunning) void this.flushPatches();
   },
@@ -208,36 +214,81 @@ Page({
   async flushPatches() {
     if (this.patchQueueRunning) return;
     this.patchQueueRunning = true;
-    while (Object.keys(this.pendingPatch).length > 0) {
-      const patch = this.pendingPatch;
-      this.pendingPatch = {};
-      try {
-        await api.updateProfile(patch);
-        this.onPatchSaved(patch);
-      } catch (e) {
-        const err = e as ApiError;
-        if (err.status === 401) {
-          this.setData({ loggedIn: false, error: "" });
-          wx.navigateTo({ url: "/pages/login/login" });
+    try {
+      while (Object.keys(this.pendingPatch).length > 0) {
+        if (this.loggingOut) {
+          this.pendingPatch = {};
           break;
         }
-        wx.showToast({ title: err.message || "自动保存失败", icon: "none" });
-        // 已修改但未保存成功：回滚对应的本地展示，避免显示未生效的数据
-        if (patch.avatar !== undefined) {
-          this.setData({ avatarUrl: this.savedAvatarUrl });
-        }
-        if (patch.birthday !== undefined) {
-          this.setData({ birthdaySet: false, birthdayText: this.savedBirthday });
+        const patch = this.pendingPatch;
+        this.pendingPatch = {};
+        try {
+          await api.updateProfile(patch);
+          if (!this.loggingOut) this.onPatchSaved(patch);
+        } catch (e) {
+          if (this.loggingOut) {
+            this.pendingPatch = {};
+            break;
+          }
+          const err = e as ApiError;
+          if (err.status === 401) {
+            this.pendingPatch = {};
+            this.setData({ loggedIn: false, error: "" });
+            wx.navigateTo({ url: "/pages/login/login" });
+            break;
+          }
+          wx.showToast({ title: err.message || "自动保存失败", icon: "none" });
+          const rollback: {
+            nickname?: string;
+            avatarUrl?: string;
+            genderIndex?: number;
+            birthdaySet?: boolean;
+            birthdayText?: string;
+          } = {};
+          if (
+            patch.nickname !== undefined &&
+            this.pendingPatch.nickname === undefined &&
+            this.data.nickname.trim() === patch.nickname
+          ) {
+            rollback.nickname = this.savedNickname;
+          }
+          if (
+            patch.avatar !== undefined &&
+            this.pendingPatch.avatar === undefined &&
+            this.data.avatarUrl === patch.avatar
+          ) {
+            rollback.avatarUrl = this.savedAvatarUrl;
+          }
+          if (
+            patch.gender !== undefined &&
+            this.pendingPatch.gender === undefined &&
+            GENDER_OPTIONS[this.data.genderIndex]?.value === patch.gender
+          ) {
+            rollback.genderIndex = this.savedGenderIndex;
+          }
+          if (
+            patch.birthday !== undefined &&
+            this.pendingPatch.birthday === undefined &&
+            this.data.birthdayText === patch.birthday
+          ) {
+            rollback.birthdaySet = false;
+            rollback.birthdayText = this.savedBirthday;
+          }
+          if (Object.keys(rollback).length > 0) this.setData(rollback);
         }
       }
+    } finally {
+      this.patchQueueRunning = false;
     }
-    this.patchQueueRunning = false;
   },
 
   onPatchSaved(patch: ProfileUpdateInput) {
     if (patch.nickname !== undefined) this.savedNickname = patch.nickname;
     if (patch.avatar !== undefined) this.savedAvatarUrl = patch.avatar;
     if (patch.birthday !== undefined) this.savedBirthday = patch.birthday;
+    if (patch.gender !== undefined) {
+      this.savedGenderIndex = GENDER_OPTIONS.findIndex((o) => o.value === patch.gender);
+    }
     updateStoredUser({
       ...(patch.nickname !== undefined ? { nickname: patch.nickname } : {}),
       ...(patch.avatar !== undefined ? { avatar: patch.avatar } : {}),

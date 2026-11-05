@@ -31,7 +31,10 @@ Page({
     /** 页脚：版权年份与 ICP 备案号（备案通过后替换 ICP_BEIAN） */
     year: new Date().getFullYear(),
     filingText: ICP_BEIAN,
+    error: "",
   },
+
+  requestVersion: 0,
 
   onLoad() {
     // 页面为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
@@ -43,43 +46,70 @@ Page({
   },
 
   async load() {
+    const version = ++this.requestVersion;
     const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
     if (!loggedIn) {
-      this.setData({ loggedIn: false, loading: false });
+      this.setData({
+        loggedIn: false,
+        loading: false,
+        availableText: "--",
+        cardStyle: "",
+        error: "",
+      });
       return;
     }
-    // 先用本地缓存的用户信息渲染，再用 userinfo 拉取最新资料覆盖
-    // （官网侧修改头像/昵称后，登录时缓存的副本不会自动更新）
     const user = getStoredUser();
     this.setData({
       loggedIn: true,
       loading: false,
+      error: "",
       nickname: user?.nickname || "微信用户",
       phoneMasked: user?.phone ? maskPhone(user.phone) : "",
-      // 官网存储的 avatar 可能是相对路径（本地存储模式），补全为绝对地址
       avatar: user?.avatar ? resolveImageUrl(user.avatar) : "",
     });
 
-    const [points, info, membership] = await Promise.all([
-      api.points().catch(() => null),
-      api.userinfo().catch(() => null),
-      // 会员等级为增强模块：失败时资料卡使用纯色背景
-      api.membership().catch(() => null),
+    const results = await Promise.allSettled([
+      api.points(),
+      api.userinfo(),
+      api.membership(),
     ]);
-    if (points) {
-      this.setData({ availableText: formatPoints(points.available) });
+    if (version !== this.requestVersion) return;
+    const [pointsResult, infoResult, membershipResult] = results;
+    const unauthorized = results.some(
+      (result) =>
+        result.status === "rejected" &&
+        (result.reason as { status?: number }).status === 401
+    );
+    if (unauthorized) {
+      this.setData({
+        loggedIn: false,
+        availableText: "--",
+        cardStyle: "",
+        error: "登录已过期，请重新登录",
+      });
+      return;
     }
-    if (membership) {
+
+    const hasFailure = results.some((result) => result.status === "rejected");
+    this.setData({
+      availableText:
+        pointsResult.status === "fulfilled" ? formatPoints(pointsResult.value.available) : "--",
+      error: hasFailure ? "部分信息暂未更新，请稍后重试" : "",
+    });
+    if (membershipResult.status === "fulfilled") {
+      const membership = membershipResult.value;
       const bg = resolveImageUrl(LEVEL_CARD_BG_IMAGES[membership.membershipLevel] ?? "");
       this.setData({
-        // 浅色卡面上叠加白色薄纱层，保证深色文字可读（与首页会员卡一致）
         cardStyle: bg
           ? `background-image: linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)), url("${bg}");`
           : "",
       });
+    } else {
+      this.setData({ cardStyle: "" });
     }
-    if (info) {
-      // userinfo.avatar 为绝对地址（官网 resolveSsoAvatar 保证），无需再补全
+    if (infoResult.status === "fulfilled") {
+      const info = infoResult.value;
       const avatar = info.avatar ? resolveImageUrl(info.avatar) : "";
       this.setData({
         nickname: info.nickname || user?.nickname || "微信用户",

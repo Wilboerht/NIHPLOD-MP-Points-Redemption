@@ -19,7 +19,11 @@ Page({
     rows: [] as RedemptionRow[],
     hasMore: false,
     error: "",
+    loadMoreError: "",
   },
+
+  refreshing: false,
+  requestVersion: 0,
 
   onShow() {
     void this.refresh();
@@ -39,14 +43,19 @@ Page({
   },
 
   async refresh() {
-    const loggedIn = await ensureSession();
-    if (!loggedIn) {
-      this.setData({ loading: false, loggedIn: false, rows: [], hasMore: false });
-      return;
-    }
-    this.setData({ loading: true, error: "" });
+    if (this.refreshing) return;
+    this.refreshing = true;
+    const version = ++this.requestVersion;
+    this.setData({ loading: true, error: "", loadMoreError: "", loadingMore: false });
     try {
+      const loggedIn = await ensureSession();
+      if (version !== this.requestVersion) return;
+      if (!loggedIn) {
+        this.setData({ loading: false, loggedIn: false, rows: [], hasMore: false });
+        return;
+      }
       const data = await api.redemptions(0);
+      if (version !== this.requestVersion) return;
       this.setData({
         loading: false,
         loggedIn: true,
@@ -54,27 +63,43 @@ Page({
         hasMore: data.hasMore,
       });
     } catch (e) {
+      if (version !== this.requestVersion) return;
       const err = e as ApiError;
       if (err.status === 401) {
-        this.setData({ loading: false, loggedIn: false });
+        this.setData({ loading: false, loggedIn: false, rows: [], hasMore: false });
         return;
       }
       this.setData({ loading: false, error: err.message || "记录加载失败" });
+    } finally {
+      if (version === this.requestVersion) this.refreshing = false;
     }
   },
 
   async loadMore() {
-    if (this.data.loadingMore || !this.data.hasMore) return;
-    this.setData({ loadingMore: true });
+    if (
+      this.refreshing ||
+      this.data.loading ||
+      this.data.loadingMore ||
+      !this.data.hasMore ||
+      !this.data.loggedIn
+    ) return;
+    const version = this.requestVersion;
+    this.setData({ loadingMore: true, loadMoreError: "" });
     try {
       const data = await api.redemptions(this.data.rows.length);
+      if (version !== this.requestVersion) return;
+      const existing = new Set(this.data.rows.map((row) => row.id));
+      const additions = this.mapRows(data.redemptions).filter((row) => !existing.has(row.id));
       this.setData({
-        loadingMore: false,
-        rows: [...this.data.rows, ...this.mapRows(data.redemptions)],
+        rows: [...this.data.rows, ...additions],
         hasMore: data.hasMore,
       });
-    } catch {
-      this.setData({ loadingMore: false });
+    } catch (e) {
+      if (version === this.requestVersion) {
+        this.setData({ loadMoreError: (e as ApiError).message || "加载更多失败，点击重试" });
+      }
+    } finally {
+      if (version === this.requestVersion) this.setData({ loadingMore: false });
     }
   },
 

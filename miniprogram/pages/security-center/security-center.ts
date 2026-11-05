@@ -97,6 +97,12 @@ Page({
     bindings: false,
     history: false,
   } as Record<SegmentKey, boolean>,
+  requestVersions: {
+    devices: 0,
+    authorizations: 0,
+    bindings: 0,
+    history: 0,
+  } as Record<SegmentKey, number>,
 
   async onLoad() {
     await this.init();
@@ -109,12 +115,28 @@ Page({
     }
   },
 
+  resetSegments() {
+    (Object.keys(this.loaded) as SegmentKey[]).forEach((key) => {
+      this.loaded[key] = false;
+      this.requestVersions[key] += 1;
+    });
+    this.setData({
+      devices: [],
+      authorizations: [],
+      identities: [],
+      history: [],
+      error: "",
+    });
+  },
+
   async init() {
     const loggedIn = await ensureSession();
     if (!loggedIn) {
+      this.resetSegments();
       this.setData({ loading: false, needLogin: true });
       return;
     }
+    if (this.data.needLogin) this.resetSegments();
     this.setData({ needLogin: false });
     await this.loadSegment(this.data.active);
   },
@@ -127,61 +149,68 @@ Page({
   },
 
   async loadSegment(key: SegmentKey) {
-    this.setData({ loading: true, error: "" });
+    const version = ++this.requestVersions[key];
+    if (this.data.active === key) this.setData({ loading: true, error: "" });
     try {
+      const patch: {
+        devices?: DeviceView[];
+        authorizations?: AuthorizationView[];
+        identities?: IdentityView[];
+        history?: HistoryView[];
+      } = {};
       if (key === "devices") {
         const data = await api.securityDevices();
-        this.setData({
-          devices: data.devices.map((d) => ({
-            ...d,
-            lastActiveText: formatDateTime(d.lastActiveAt),
-          })),
-        });
+        patch.devices = data.devices.map((d) => ({
+          ...d,
+          lastActiveText: formatDateTime(d.lastActiveAt),
+        }));
       } else if (key === "authorizations") {
         const data = await api.securityAuthorizations();
-        this.setData({
-          authorizations: data.authorizations.map((a) => ({
-            ...a,
-            scopesText: a.scopes.length > 0 ? a.scopes.join(" / ") : "—",
-            createdText: formatDateTime(a.createdAt),
-          })),
-        });
+        patch.authorizations = data.authorizations.map((a) => ({
+          ...a,
+          scopesText: a.scopes.length > 0 ? a.scopes.join(" / ") : "—",
+          createdText: formatDateTime(a.createdAt),
+        }));
       } else if (key === "bindings") {
         const data = await api.securityIdentities();
-        this.setData({
-          identities: data.identities.map((i) => {
-            // 旧服务端不返回 mpClientId 时保持全阻断兜底，避免误删当前登录方式
-            const isCurrentLogin =
-              i.provider === CURRENT_LOGIN_PROVIDER &&
-              (i.mpClientId ? i.mpClientId === CURRENT_LOGIN_CLIENT_ID : true);
-            return {
-              ...i,
-              providerLabel: identityLabel(i),
-              createdText: formatDateTime(i.createdAt),
-              isCurrentLogin,
-              canUnbind: i.canUnbind && !isCurrentLogin,
-            };
-          }),
+        patch.identities = data.identities.map((i) => {
+          // 旧服务端不返回 mpClientId 时保持全阻断兜底，避免误删当前登录方式
+          const isCurrentLogin =
+            i.provider === CURRENT_LOGIN_PROVIDER &&
+            (i.mpClientId ? i.mpClientId === CURRENT_LOGIN_CLIENT_ID : true);
+          return {
+            ...i,
+            providerLabel: identityLabel(i),
+            createdText: formatDateTime(i.createdAt),
+            isCurrentLogin,
+            canUnbind: i.canUnbind && !isCurrentLogin,
+          };
         });
       } else {
         const data = await api.securityLoginHistory();
-        this.setData({
-          history: data.attempts.map((h) => ({
-            ...h,
-            typeLabel: LOGIN_TYPE_LABELS[h.type] ?? h.type,
-            dateText: formatDateTime(h.createdAt),
-          })),
-        });
+        patch.history = data.attempts.map((h) => ({
+          ...h,
+          typeLabel: LOGIN_TYPE_LABELS[h.type] ?? h.type,
+          dateText: formatDateTime(h.createdAt),
+        }));
       }
+      if (version !== this.requestVersions[key]) return;
       this.loaded[key] = true;
-      this.setData({ loading: false });
+      this.setData({
+        ...patch,
+        ...(this.data.active === key ? { loading: false } : {}),
+      });
     } catch (e) {
+      if (version !== this.requestVersions[key]) return;
       const err = e as ApiError;
       if (err.status === 401) {
+        this.resetSegments();
         this.setData({ loading: false, needLogin: true });
         return;
       }
-      this.setData({ loading: false, error: err.message || "加载失败" });
+      if (this.data.active === key) {
+        this.setData({ loading: false, error: err.message || "加载失败" });
+      }
     }
   },
 
@@ -271,7 +300,8 @@ Page({
   handleActionError(e: unknown) {
     const err = e as ApiError;
     if (err.status === 401) {
-      this.setData({ needLogin: true });
+      this.resetSegments();
+      this.setData({ needLogin: true, loading: false });
       return;
     }
     wx.showToast({ title: err.message || "操作失败，请稍后重试", icon: "none" });

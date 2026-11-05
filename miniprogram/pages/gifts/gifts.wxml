@@ -80,7 +80,10 @@
     </view>
   </block>
 
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+  <view wx:if="{{error}}" class="card error-card">
+    <view>{{error}}</view>
+    <button class="ghost-btn retry-btn" bindtap="load">重试</button>
+  </view>
 
   <!-- 积分规则半屏抽屉（组件，与「我的」页共用） -->
   <rules-sheet id="rules-sheet" />

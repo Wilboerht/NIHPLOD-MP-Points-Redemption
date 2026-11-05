@@ -28,6 +28,8 @@ Page({
     error: "",
   },
 
+  requestVersion: 0,
+
   onLoad() {
     // 页面为自定义导航栏（navigationStyle: custom），状态栏高度取全局缓存
     this.setData({ statusBarHeight: getStatusBarHeight() });
@@ -47,14 +49,17 @@ Page({
   },
 
   async load() {
+    const version = ++this.requestVersion;
     const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
     if (!loggedIn) {
-      this.setData({ loading: false, loggedIn: false, error: "" });
+      this.setData({ loading: false, loggedIn: false, gifts: [], error: "" });
       return;
     }
     this.setData({ loading: true, error: "" });
     try {
       const data = await api.gifts();
+      if (version !== this.requestVersion) return;
       setLastGifts(data.gifts);
       const canRedeem = data.redeemRate !== null;
       const cardBg = resolveImageUrl(LEVEL_CARD_BG_IMAGES[data.membershipLevel] ?? "");
@@ -64,16 +69,16 @@ Page({
         availableText: formatPoints(data.available),
         canRedeem,
         levelName: LEVEL_NAME_LABELS[data.membershipLevel] ?? "",
-        // 卡面左上强、右下弱的薄纱渐变：保证文字可读同时保留卡面纹理
         cardStyle: cardBg
           ? `background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.14) 100%), url("${cardBg}");`
           : "",
         gifts: data.gifts.map(mapGiftRow),
       });
     } catch (e) {
+      if (version !== this.requestVersion) return;
       const err = e as Error & { status?: number };
       if (err.status === 401) {
-        this.setData({ loading: false, loggedIn: false });
+        this.setData({ loading: false, loggedIn: false, gifts: [] });
         return;
       }
       this.setData({ loading: false, error: err.message || "礼品加载失败" });

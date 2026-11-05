@@ -42,7 +42,8 @@
         <button
           size="mini"
           class="ghost-btn sms-btn"
-          disabled="{{counting > 0}}"
+          loading="{{codeSending}}"
+          disabled="{{codeSending || counting > 0 || busy}}"
           bindtap="sendCode"
         >
           {{counting > 0 ? counting + 's 后重试' : '获取验证码'}}

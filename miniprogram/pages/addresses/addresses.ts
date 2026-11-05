@@ -10,24 +10,30 @@ Page({
     error: "",
   },
 
+  requestVersion: 0,
+
   onShow() {
     void this.load();
   },
 
   async load() {
+    const version = ++this.requestVersion;
     const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
     if (!loggedIn) {
-      this.setData({ loading: false, loggedIn: false });
+      this.setData({ loading: false, loggedIn: false, addresses: [] });
       return;
     }
     this.setData({ loading: true, error: "" });
     try {
       const data = await api.addresses();
+      if (version !== this.requestVersion) return;
       this.setData({ loading: false, loggedIn: true, addresses: data.addresses });
     } catch (e) {
+      if (version !== this.requestVersion) return;
       const err = e as ApiError;
       if (err.status === 401) {
-        this.setData({ loading: false, loggedIn: false });
+        this.setData({ loading: false, loggedIn: false, addresses: [] });
         return;
       }
       this.setData({ loading: false, error: err.message || "地址加载失败" });

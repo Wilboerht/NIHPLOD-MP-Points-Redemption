@@ -115,11 +115,16 @@ function resolveEnvelope<T>(res: RawResponse): T {
 }
 
 export async function authRequest<T>(options: AuthRequestOptions): Promise<T> {
-  const call = () =>
-    rawRequest({
-      ...options,
-      headers: { Authorization: `Bearer ${getAccessToken()}` },
-    });
+  const call = async () => {
+    try {
+      return await rawRequest({
+        ...options,
+        headers: { Authorization: `Bearer ${getAccessToken()}` },
+      });
+    } catch {
+      throw new ApiError(0, "NETWORK", "网络异常，请稍后重试");
+    }
+  };
 
   let res = await call();
 
@@ -164,7 +169,7 @@ function uploadRequest<T>(url: string, filePath: string): Promise<T> {
           }
           resolve({ statusCode: res.statusCode, data });
         },
-        fail: (err) => reject(new Error(err.errMsg || "上传失败")),
+        fail: () => reject(new ApiError(0, "NETWORK", "上传失败，请检查网络后重试")),
       });
     });
 

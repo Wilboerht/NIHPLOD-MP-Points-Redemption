@@ -2,7 +2,7 @@
  * 登录 / 绑定 / 会话管理
  *
  * 流程：wx.login → POST /api/auth/wechat/miniprogram-login（clientId=wechat-mp-points）
- * - 已绑定：直接得到 OAuth 双 Token（access 8h / refresh 30 天）
+ * - 已绑定：直接得到 OAuth 双 Token（有效期由服务端客户端配置决定）
  * - 未绑定：返回 bindToken → 登录页引导「一键手机号」或短信验证码绑定
  */
 import { rawRequest } from "./request";
@@ -76,24 +76,30 @@ export function hasSession(): boolean {
   return Boolean(getAccessToken() || getRefreshToken());
 }
 
-function saveSession(data: {
-  accessToken: string;
-  refreshToken: string;
-  user?: MpUser;
-}): void {
-  // 切换账号时清理上一账号的页面缓存（同账号刷新/续期不清理）
+let sessionEpoch = 0;
+
+function saveSession(
+  data: { accessToken: string; refreshToken: string; user?: MpUser },
+  expectedEpoch: number
+): boolean {
+  if (expectedEpoch !== sessionEpoch) return false;
+
+  // 切换账号时使旧账号的在途请求失效，并清理上一账号的页面缓存
   const previousUser = getStoredUser();
   if (data.user && previousUser && previousUser.id !== data.user.id) {
+    sessionEpoch += 1;
     clearTransientCache();
   }
   wx.setStorageSync(STORAGE_KEYS.accessToken, data.accessToken);
   wx.setStorageSync(STORAGE_KEYS.refreshToken, data.refreshToken);
   if (data.user) wx.setStorageSync(STORAGE_KEYS.user, data.user);
-  // 登录/刷新成功 = 用户已恢复会话：解除「主动退出」抑制
+  pendingBindToken = "";
   wx.removeStorageSync(STORAGE_KEYS.loggedOut);
+  return true;
 }
 
 export function clearSession(): void {
+  sessionEpoch += 1;
   wx.removeStorageSync(STORAGE_KEYS.accessToken);
   wx.removeStorageSync(STORAGE_KEYS.refreshToken);
   wx.removeStorageSync(STORAGE_KEYS.user);
@@ -126,6 +132,7 @@ function wxLogin(): Promise<string> {
  * 结果 need-binding 时返回 bindToken，由登录页引导完成绑定。
  */
 export async function login(phoneCode?: string): Promise<LoginOutcome> {
+  const expectedEpoch = sessionEpoch;
   let code: string;
   try {
     code = await wxLogin();
@@ -147,15 +154,19 @@ export async function login(phoneCode?: string): Promise<LoginOutcome> {
 
     if (res.statusCode === 200 && body.success && body.data) {
       if (body.data.needBinding) {
-        return { kind: "need-binding", bindToken: body.data.bindToken ?? "" };
+        return expectedEpoch === sessionEpoch
+          ? { kind: "need-binding", bindToken: body.data.bindToken ?? "" }
+          : { kind: "failed", message: "登录已取消" };
       }
       if (body.data.accessToken && body.data.refreshToken) {
-        saveSession({
+        const saved = saveSession({
           accessToken: body.data.accessToken,
           refreshToken: body.data.refreshToken,
           user: body.data.user,
-        });
-        return { kind: "ok" };
+        }, expectedEpoch);
+        return saved
+          ? { kind: "ok" }
+          : { kind: "failed", message: "登录已取消" };
       }
     }
     return { kind: "failed", message: body.error?.message ?? "登录失败，请重试", code: body.error?.code };
@@ -177,6 +188,7 @@ export async function login(phoneCode?: string): Promise<LoginOutcome> {
 export type RefreshOutcome = "ok" | "invalid" | "transient";
 
 export async function refreshAccessToken(): Promise<RefreshOutcome> {
+  const expectedEpoch = sessionEpoch;
   const refreshToken = getRefreshToken();
   if (!refreshToken) return "invalid";
   try {
@@ -191,20 +203,19 @@ export async function refreshAccessToken(): Promise<RefreshOutcome> {
     });
     const body = res.data as { access_token?: string; refresh_token?: string };
     if (res.statusCode === 200 && body.access_token) {
-      saveSession({
+      const saved = saveSession({
         accessToken: body.access_token,
         refreshToken: body.refresh_token ?? refreshToken,
-      });
-      return "ok";
+      }, expectedEpoch);
+      return saved ? "ok" : "transient";
     }
     if (res.statusCode === 400 || res.statusCode === 401) {
-      // invalid_grant：refresh token 已失效/被撤销
+      if (expectedEpoch !== sessionEpoch) return "transient";
       clearSession();
       return "invalid";
     }
     return "transient";
   } catch {
-    // 网络异常：保留会话，由下次请求重试
     return "transient";
   }
 }
@@ -214,12 +225,19 @@ export async function refreshAccessToken(): Promise<RefreshOutcome> {
  * 避免并发 refresh_token 触发服务端轮换互踢（后到者失败清会话）。
  */
 let refreshingPromise: Promise<RefreshOutcome> | null = null;
+let refreshingToken = "";
 
 export function refreshAccessTokenOnce(): Promise<RefreshOutcome> {
-  if (!refreshingPromise) {
-    refreshingPromise = refreshAccessToken().finally(() => {
-      refreshingPromise = null;
+  const token = getRefreshToken();
+  if (!refreshingPromise || refreshingToken !== token) {
+    refreshingToken = token;
+    const current = refreshAccessToken().finally(() => {
+      if (refreshingPromise === current) {
+        refreshingPromise = null;
+        refreshingToken = "";
+      }
     });
+    refreshingPromise = current;
   }
   return refreshingPromise;
 }

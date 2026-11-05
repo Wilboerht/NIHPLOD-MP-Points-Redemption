@@ -1,6 +1,13 @@
 <view wx:if="{{loading && !gift}}" class="loading-block">加载中…</view>
 
-<view class="container gift-detail" wx:if="{{gift}}">
+<view wx:if="{{needLogin && !loading}}" class="container">
+  <view class="card login-card">
+    <view class="login-title">登录后查看礼品详情</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+</view>
+
+<view class="container gift-detail" wx:elif="{{gift}}">
   <view class="gallery-wrap">
     <swiper
       wx:if="{{images.length > 0}}"
@@ -77,6 +84,8 @@
     <view class="detail-text">{{gift.detail.usage}}</view>
   </view>
 
+  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+
   <view class="bottom-bar">
     <view class="bar-cost">
       <view class="bar-cost-label">所需积分</view>
@@ -86,11 +95,6 @@
       {{buttonText}}
     </button>
   </view>
-</view>
-
-<view wx:elif="{{needLogin && !loading}}" class="card login-card">
-  <view class="login-title">登录后查看礼品详情</view>
-  <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
 </view>
 
 <view wx:elif="{{notFound && !loading}}" class="empty">礼品不存在或已下架</view>

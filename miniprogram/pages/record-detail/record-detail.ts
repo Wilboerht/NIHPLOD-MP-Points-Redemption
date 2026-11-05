@@ -1,4 +1,5 @@
 import { api, ApiError } from "../../utils/api";
+import { ensureSession } from "../../utils/auth";
 import { getLastRedemption } from "../../utils/cache";
 import {
   formatDateTime,
@@ -30,6 +31,7 @@ interface TrackingRow extends TrackingRoute {
 Page({
   data: {
     loading: true,
+    needLogin: false,
     item: null as ItemView | null,
     tracking: null as (TrackingData & { rows: TrackingRow[] }) | null,
     trackingLoading: false,
@@ -38,16 +40,51 @@ Page({
   },
 
   redemptionId: "",
+  requestVersion: 0,
 
-  async onLoad(query: Record<string, string | undefined>) {
+  onLoad(query: Record<string, string | undefined>) {
     this.redemptionId = query.id ?? "";
+    void this.load();
+  },
+
+  onShow() {
+    if (this.data.needLogin && !this.data.loading) void this.load();
+  },
+
+  async load() {
+    const version = ++this.requestVersion;
+    this.setData({ loading: true, needLogin: false, error: "" });
+    if (!this.redemptionId) {
+      this.setData({ loading: false, error: "兑换记录参数缺失" });
+      return;
+    }
+
+    const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
+    if (!loggedIn) {
+      this.showLogin();
+      return;
+    }
+
     const cached = getLastRedemption();
     if (cached && cached.id === this.redemptionId) {
       this.setData({ loading: false, item: this.decorate(cached) });
-    } else {
-      await this.loadFromList();
+      void this.loadTracking();
+      return;
     }
-    void this.loadTracking();
+    if (await this.loadFromList(version)) void this.loadTracking();
+  },
+
+  showLogin() {
+    this.setData({
+      loading: false,
+      needLogin: true,
+      item: null,
+      tracking: null,
+      trackingLoading: false,
+      trackingMessage: "",
+      error: "",
+    });
   },
 
   decorate(item: RedemptionItem): ItemView {
@@ -61,25 +98,42 @@ Page({
     };
   },
 
-  async loadFromList() {
+  async loadFromList(version: number): Promise<boolean> {
     try {
-      const data = await api.redemptions(0);
-      const item = data.redemptions.find((r) => r.id === this.redemptionId);
-      if (!item) {
-        this.setData({ loading: false, error: "兑换记录不存在" });
-        return;
+      let offset = 0;
+      while (version === this.requestVersion) {
+        const data = await api.redemptions(offset);
+        if (version !== this.requestVersion) return false;
+        const item = data.redemptions.find((r) => r.id === this.redemptionId);
+        if (item) {
+          this.setData({ loading: false, item: this.decorate(item) });
+          return true;
+        }
+        if (!data.hasMore || data.redemptions.length === 0) break;
+        offset += data.redemptions.length;
       }
-      this.setData({ loading: false, item: this.decorate(item) });
+      if (version !== this.requestVersion) return false;
+      this.setData({ loading: false, error: "兑换记录不存在" });
+      return false;
     } catch (e) {
-      this.setData({ loading: false, error: (e as ApiError).message || "加载失败" });
+      if (version !== this.requestVersion) return false;
+      const err = e as ApiError;
+      if (err.status === 401) {
+        this.showLogin();
+        return false;
+      }
+      this.setData({ loading: false, error: err.message || "加载失败" });
+      return false;
     }
   },
 
   async loadTracking() {
     if (!this.redemptionId) return;
+    const version = this.requestVersion;
     this.setData({ trackingLoading: true, trackingMessage: "" });
     try {
       const data = await api.tracking(this.redemptionId);
+      if (version !== this.requestVersion) return;
       const rows: TrackingRow[] = (data.routes ?? [])
         .slice()
         .reverse()
@@ -92,7 +146,12 @@ Page({
           : "物流查询暂不可用，可凭运单号在顺丰官网查询",
       });
     } catch (e) {
+      if (version !== this.requestVersion) return;
       const err = e as ApiError;
+      if (err.status === 401) {
+        this.showLogin();
+        return;
+      }
       this.setData({
         trackingLoading: false,
         tracking: null,
@@ -100,6 +159,14 @@ Page({
           err.code === "NO_WAYBILL" ? "商家尚未录入运单号，发货后可查看物流" : err.message,
       });
     }
+  },
+
+  retry() {
+    void this.load();
+  },
+
+  goLogin() {
+    wx.navigateTo({ url: "/pages/login/login" });
   },
 
   copyWaybill() {

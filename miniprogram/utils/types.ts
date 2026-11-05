@@ -298,6 +298,8 @@ export interface SpentApplication {
 }
 
 export interface SpentApplicationInput {
+  /** 客户端幂等号；服务端按用户维度去重网络重试 */
+  requestId?: string;
   channel: SpentChannel;
   orderNo: string;
   dealerName?: string;

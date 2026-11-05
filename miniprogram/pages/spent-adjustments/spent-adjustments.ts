@@ -29,12 +29,16 @@ Page({
     error: "",
   },
 
+  requestVersion: 0,
+
   onShow() {
     void this.load();
   },
 
   async load() {
+    const version = ++this.requestVersion;
     const loggedIn = await ensureSession();
+    if (version !== this.requestVersion) return;
     if (!loggedIn) {
       this.setData({ loading: false, loggedIn: false, rows: [] });
       return;
@@ -42,6 +46,7 @@ Page({
     this.setData({ loading: true, error: "" });
     try {
       const data = await api.spentAdjustments();
+      if (version !== this.requestVersion) return;
       const rows: AppRow[] = data.applications.map((a) => ({
         ...a,
         channelLabel: SPENT_CHANNEL_LABELS[a.channel] ?? a.channel,
@@ -72,9 +77,10 @@ Page({
           : "待审核 2 条，暂不可申请",
       });
     } catch (e) {
+      if (version !== this.requestVersion) return;
       const err = e as ApiError;
       if (err.status === 401) {
-        this.setData({ loading: false, loggedIn: false });
+        this.setData({ loading: false, loggedIn: false, rows: [] });
         return;
       }
       this.setData({ loading: false, error: err.message || "补录记录加载失败" });

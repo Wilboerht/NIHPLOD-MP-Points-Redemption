@@ -51,10 +51,10 @@
     <button
       class="btn-primary submit-btn"
       loading="{{submitting}}"
-      disabled="{{submitting || addresses.length === 0}}"
+      disabled="{{submitting || !canRedeem || addresses.length === 0}}"
       bindtap="submit"
     >
-      确认兑换
+      {{buttonText}}
     </button>
   </view>
 </view>

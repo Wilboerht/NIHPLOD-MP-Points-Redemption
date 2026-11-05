@@ -35,7 +35,9 @@
       <image class="record-chevron" src="/images/icons/chevron-right.svg" mode="aspectFit" />
     </view>
 
-    <view wx:if="{{hasMore}}" class="load-more">{{loadingMore ? '加载中…' : '上拉加载更多'}}</view>
+    <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMore">
+      {{loadingMore ? '加载中…' : (loadMoreError || '上拉加载更多')}}
+    </view>
   </block>
 
   <view wx:if="{{error}}" class="card error-card">{{error}}</view>

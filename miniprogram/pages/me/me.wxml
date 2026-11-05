@@ -114,6 +114,11 @@
     </view>
   </block>
 
+  <view wx:if="{{error}}" class="card error-card">
+    <view>{{error}}</view>
+    <button class="btn-plain retry-btn" bindtap="load">重试</button>
+  </view>
+
   <!-- 页脚：版权与小程序 ICP 备案信息（备案通过后替换 me.ts 中 ICP_BEIAN） -->
   <view class="footer-filing">
     <view class="footer-filing-text">© {{year}} NIHPLOD. All Rights Reserved.</view>

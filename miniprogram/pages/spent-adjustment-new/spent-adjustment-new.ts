@@ -1,6 +1,6 @@
 import { api, ApiError } from "../../utils/api";
 import { ensureSession } from "../../utils/auth";
-import { spentProofDisplayUrl, SPENT_CHANNEL_OPTIONS } from "../../utils/format";
+import { genRequestId, spentProofDisplayUrl, SPENT_CHANNEL_OPTIONS } from "../../utils/format";
 import { subscribeSpentReview } from "../../utils/subscribe";
 import type { SpentApplicationInput } from "../../utils/types";
 
@@ -35,8 +35,10 @@ Page({
   /** 登录引导是否已触发（用户跳过登录返回时不再反复跳转） */
   loginPrompted: false,
   checkingSession: false,
+  requestId: "",
 
   onLoad() {
+    this.requestId = genRequestId();
     const now = new Date();
     const pad = (n: number) => (n < 10 ? `0${n}` : String(n));
     this.setData({
@@ -176,7 +178,9 @@ Page({
       return;
     }
 
+    const requestId = this.requestId || (this.requestId = genRequestId());
     const payload: SpentApplicationInput = {
+      requestId,
       channel: SPENT_CHANNEL_OPTIONS[channelIndex].value as SpentApplicationInput["channel"],
       orderNo: orderNo.trim(),
     };

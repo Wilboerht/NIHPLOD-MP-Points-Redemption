@@ -1,4 +1,5 @@
 import { api, ApiError } from "../../utils/api";
+import { ensureSession } from "../../utils/auth";
 import type { AddressItem } from "../../utils/types";
 
 type AddressErrorField = "recipient" | "phone" | "region" | "detail";
@@ -13,34 +14,67 @@ Page({
     detail: "",
     isDefault: false,
     saving: false,
-    loading: false,
+    loading: true,
+    loggedIn: false,
+    needLogin: false,
+    notFound: false,
     error: "",
     errorField: "" as "" | AddressErrorField,
   },
 
-  async onLoad(query: Record<string, string | undefined>) {
+  onLoad(query: Record<string, string | undefined>) {
     const id = query.id ?? "";
     wx.setNavigationBarTitle({ title: id ? "编辑地址" : "新增地址" });
-    if (!id) return;
-    this.setData({ id, loading: true });
+    this.setData({ id });
+    void this.load();
+  },
+
+  onShow() {
+    if (this.data.needLogin && !this.data.loading) void this.load();
+  },
+
+  async load() {
+    this.setData({ loading: true, error: "", notFound: false });
+    const loggedIn = await ensureSession();
+    if (!loggedIn) {
+      this.setData({ loading: false, loggedIn: false, needLogin: true });
+      return;
+    }
+    this.setData({ loggedIn: true, needLogin: false });
+    const id = this.data.id;
+    if (!id) {
+      this.setData({ loading: false });
+      return;
+    }
     try {
       const data = await api.addresses();
       const address = data.addresses.find((a: AddressItem) => a.id === id);
-      if (address) {
-        this.setData({
-          recipient: address.recipient,
-          phone: address.phone,
-          region: address.region,
-          regionArray: address.region.split(/[\s,，]+/).filter(Boolean),
-          detail: address.detail,
-          isDefault: address.isDefault,
-        });
+      if (!address) {
+        this.setData({ loading: false, notFound: true });
+        return;
       }
+      this.setData({
+        loading: false,
+        recipient: address.recipient,
+        phone: address.phone,
+        region: address.region,
+        regionArray: address.region.split(/[\s,，]+/).filter(Boolean),
+        detail: address.detail,
+        isDefault: address.isDefault,
+      });
     } catch (e) {
-      this.setData({ error: (e as ApiError).message || "地址加载失败" });
-    } finally {
+      const err = e as ApiError;
+      if (err.status === 401) {
+        this.setData({ loggedIn: false, needLogin: true });
+      } else {
+        this.setData({ error: err.message || "地址加载失败" });
+      }
       this.setData({ loading: false });
     }
+  },
+
+  goLogin() {
+    wx.navigateTo({ url: "/pages/login/login" });
   },
 
   onRecipientInput(e: WechatMiniprogram.Input) {
@@ -76,8 +110,8 @@ Page({
   },
 
   async save() {
-    const { id, recipient, phone, region, detail, isDefault, saving } = this.data;
-    if (saving) return;
+    const { id, recipient, phone, region, detail, isDefault, saving, loggedIn, notFound } = this.data;
+    if (saving || !loggedIn || notFound) return;
     if (!recipient.trim()) {
       this.showFieldError("recipient", "请填写收货人姓名");
       return;
@@ -110,11 +144,17 @@ Page({
         await api.createAddress(payload);
       }
       wx.showToast({ title: "已保存", icon: "success" });
-      setTimeout(() => wx.navigateBack({ delta: 1 }), 500);
+      setTimeout(() => {
+        wx.navigateBack({
+          delta: 1,
+          fail: () => this.setData({ saving: false }),
+        });
+      }, 500);
     } catch (e) {
-      this.setData({ error: (e as ApiError).message || "保存失败" });
-    } finally {
-      this.setData({ saving: false });
+      this.setData({
+        saving: false,
+        error: (e as ApiError).message || "保存失败",
+      });
     }
   },
 });

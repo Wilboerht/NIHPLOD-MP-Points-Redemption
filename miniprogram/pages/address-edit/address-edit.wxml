@@ -1,7 +1,14 @@
 <view class="container">
   <view wx:if="{{loading}}" class="loading-block">加载中…</view>
 
-  <block wx:if="{{!loading}}">
+  <view wx:if="{{needLogin && !loading}}" class="card login-card">
+    <view class="login-title">登录后维护收货地址</view>
+    <button class="btn-primary login-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <view wx:elif="{{notFound && !loading}}" class="empty">地址不存在或已被删除</view>
+
+  <block wx:if="{{!loading && loggedIn && !notFound}}">
     <view class="card form-card">
       <view class="form-row {{errorField === 'recipient' ? 'form-row-error' : ''}}">
         <text class="label"><text class="required">*</text>收货人</text>

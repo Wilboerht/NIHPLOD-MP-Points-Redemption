@@ -117,5 +117,8 @@
     </view>
   </block>
 
-  <view wx:if="{{error}}" class="card error-card">{{error}}</view>
+  <view wx:if="{{error}}" class="card error-card">
+    <view>{{error}}</view>
+    <button class="ghost-btn retry-btn" bindtap="load">重试</button>
+  </view>
 </view>
